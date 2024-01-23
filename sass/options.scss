@@ -1,0 +1,20 @@
+$componentName: 'uploader';
+$componentTab: 'tab';
+// divisions
+$componentWrapperClass: #{$componentName}+ "-wrapper";
+$componentTabsClass: #{$componentName} + "-tabs";
+$componentDragClass: #{$componentName} + "-drag";
+$componentSubmitClass: #{$componentName} + "-submit";
+
+$componentPreviewClass: #{$componentName} + "-preview";
+// items
+$componentItem: #{$componentName} + '-item';
+$componentItemImage: #{$componentName} + '-item-image';
+//colors
+$componentMainColor: #202a44 !default;
+$componentSecondaryColor: #1d1d2a !default;
+$componentHighlightColor: #1d2f56 !default;
+//font
+$componentFontFamily: "Calibri Light", serif !default;
+$componentMinHeight: 220px;
+$componentMinWidth: 220px;
