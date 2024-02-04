@@ -1,0 +1,1 @@
+export type tabs = 'image' | 'video' | 'other'
