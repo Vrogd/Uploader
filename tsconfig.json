@@ -1,28 +1,15 @@
 {
-  "extends": "@tsconfig/svelte/tsconfig.json",
-  "exclude": [
-    "node_modules/*"
-  ],
-  "compilerOptions": {
-    "strict": true,
-    "esModuleInterop": true,
-    "allowUnreachableCode": false,
-    "exactOptionalPropertyTypes": true,
-    "noImplicitAny": true,
-    "skipLibCheck": true,
-    "noImplicitOverride": true,
-    "noImplicitReturns": false,
-    "noImplicitThis": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUncheckedIndexedAccess": true,
-    "module": "es2020",
-    "moduleResolution": "node",
-    "baseUrl": ".",
-    "ignoreDeprecations": "5.0",
-    "paths": {
-      "~/*": [
-        "src/*"
-      ]
-    }
-  }
+	"extends": "./.svelte-kit/tsconfig.json",
+	"compilerOptions": {
+		"allowJs": true,
+		"checkJs": true,
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"resolveJsonModule": true,
+		"skipLibCheck": true,
+		"sourceMap": true,
+		"strict": true,
+		"module": "NodeNext",
+		"moduleResolution": "NodeNext"
+	}
 }
