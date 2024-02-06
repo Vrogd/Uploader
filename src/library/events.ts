@@ -42,6 +42,8 @@ export const objectInstance = {
                 }).catch(() => {
                     console.error(constants.prefixError + ' failed to set preview');
                 })
+            } else {
+                filesList.update(file);
             }
         }
     },

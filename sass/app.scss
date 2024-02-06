@@ -1,0 +1,6 @@
+@import "options";
+#{'.' +  #{$componentName}}{
+  @import "uploader/actions";
+  @import "uploader/preview";
+  @import "uploader/animations";
+}

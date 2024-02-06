@@ -37,7 +37,7 @@ export function upload(parent: Upload, file: typeFile) : void {
  * @return void
  */
 function uploadProgressHandler(file : typeFile, e : ProgressEvent) : void {
-    file.progress = (e.loaded / e.total) * 100
+    file.progress = Math.round((e.loaded / e.total) * 100)
     objectInstance.updateFileData(file);
 }
 /**

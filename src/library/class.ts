@@ -11,12 +11,13 @@ import {objectInstance} from "./events"
  */
 export class Upload {
     private fallback: boolean = false;
+    private uploadCallback : null|((typeFile) => void | boolean);
     public maxAmountOfFiles : Number = 5;
     public input: null| HTMLElement = null;
     public files = filesList;
     public image : boolean = true;
     public video : boolean = true;
-    public other : boolean = false
+    public other : boolean = false;
     public tabActive : string = 'image'
     constructor(object: typeOptions) {
         if (object.wrapper && object.wrapper instanceof HTMLElement){
@@ -24,6 +25,9 @@ export class Upload {
             if (this.input instanceof HTMLElement){
                 this.input.addEventListener('change', (e : Event) => { this.eventChange(e) });
             }
+        }
+        if (object.uploadCallback && typeof object.uploadCallback === 'function'){
+            this.uploadCallback = object.uploadCallback;
         }
     }
     /**

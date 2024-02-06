@@ -1,24 +1,30 @@
 <script lang="ts">
-    import { onMount } from 'svelte';
+    import {onMount} from 'svelte';
     import {Upload} from "../library/class";
     import type typeFile from "../types/file";
     export let component = null;
     let upload;
+    let updater = 0;
     let fileList;
     onMount(() => {
         upload = new Upload({
-            wrapper: component
+            wrapper: component,
+            uploadCallback: function (file : typeFile){
+                console.log(upload)
+                return true;
+            }
         });
         upload.files.callback = function (list: typeFile[]) {
             fileList = list;
+            console.log(list)
+            updater++;
         }
     });
-
 </script>
-<div class="uploader" bind:this={component}>
+<div class="uploader" bind:this={component} style="max-width: 300px">
     <div class="uploader-wrapper">
         {#if upload}
-            {#key upload.tabActive}
+            {#key updater}
                 <div class="uploader-tabs">
                     {#if upload.image}
                         <button type="button" class="uploader-tab-image tab" class:show={upload.tabActive === 'image'} on:click="{() => upload.switch('image')}">Image</button>
@@ -30,35 +36,34 @@
                         <button type="button" class="uploader-tab-other tab" class:show={upload.tabActive === 'other'} on:click="{() => upload.switch('other')}">Other</button>
                     {/if}
                 </div>
-            {/key}
-            <div class="uploader-preview">
-                {#if fileList}
-                    {#each fileList as file}
-                        <div class="uploader-item" class:uploader-item-image="{file.preview != null}">
-                            <div class="info">
+                <div class="uploader-preview">
+                    {#if fileList}
+                        {#each fileList as file}
+                            <div class="uploader-item" class:uploader-item-image="{file.preview != null}">
+                                <div class="info">
                             <span class="text">
                                 <span>{file.name}</span>
                                 <span>{file.size}</span>
                             </span>
-                                <span class="percentage">{file.progress} %</span>
+                                    <span class="percentage">{file.progress} %</span>
+                                </div>
+                                <div class="progress">
+                                    <span class="bar" style="width: {file.progress}%"></span>
+                                </div>
+                                {#if file.isPreviewAble}
+                                    <div class="preview" bind:this={file.previewElement}></div>
+                                {/if}
                             </div>
-                            <div class="progress">
-                                <span class="bar" style="width: {file.progress}%"></span>
-                            </div>
-                            {#if file.isPreviewAble}
-                                <div class="preview" bind:this={file.previewElement}></div>
-                            {/if}
-                        </div>
-                    {/each}
-                {/if}
-                {#if false}
-                    <div class="uploader-item">
-                        <div class="info">
+                        {/each}
+                    {/if}
+                    {#if false}
+                        <div class="uploader-item">
+                            <div class="info">
                                 <span class="text">
                                     <span>filename.jpg</span>
                                     <span>128 kb</span>
                                 </span>
-                            <span class="actions">
+                                <span class="actions">
                                     <button>
                                         <i class="fa-solid fa-cloud-arrow-down"></i>
                                     </button>
@@ -66,10 +71,11 @@
                                         <i class="fa-solid fa-trash"></i>
                                     </button>
                                 </span>
+                            </div>
                         </div>
-                    </div>
-                {/if}
-            </div>
+                    {/if}
+                </div>
+            {/key}
         {/if}
         <div class="uploader-submit" role="button" tabindex="0"
              on:click="{() => {upload.eventUpload()}}"
