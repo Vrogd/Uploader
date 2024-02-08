@@ -24,7 +24,7 @@ export function upload(parent: Upload, file: typeFile) : void {
             }, false);
             ajax.addEventListener("error", uploadErrorhandler, false);
             ajax.addEventListener("abort", uploadAbortHandler, false);
-            ajax.open("POST", "");
+            ajax.open("POST", "/file");
             ajax.send(formData);
         }
     }

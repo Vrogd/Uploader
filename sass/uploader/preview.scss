@@ -45,6 +45,7 @@
       position: absolute;
       height: .8rem;
       width: 30%;
+      transition: .4s width ease-out;
       background: var(--text-color);
     }
   }

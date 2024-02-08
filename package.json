@@ -10,14 +10,14 @@
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"build-sass": "rollup -c",
-		"autobuild-sass": "rollup -c -w"
+		"dev-sass": "rollup -c -w"
 	},
 	"exports": {
 		".": {
 			"types": "./dist/index.d.ts",
 			"svelte": "./dist/index.js"
 		},
-		"./upload.css": "./dist/upload.css"
+		"./upload.css": "./static/upload.css"
 	},
 	"files": [
 		"dist",

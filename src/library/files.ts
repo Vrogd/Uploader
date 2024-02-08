@@ -1,7 +1,12 @@
+import type {typeFileList} from "../types/fileList";
 import {generateId} from "./functions";
 import type {typeFile} from "../types/file";
 
-export const filesList = {
+/**
+ * @description data object
+ * @type {typeFileList} hold data of files
+ */
+export const filesList : typeFileList = {
     list: <typeFile[]>[],
     callback: <((files : typeFile[]) => void)| null> null,
     update: function (item : typeFile){
@@ -19,7 +24,6 @@ export const filesList = {
         } else {
             item.id = generateId(30);
             this.list.push(item);
-            if (typeof this.callback === 'function') this.callback(this.list);
         }
     }
 }

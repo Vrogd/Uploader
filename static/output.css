@@ -135,6 +135,7 @@
   position: absolute;
   height: 0.8rem;
   width: 30%;
+  transition: 0.4s width ease-out;
   background: var(--text-color);
 }
 .uploader .uploader-item .info {

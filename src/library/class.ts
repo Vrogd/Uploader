@@ -11,7 +11,6 @@ import {objectInstance} from "./events"
  */
 export class Upload {
     private fallback: boolean = false;
-    private uploadCallback : null|((typeFile) => void | boolean);
     public maxAmountOfFiles : Number = 5;
     public input: null| HTMLElement = null;
     public files = filesList;
@@ -19,16 +18,8 @@ export class Upload {
     public video : boolean = true;
     public other : boolean = false;
     public tabActive : string = 'image'
-    constructor(object: typeOptions) {
-        if (object.wrapper && object.wrapper instanceof HTMLElement){
-            this.input = object.wrapper.querySelector('input[type="file"]');
-            if (this.input instanceof HTMLElement){
-                this.input.addEventListener('change', (e : Event) => { this.eventChange(e) });
-            }
-        }
-        if (object.uploadCallback && typeof object.uploadCallback === 'function'){
-            this.uploadCallback = object.uploadCallback;
-        }
+    constructor(object: typeOptions = {}) {
+        if (object.wrapper) this.dom(object.wrapper);
     }
     /**
      * @description on change event file list
@@ -79,6 +70,15 @@ export class Upload {
         if (this.tabActive !== key) {
             this.tabActive = key;
             this.files.callback?.(this.files.list)
+        }
+    }
+
+    public dom(wrapper? : HTMLElement | Element){
+        if (wrapper && wrapper instanceof HTMLElement){
+            this.input = wrapper.querySelector('input[type="file"]');
+            if (this.input instanceof HTMLElement){
+                this.input.addEventListener('change', (e : Event) => { this.eventChange(e) });
+            }
         }
     }
 }

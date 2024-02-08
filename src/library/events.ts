@@ -59,25 +59,26 @@ export const objectInstance = {
                     reader.onload =  function(e: any){
                         const image = new Image();
                         image.src = e.target.result;
-                        resolve()
                         image.onload = function (){
                             const canvas = document.createElement('canvas');
                             canvas.width = image.width;
                             canvas.height = image.height;
-                            const ctx = canvas.getContext('2d');
-                            if (ctx instanceof CanvasRenderingContext2D){
+                            setTimeout(() => {
+                                const ctx = canvas.getContext('2d');
                                 ctx.drawImage(image,0,0);
                                 file.preview = canvas;
-                            }
-                            if (file.previewElement instanceof HTMLElement){
                                 file.previewElement.appendChild(canvas)
-                            }
-                            filesList.update(file);
+                                filesList.update(file);
+                            },100)
                         }
                     };
                 };
                 request.send();
+                resolve()
             }
         })
+    },
+    previewEvent(file : typeFile): void{
+
     }
 }
