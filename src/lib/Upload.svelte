@@ -33,7 +33,7 @@
             </div>
             <div class="uploader-preview">
                 {#key updater}
-                    {#if fileList}
+                    {#if fileList && Object.keys(fileList).length}
                         {#each fileList as file}
                             <div class="uploader-item" class:uploader-item-image="{file.preview != null}" bind:this={file.previewElement}>
                                 <div class="info">
@@ -47,7 +47,8 @@
                                     <span class="bar" style="width: {file.progress}%"></span>
                                 </div>
                                 {#if file.isPreviewAble}
-                                    <div class="preview"></div>
+                                    <div class="preview">
+                                    </div>
                                 {/if}
                             </div>
                         {/each}

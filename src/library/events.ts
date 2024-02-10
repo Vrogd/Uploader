@@ -38,6 +38,7 @@ export const objectInstance = {
             if (file.file.type.includes('image') && !file.isPreviewAble){
                 file.isPreviewAble = true
                 objectInstance.fileReader(file).then(() => {
+                    console.dir('update')
                     filesList.update(file);
                 }).catch(() => {
                     console.error(constants.prefixError + ' failed to set preview');
@@ -56,29 +57,37 @@ export const objectInstance = {
                 request.onload = function() {
                     const reader = new FileReader();
                     reader.readAsDataURL(request.response);
-                    reader.onload =  function(e: any){
-                        const image = new Image();
-                        image.src = e.target.result;
-                        image.onload = function (){
-                            const canvas = document.createElement('canvas');
-                            canvas.width = image.width;
-                            canvas.height = image.height;
-                            setTimeout(() => {
-                                const ctx = canvas.getContext('2d');
-                                ctx.drawImage(image,0,0);
-                                file.preview = canvas;
-                                file.previewElement.appendChild(canvas)
-                                filesList.update(file);
-                            },100)
-                        }
-                    };
+                    reader.onload = (e: any) => renderPreview(file, e.target.result);
                 };
                 request.send();
-                resolve()
+                resolve();
             }
         })
     },
     previewEvent(file : typeFile): void{
 
+    }
+}
+
+/**
+ * @description show image in canvas
+ * @param {typeFile} file
+ * @param {string} src
+ * @return void
+ */
+function renderPreview(file : typeFile, src: string){
+    const canvas = document.createElement('canvas');
+    const image = new Image();
+    image.src = src;
+    image.onload = function (){
+        canvas.width = image.width;
+        canvas.height = image.height;
+        const ctx = canvas.getContext('2d');
+        file.preview = canvas;
+        setTimeout(() => {
+            ctx.drawImage(image,0,0);
+            file.previewElement.querySelector('.preview').appendChild(canvas);
+        }, 0)
+        filesList.update(file);
     }
 }

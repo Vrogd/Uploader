@@ -15,6 +15,7 @@ export const filesList : typeFileList = {
                 if (item.id === file.id) return file;
             })
             if (find && find as typeFile){
+                console.dir('update')
                 const index : number = this.list.indexOf(find);
                 if (index > -1){
                     this.list[index] = item;
