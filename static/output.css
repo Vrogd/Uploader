@@ -104,14 +104,12 @@
   color: var(--text-color);
 }
 .uploader .uploader-preview canvas {
-  width: 100%;
   max-width: 100%;
-  height: 100%;
 }
 .uploader .uploader-item {
   min-height: 2rem;
   position: relative;
-  display: inline-block;
+  display: block;
   background: var(--main-color);
   border-radius: 0.3rem;
   outline: 0.05rem solid var(--main-color-high);

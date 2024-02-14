@@ -14,6 +14,11 @@
     onMount(() => {
         upload.dom(component)
     });
+
+    function isPreview(check){
+        if (check.preview)
+        return false
+    }
 </script>
 <div class="uploader" bind:this={component} style="max-width: 300px">
     <div class="uploader-wrapper">
@@ -32,7 +37,6 @@
                 {/key}
             </div>
             <div class="uploader-preview">
-                {#key updater}
                     {#if fileList && Object.keys(fileList).length}
                         {#each fileList as file}
                             <div class="uploader-item" class:uploader-item-image="{file.preview != null}" bind:this={file.previewElement}>
@@ -53,7 +57,6 @@
                             </div>
                         {/each}
                     {/if}
-                {/key}
                 {#if false}
                     <div class="uploader-item">
                         <div class="info">
