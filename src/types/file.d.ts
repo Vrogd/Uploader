@@ -1,3 +1,5 @@
+import type {Tabs} from "./tabs";
+
 export type typeFile = {
     id ? : string
     file? : File | Blob | string,
@@ -8,4 +10,5 @@ export type typeFile = {
     previewElement ?: null | HTMLElement
     name: string | null,
     size: string | null | number
+    type: Tabs|string
 }

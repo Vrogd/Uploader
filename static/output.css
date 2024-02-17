@@ -1,6 +1,7 @@
 .uploader .uploader-wrapper {
   --main-color: #202a44;
   --main-color-high: #151b2c;
+  --main-color-low: #303f67;
   --second-color: #1d1d2a;
   --high-color: #1d2f56;
   --text-color: white;
@@ -90,7 +91,7 @@
 }
 .uploader .actions button:active, .uploader .actions button:hover {
   cursor: pointer;
-  background: var(--main-color-high);
+  background: var(--main-color-high) !important;
 }
 .uploader .uploader-preview {
   box-sizing: border-box;
@@ -167,6 +168,24 @@
 .uploader .uploader-item:not(.uploader-item-image) .text {
   padding-bottom: 0.8rem !important;
 }
+.uploader .uploader-item-image .actions {
+  position: absolute;
+  bottom: 10%;
+  right: 2%;
+}
+.uploader .uploader-item-image .actions button {
+  opacity: 0.85;
+  padding: 0.4rem 0.4rem;
+  margin-left: 0.4rem;
+  border-radius: 50%;
+  width: 2.6rem !important;
+  height: 2.6rem !important;
+  background: var(--main-color);
+  outline: 1px solid var(--text-color);
+}
+.uploader .uploader-item-image .actions button:hover, .uploader .uploader-item-image .actions button:focus, .uploader .uploader-item-image .actions button:focus-within, .uploader .uploader-item-image .actions button:focus-visible {
+  opacity: 1;
+}
 .uploader .uploader-item-image .preview {
   width: 100%;
   height: 100%;
@@ -175,4 +194,19 @@
 }
 .uploader .uploader-item-image .info {
   border-bottom: 2px solid var(--text-color);
+}
+@keyframes item {
+  0% {
+    transition: all ease-out;
+    opacity: 0;
+  }
+  60% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+.uploader .uploader-item {
+  animation: item 0.7s;
 }

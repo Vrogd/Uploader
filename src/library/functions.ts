@@ -16,10 +16,10 @@ export function upload(parent: Upload, file: typeFile) : void {
         formData.append("file", file.file);
         const ajax = new XMLHttpRequest();
         if (ajax.upload){
-            ajax.upload.addEventListener("progress", (e) => {
+            ajax.upload.addEventListener("progress", (e : ProgressEvent<XMLHttpRequestEventTarget>) => {
                 uploadProgressHandler(file, e);
             }, false);
-            ajax.addEventListener("load", (e) => {
+            ajax.addEventListener("load", (e : ProgressEvent<XMLHttpRequestEventTarget>) => {
                 uploadLoadHandler(file, e);
             }, false);
             ajax.addEventListener("error", uploadErrorhandler, false);
@@ -76,7 +76,7 @@ function uploadAbortHandler(e : Event): void {
 export function formatFileSize(bytes : number, decimalPoint : number = 2){
     if(bytes == 0) return '0 Bytes';
     const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
-    const  i = Math.floor(Math.log(bytes) / Math.log(1024));
+    const i = Math.floor(Math.log(bytes) / Math.log(1024));
     return parseFloat((bytes / Math.pow(1024, i)).toFixed(decimalPoint)) + ' ' + sizes[i];
 }
 /**

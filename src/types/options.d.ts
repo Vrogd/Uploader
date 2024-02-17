@@ -4,4 +4,6 @@ export type typeOptions =  {
     enableImage ?: boolean,
     enableVideo ?: boolean,
     enableOther ?: boolean
+    imageExtensions ?: string[],
+    videoExtensions ?: string[]
 }

@@ -1,24 +1,21 @@
 <script lang="ts">
     import {onMount} from 'svelte';
     import {Upload} from "../library/class";
-    import type typeFile from "../types/file";
+    import {objectInstance} from "../library/events";
+    import type {typeFile} from "../types/file";
     export let component = null;
     let upload = new Upload();
+    let updater = 0;
+
+    // callback
     upload.files.callback = function (list: typeFile[]) {
         fileList = list;
-        console.dir(fileList)
         updater++;
+        console.log(list)
     }
-    let updater = 0;
     let fileList;
-    onMount(() => {
-        upload.dom(component)
-    });
-
-    function isPreview(check){
-        if (check.preview)
-        return false
-    }
+    const renderPreview = (node, file) => objectInstance.previewEvent(file, node);
+    onMount(() => upload.dom(component));
 </script>
 <div class="uploader" bind:this={component} style="max-width: 300px">
     <div class="uploader-wrapper">
@@ -39,25 +36,35 @@
             <div class="uploader-preview">
                     {#if fileList && Object.keys(fileList).length}
                         {#each fileList as file}
-                            <div class="uploader-item" class:uploader-item-image="{file.preview != null}" bind:this={file.previewElement}>
-                                <div class="info">
-                                <span class="text">
-                                    <span>{file.name}</span>
-                                    <span>{file.size}</span>
-                                </span>
-                                    <span class="percentage">{file.progress} %</span>
-                                </div>
-                                <div class="progress">
-                                    <span class="bar" style="width: {file.progress}%"></span>
-                                </div>
-                                {#if file.isPreviewAble}
-                                    <div class="preview">
+                            {#if 'id' in file && file.id}
+                                <div class="uploader-item" class:uploader-item-image="{file.preview != null}" bind:this={file.previewElement}>
+                                    <div class="info">
+                                        <span class="text">
+                                            <span>{file.name}</span>
+                                            <span>{file.size}</span>
+                                        </span>
+                                        <span class="actions">
+                                            <button>
+                                                <i class="fa-solid fa-cloud-arrow-down"></i>
+                                            </button>
+                                            <button>
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                        </span>
+                                        <span class="percentage">{file.progress} %</span>
                                     </div>
-                                {/if}
-                            </div>
+                                    <div class="progress">
+                                        <span class="bar" style="width: {file.progress}%"></span>
+                                    </div>
+                                    {#if file.isPreviewAble}
+                                        <div class="preview" use:renderPreview={file}>
+                                        </div>
+                                    {/if}
+                                </div>
+                            {/if}
                         {/each}
                     {/if}
-                {#if false}
+                {#if true}
                     <div class="uploader-item">
                         <div class="info">
                                 <span class="text">

@@ -1,9 +1,10 @@
 export const constants = {
-    previewExtensions : <any> ['png', 'jpg', 'jpeg', 'webp'],
-    previewVideoExtensions : <any>  ['mp4'],
+    previewExtensions : <string[]> ['png', 'jpg', 'jpeg', 'webp'],
+    previewVideoExtensions : <string[]>  ['mp4'],
+    imageDefaultExtensions : <string[]>  ['png', 'jpg', 'jpeg', 'webp', 'gif', 'svg'],
+    videoDefaultExtensions : <string[]>  ['mp4', 'mpg', 'webm', 'avi'],
     prefixError: <string> '[Upload]',
     customUpdateEvent: <string> 'fileUpdate',
-    showImagesTab : <boolean> true,
-    showVideosTab : <boolean> true,
-    showOtherTab : <boolean> false
+    previewBorderSpace: <number> 2,
+    previewSizeLimit: <number> 50
 } as const

@@ -1,6 +1,7 @@
 #{'.' +  #{$componentWrapperClass}}{
   --main-color: #{$componentMainColor};
   --main-color-high: #{darken($componentMainColor, 7)};
+  --main-color-low: #{lighten($componentMainColor, 10)};
   --second-color: #{$componentSecondaryColor};
   --high-color: #{$componentHighlightColor};
   --text-color: white;
@@ -93,7 +94,7 @@
     padding: 0.3rem 0.7rem;
     &:active, &:hover{
       cursor: pointer;
-      background: var(--main-color-high);
+      background: var(--main-color-high) !important;
     }
   }
 }

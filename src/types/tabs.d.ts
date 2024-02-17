@@ -1,1 +1,1 @@
-export type tabs = 'image' | 'video' | 'other'
+export type Tabs = 'image' | 'video' | 'other'

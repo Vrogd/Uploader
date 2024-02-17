@@ -1,7 +1,8 @@
 import {filesList} from "./files";
 import {upload} from "./functions";
 import type {typeOptions} from "../types/options";
-import type {tabs} from "../types/tabs";
+import type {Tabs} from "../types/tabs";
+import type {typeFile} from "../types/file";
 import {objectInstance} from "./events"
 
 /**
@@ -17,7 +18,7 @@ export class Upload {
     public image : boolean = true;
     public video : boolean = true;
     public other : boolean = false;
-    public tabActive : string = 'image'
+    public tabActive : Tabs = 'image'
     constructor(object: typeOptions = {}) {
         if (object.wrapper) this.dom(object.wrapper);
     }
@@ -29,7 +30,7 @@ export class Upload {
     private eventChange = (e : Event) : void => {
         if (e.target instanceof HTMLInputElement && e.target.files instanceof FileList && Object.keys(e.target.files).length){
             for (const file of e.target.files){
-                if (file instanceof File) upload(this, objectInstance.new(file));
+                if (file instanceof File) upload(this, objectInstance.new(file, this.tabActive));
             }
         }
     }
@@ -49,7 +50,7 @@ export class Upload {
         if (e.dataTransfer && "files" in e.dataTransfer) {
             const files = e.dataTransfer.files;
             for (const file of files){
-                if (file instanceof File) upload(this, objectInstance.new(file));
+                if (file instanceof File) upload(this, objectInstance.new(file, this.tabActive));
             }
         }
     }
@@ -63,21 +64,26 @@ export class Upload {
     }
     /**
      * @description switch tabs
-     * @param {tabs} key tab name
+     * @param {Tabs} key tab name
      * @return void
      */
-    public switch = (key : tabs) : void => {
+    public switch = (key : Tabs) : void => {
         if (this.tabActive !== key) {
             this.tabActive = key;
-            this.files.callback?.(this.files.list)
+            this.files.callback?.(this.files.list.filter((file: typeFile) => file.type === this.tabActive));
         }
     }
 
-    public dom(wrapper? : HTMLElement | Element){
+    /**
+     * @description add event listeners
+     * @param {HTMLElement | Element} wrapper dom element
+     * @return void
+     */
+    public dom = (wrapper? : HTMLElement | Element) : void  => {
         if (wrapper && wrapper instanceof HTMLElement){
             this.input = wrapper.querySelector('input[type="file"]');
             if (this.input instanceof HTMLElement){
-                this.input.addEventListener('change', (e : Event) => { this.eventChange(e) });
+                this.input.addEventListener('change', (e : Event) => this.eventChange(e));
             }
         }
     }

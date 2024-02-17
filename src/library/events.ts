@@ -2,7 +2,8 @@ import {constants} from "./constants";
 import {filesList} from "./files";
 import {formatFileSize} from "./functions";
 import type {typeFile} from "../types/file";
-
+import type {canvasSize} from "../types/size";
+import type {Tabs} from "../types/tabs";
 /**
  * @description update and create of files
  * @type {object} objectInstance
@@ -11,16 +12,18 @@ export const objectInstance = {
     /**
      * @description create new instance
      * @param {File} file file upload or drag
+     * @param {Tabs} tab active tab
      * @return {typeFile} new file object
      */
-    new : function (file : File) {
+    new : function (file : File, tab: Tabs ) {
         return <typeFile> {
             'file': file,
             'progress': 0,
             'isPreviewAble' : false,
             'preview': null,
             'name': null,
-            'size': null
+            'size': null,
+            'type' : tab
         }
     },
     update: function (){
@@ -36,12 +39,10 @@ export const objectInstance = {
             file.size = formatFileSize(file.file.size, 2);
             file.name = file.file.name;
             if (file.file.type.includes('image') && !file.isPreviewAble){
-                file.isPreviewAble = true
                 objectInstance.fileReader(file).then(() => {
-                    console.dir('update')
                     filesList.update(file);
-                }).catch(() => {
-                    console.error(constants.prefixError + ' failed to set preview');
+                }).catch((e) => {
+                    console.error(constants.prefixError + ' failed to set preview', e);
                 })
             } else {
                 filesList.update(file);
@@ -60,15 +61,20 @@ export const objectInstance = {
                 request.open('GET', URL.createObjectURL(file.file), true);
                 request.responseType = 'blob';
                 request.onload = function() {
+                    if (request.status === 200) {
+                        // todo store blob later
+                    }
                     const reader = new FileReader();
                     const canvas = document.createElement('canvas');
                     reader.readAsDataURL(request.response);
                     reader.onload =  function(e: any){
+                        file.isPreviewAble = true
                         file.preview = canvas;
                         const image = new Image();
                         image.src = e.target.result;
-                        renderPreview(file, image, canvas)
-                        filesList.update(file);
+                        renderPreview(file, image, canvas).then(()=>{
+                            filesList.update(file);
+                        })
                     };
                 };
                 request.send();
@@ -76,8 +82,16 @@ export const objectInstance = {
             }
         })
     },
-    previewEvent(file : typeFile): void{
-        //add resize observer to change preview size
+    /**
+     * @description render dom element if available
+     * @param {typeFile} file current file
+     * @param {HTMLElement} node dom element
+     * @return void
+     */
+    previewEvent(file : typeFile, node : HTMLElement): void{
+        if(file.preview instanceof HTMLCanvasElement){
+            node.appendChild(file.preview)
+        }
     }
 }
 
@@ -95,12 +109,8 @@ function renderPreview(file : typeFile, image: HTMLImageElement, canvas : HTMLCa
                 canvas.width = size.width;
                 canvas.height = size.height;
                 const ctx = canvas.getContext('2d');
-                const preview = file.previewElement.querySelector('.preview');
                 observer(file, canvas, image);
-                if (preview instanceof HTMLElement){
-                    ctx.drawImage(image, 0, 0, size.height, size.width);
-                    preview.appendChild(canvas);
-                }
+                ctx.drawImage(image, 0, 0, size.height, size.width);
             })
             resolve();
         }
@@ -126,12 +136,15 @@ function observer(file:typeFile, canvas : HTMLCanvasElement, image: HTMLImageEle
            const height: number = Math.round(entry.contentRect.height);
            const oldWidth: number = Math.round(canvas.width);
            const oldHeight : number = Math.round(canvas.height)
-           calculateCanvasSize(width, height, oldWidth, oldHeight).then((size) => {
-               canvas.width = size.width;
-               canvas.height = size.height;
-               const ctx = canvas.getContext('2d');
-               ctx.drawImage(image,0,0, size.height, size.width);
-           });
+
+           if (width > constants.previewSizeLimit && height > constants.previewSizeLimit){
+               calculateCanvasSize(width, height, oldWidth, oldHeight).then((size: canvasSize) => {
+                   canvas.width = size.width;
+                   canvas.height = size.height;
+                   const ctx = canvas.getContext('2d');
+                   ctx.drawImage(image, size.left, size.top, size.height, size.width);
+               });
+           }
        }
     });
     resizeObserver.observe(file.previewElement);
@@ -139,27 +152,35 @@ function observer(file:typeFile, canvas : HTMLCanvasElement, image: HTMLImageEle
 
 /**
  * @description calculate canvas size on resize
- * @param {number} domWidth
- * @param {number} domHeight
- * @param {number} width
- * @param {number} height
- * @return Object
+ * @param {number} domWidth current dom width
+ * @param {number} domHeight current dom height
+ * @param {number} width current image width
+ * @param {number} height current image height
+ * @return Promise<canvasSize|object>
  */
-function calculateCanvasSize(domWidth : number, domHeight : number, width : number, height: number) : Promise<object> {
+function calculateCanvasSize(domWidth : number, domHeight : number, width : number, height: number) : Promise<canvasSize> {
     return new Promise((resolve: unknown) => {
-        let newWidth, newHeight;
+        let newWidth, newHeight, newTop = 0, newLeft = 0;
         const widthBigger = domWidth > domHeight;
-        const ratio = width/ height;
+        const ratio : number = width/ height;
         if (widthBigger){
-            newWidth = Math.round(domWidth * .98);
-            newHeight = newWidth * ratio;
+            newWidth = Math.round(domWidth * ((100 - constants.previewBorderSpace) / 100));
+            newHeight = Math.round(newWidth * ratio);
         } else {
-            newHeight = Math.round(domHeight * .98);
-            newWidth = newHeight * ratio;
+            newHeight = Math.round(domHeight * ((100 - constants.previewBorderSpace) / 100));
+            newWidth = Math.round(newHeight * ratio);
+        }
+
+        if (width >= height){
+            newTop = Math.round((domHeight - height) / 2);
+        } else {
+            newLeft = Math.round((domWidth - width) / 2);
         }
         resolve({
             'width': newWidth,
-            'height': newHeight
-        })
+            'height': newHeight,
+            'top': newTop,
+            'left': newLeft
+        });
     })
 }
