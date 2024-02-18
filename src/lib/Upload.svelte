@@ -57,14 +57,13 @@
                                         <span class="bar" style="width: {file.progress}%"></span>
                                     </div>
                                     {#if file.isPreviewAble}
-                                        <div class="preview" use:renderPreview={file}>
-                                        </div>
+                                        <div class="preview" use:renderPreview={file}></div>
                                     {/if}
                                 </div>
                             {/if}
                         {/each}
                     {/if}
-                {#if true}
+                {#if false}
                     <div class="uploader-item">
                         <div class="info">
                                 <span class="text">

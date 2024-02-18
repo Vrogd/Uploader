@@ -168,7 +168,11 @@
 .uploader .uploader-item:not(.uploader-item-image) .text {
   padding-bottom: 0.8rem !important;
 }
+.uploader .uploader-item-image:hover .actions {
+  display: block !important;
+}
 .uploader .uploader-item-image .actions {
+  display: none;
   position: absolute;
   bottom: 10%;
   right: 2%;

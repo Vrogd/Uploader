@@ -85,7 +85,11 @@
 
 // image preview
 #{'.' +  #{$componentItemImage}}{
+  &:hover .actions{
+    display: block !important;
+  }
   .actions {
+    display: none;
     position: absolute;
     bottom: 10%;
     right: 2%;
