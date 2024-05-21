@@ -16,8 +16,7 @@
 		".": {
 			"types": "./dist/index.d.ts",
 			"svelte": "./dist/index.js"
-		},
-		"./upload.css": "./static/upload.css"
+		}
 	},
 	"files": [
 		"dist",
