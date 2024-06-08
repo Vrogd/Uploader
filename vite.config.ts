@@ -1,18 +1,40 @@
-import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
-import sass from 'rollup-plugin-sass';
+import { sveltekit } from '@sveltejs/kit/vite';
+import { resolve } from 'path';
+import { writeFileSync, mkdirSync } from 'fs';
+import * as sass from 'sass'
 
 const svelteConfig = defineConfig({
 	plugins: [
 		sveltekit(),
-		sass({
-			output: "static/output.css",
-			outputStyle: "compressed",
-		})
+		{
+			name: 'compile-sass',
+			buildStart() {
+				const result = sass.renderSync({
+					file: resolve(__dirname, 'sass/app.scss'),
+					outputStyle: 'compressed'
+				});
+
+				// Create static directory if it doesn't exist
+				mkdirSync(resolve(__dirname, 'static'), { recursive: true });
+
+				// Write the compiled CSS to the output file
+				console.log('test')
+				writeFileSync(resolve(__dirname, 'static/output.css'), result.css);
+			}
+		}
 	],
 	build: {
 		cssCodeSplit: true,
-		modulePreload: false,
+		rollupOptions: {
+			output: {
+				manualChunks(id) {
+					if (id.includes('src/styles/')) {
+						return 'styles';
+					}
+				},
+			},
+		},
 	},
 });
 
