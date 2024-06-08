@@ -19,7 +19,6 @@ const svelteConfig = defineConfig({
 				mkdirSync(resolve(__dirname, 'static'), { recursive: true });
 
 				// Write the compiled CSS to the output file
-				console.log('test')
 				writeFileSync(resolve(__dirname, 'static/output.css'), result.css);
 			}
 		}
