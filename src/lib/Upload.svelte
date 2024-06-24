@@ -1,20 +1,18 @@
 <script lang="ts">
     import {onMount} from 'svelte';
-    import {Upload} from "../library/class";
-    import {objectInstance} from "../library/events";
     import type {typeFile} from "../types/file";
+    import {library} from "./index";
     export let component = null;
-    let upload = new Upload();
+    let upload = new library.upload();
     let updater = 0;
 
     // callback
     upload.files.callback = function (list: typeFile[]) {
         fileList = list;
         updater++;
-        console.log(list)
     }
     let fileList;
-    const renderPreview = (node, file) => objectInstance.previewEvent(file, node);
+    const renderPreview = (node, file) => library.objectInstance.previewEvent(file, node);
     onMount(() => upload.dom(component));
 </script>
 <div class="uploader" bind:this={component} style="max-width: 300px">

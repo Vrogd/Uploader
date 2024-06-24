@@ -1,5 +1,12 @@
 import Upload from './Upload.svelte';
-import ('./../sass/app.scss')
+import {Upload as Class} from "../library/class";
+import {objectInstance} from "../library/events";
+
 export default Upload;
 
-export { Upload };
+export const library = {
+   'upload' : Class,
+   'objectInstance': objectInstance,
+}
+
+export { Upload as Upload };
