@@ -16,9 +16,7 @@ const config = {
 			$src: 'src',
 		},
 	},
-	sass: {
-
-	}
+	sass: {}
 };
 
 export default config;
