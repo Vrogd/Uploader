@@ -1,6 +1,6 @@
-import type {typeFileList} from "../types/fileList";
+import type {typeFileList} from "../../types/fileList";
 import {generateId} from "./functions";
-import type {typeFile} from "../types/file";
+import type {typeFile} from "../../types/file";
 
 /**
  * @description data object

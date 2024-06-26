@@ -1,9 +1,9 @@
 import {constants} from "./constants";
 import {filesList} from "./files";
 import {formatFileSize} from "./functions";
-import type {typeFile} from "../types/file";
-import type {canvasSize} from "../types/size";
-import type {Tabs} from "../types/tabs";
+import type {typeFile} from "../../types/file";
+import type {canvasSize} from "../../types/size";
+import type {Tabs} from "../../types/tabs";
 /**
  * @description update and create of files
  * @type {object} objectInstance
@@ -184,3 +184,5 @@ function calculateCanvasSize(domWidth : number, domHeight : number, width : numb
         });
     })
 }
+
+export default objectInstance;

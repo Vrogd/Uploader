@@ -1,6 +1,7 @@
 {
 	"extends": "./.svelte-kit/tsconfig.json",
 	"compilerOptions": {
+		"target": "ES2021",
 		"sourceMap": true,
 		"strict": true,
 		"allowUnreachableCode": false,

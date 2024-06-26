@@ -1,6 +1,6 @@
 import type {Upload} from "./class";
 import {objectInstance} from "./events";
-import type {typeFile} from "../types/file";
+import type {typeFile} from "../../types/file";
 
 /**
  * @description file upload function

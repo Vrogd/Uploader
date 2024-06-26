@@ -1,5 +1,5 @@
 import type { Upload } from "./class";
-import type { typeFile } from "../types/file";
+import type { typeFile } from "../../types/file";
 /**
  * @description file upload function
  * track all data and update list

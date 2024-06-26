@@ -1,8 +1,8 @@
 import {filesList} from "./files";
 import {upload} from "./functions";
-import type {typeOptions} from "../types/options";
-import type {Tabs} from "../types/tabs";
-import type {typeFile} from "../types/file";
+import type {typeOptions} from "../../types/options";
+import type {Tabs} from "../../types/tabs";
+import type {typeFile} from "../../types/file";
 import {objectInstance} from "./events"
 
 /**
@@ -88,3 +88,5 @@ export class Upload {
         }
     }
 }
+
+export default Upload

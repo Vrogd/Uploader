@@ -1,5 +1,5 @@
-import type { typeOptions } from "../types/options";
-import type { Tabs } from "../types/tabs";
+import type { typeOptions } from "../../types/options";
+import type { Tabs } from "../../types/tabs";
 /**
  * @description upload class
  * @class Upload
@@ -9,7 +9,7 @@ export declare class Upload {
     private fallback;
     maxAmountOfFiles: Number;
     input: null | HTMLElement;
-    files: import("../types/fileList").typeFileList;
+    files: import("../../types/fileList").typeFileList;
     image: boolean;
     video: boolean;
     other: boolean;
@@ -51,3 +51,4 @@ export declare class Upload {
      */
     dom: (wrapper?: HTMLElement | Element) => void;
 }
+export default Upload;

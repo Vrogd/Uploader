@@ -1,4 +1,4 @@
-import type { typeFileList } from "../types/fileList";
+import type { typeFileList } from "../../types/fileList";
 /**
  * @description data object
  * @type {typeFileList} hold data of files

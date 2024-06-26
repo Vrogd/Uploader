@@ -1,12 +1,9 @@
 import Upload from './Upload.svelte';
-import {Upload as Class} from "../library/class";
-import {objectInstance} from "../library/events";
-
 export default Upload;
 
 export const library = {
-   'upload' : Class,
-   'objectInstance': objectInstance,
+   'upload' : import("./library/class"),
+   'objectInstance': import('./library/events'),
 }
 
 export { Upload as Upload };

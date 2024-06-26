@@ -1,5 +1,5 @@
-import type { typeFile } from "../types/file";
-import type { Tabs } from "../types/tabs";
+import type { typeFile } from "../../types/file";
+import type { Tabs } from "../../types/tabs";
 /**
  * @description update and create of files
  * @type {object} objectInstance
@@ -33,3 +33,4 @@ export declare const objectInstance: {
      */
     previewEvent(file: typeFile, node: HTMLElement): void;
 };
+export default objectInstance;
