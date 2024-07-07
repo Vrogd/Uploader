@@ -106,6 +106,7 @@ function renderPreview(file : typeFile, image: HTMLImageElement, canvas : HTMLCa
     return new Promise(((resolve: unknown) => {
         image.onload = function (){
             calculateCanvasSize(file.previewElement.clientWidth, file.previewElement.clientHeight, image.width, image.height).then((size) => {
+                console.log(size)
                 canvas.width = size.width;
                 canvas.height = size.height;
                 const ctx = canvas.getContext('2d');
@@ -137,7 +138,7 @@ function observer(file:typeFile, canvas : HTMLCanvasElement, image: HTMLImageEle
            const oldWidth: number = Math.round(canvas.width);
            const oldHeight : number = Math.round(canvas.height)
 
-           if (width > constants.previewSizeLimit && height > constants.previewSizeLimit){
+           if (width > constants.previewSizeLimit || height > constants.previewSizeLimit){
                calculateCanvasSize(width, height, oldWidth, oldHeight).then((size: canvasSize) => {
                    canvas.width = size.width;
                    canvas.height = size.height;

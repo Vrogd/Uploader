@@ -6,7 +6,6 @@
   --high-color: #{$componentHighlightColor};
   --text-color: white;
   font-family: #{$componentFontFamily};
-  box-shadow: 0 0 3px black;
   text-align: center;
   background-color: var(--main-color);
   min-width: #{$componentMinWidth};
