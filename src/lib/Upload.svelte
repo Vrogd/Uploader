@@ -15,7 +15,7 @@
     const renderPreview = (node, file) => library.objectInstance.previewEvent(file, node);
     onMount(() => upload.dom(component));
 </script>
-<div class="uploader" bind:this={component} style="max-width: 300px">
+<div class="uploader" bind:this={component}>
     <div class="uploader-wrapper">
         {#if upload}
             <div class="uploader-tabs">

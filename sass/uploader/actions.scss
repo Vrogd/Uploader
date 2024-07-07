@@ -76,7 +76,7 @@
   position: relative;
   list-style: none;
   padding: 1rem;
-  color: white;
+  color: var(--text-color);
   user-select: none;
   &:hover, &.show {
     background-color: var(--main-color-high);
