@@ -1,19 +1,33 @@
 <script lang="ts">
-    import {onMount} from 'svelte';
+    import {onMount , createEventDispatcher} from 'svelte';
     import type {typeFile} from "../types/file";
     import {library} from "./index";
+    import {constants} from "./library/constants";
     export let component = null;
     let upload = new library.upload();
     let updater = 0;
+    const dispatch = createEventDispatcher();
 
     // callback
     upload.files.callback = function (list: typeFile[]) {
         fileList = list;
         updater++;
     }
+
     let fileList;
     const renderPreview = (node, file) => library.objectInstance.previewEvent(file, node);
-    onMount(() => upload.dom(component));
+    onMount(() => {
+        upload.dom(component)
+        component.addEventListener(constants.uploadEvent, function (e){
+            dispatch(constants.uploadEvent, e.detail);
+        })
+        component.addEventListener(constants.downloadEvent, function (e){
+            console.log('download', e)
+        })
+        component.addEventListener(constants.deleteEvent, function (e){
+            console.log('delete', e)
+        })
+    });
 </script>
 <div class="uploader" bind:this={component}>
     <div class="uploader-wrapper">
@@ -42,10 +56,10 @@
                                             <span>{file.size}</span>
                                         </span>
                                         <span class="actions">
-                                            <button>
+                                            <button on:click="{() => upload.download(file)}">
                                                 <i class="fa-solid fa-cloud-arrow-down"></i>
                                             </button>
-                                            <button>
+                                            <button on:click="{() => upload.delete(file)}">
                                                 <i class="fa-solid fa-trash"></i>
                                             </button>
                                         </span>

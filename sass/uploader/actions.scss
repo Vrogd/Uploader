@@ -36,6 +36,7 @@
   #{'.' +  #{$componentTab}}{
     display: flex;
     flex: 1 1;
+    cursor: pointer;
     background-color: var(--main-color);
     justify-content: center;
     border: none;

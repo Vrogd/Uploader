@@ -4,6 +4,7 @@ import {formatFileSize} from "./functions";
 import type {typeFile} from "../../types/file";
 import type {canvasSize} from "../../types/size";
 import type {Tabs} from "../../types/tabs";
+import {Upload} from "./class";
 /**
  * @description update and create of files
  * @type {object} objectInstance
@@ -34,18 +35,21 @@ export const objectInstance = {
      * @param {typeFile} file file object
      * @return void
      */
-    updateFileData(file : typeFile) : void {
+    updateFileData(file : typeFile, parent: Upload) : void {
         if (file.file instanceof File){
             file.size = formatFileSize(file.file.size, 2);
             file.name = file.file.name;
             if (file.file.type.includes('image') && !file.isPreviewAble){
                 objectInstance.fileReader(file).then(() => {
                     filesList.update(file);
+                    parent.component.dispatchEvent(customEvent(constants.uploadEvent, file));
+                    console.log(parent, 'class')
                 }).catch((e) => {
                     console.error(constants.prefixError + ' failed to set preview', e);
                 })
             } else {
                 filesList.update(file);
+                parent.component.dispatchEvent(customEvent(constants.uploadEvent, file));
             }
         }
     },
@@ -72,6 +76,7 @@ export const objectInstance = {
                         file.preview = canvas;
                         const image = new Image();
                         image.src = e.target.result;
+                        file.url = image.src;
                         renderPreview(file, image, canvas).then(()=>{
                             filesList.update(file);
                         })
@@ -106,11 +111,12 @@ function renderPreview(file : typeFile, image: HTMLImageElement, canvas : HTMLCa
     return new Promise(((resolve: unknown) => {
         image.onload = function (){
             calculateCanvasSize(file.previewElement.clientWidth, file.previewElement.clientHeight, image.width, image.height).then((size) => {
-                console.log(size)
                 canvas.width = size.width;
                 canvas.height = size.height;
+                canvas.setAttribute('data-width', String(size.width));
+                canvas.setAttribute('data-height', String(size.height))
                 const ctx = canvas.getContext('2d');
-                observer(file, canvas, image);
+                //observer(file, canvas, image);
                 ctx.drawImage(image, 0, 0, size.height, size.width);
             })
             resolve();
@@ -163,13 +169,12 @@ function calculateCanvasSize(domWidth : number, domHeight : number, width : numb
     return new Promise((resolve: unknown) => {
         let newWidth, newHeight, newTop = 0, newLeft = 0;
         const widthBigger = domWidth > domHeight;
-        const ratio : number = width/ height;
         if (widthBigger){
             newWidth = Math.round(domWidth * ((100 - constants.previewBorderSpace) / 100));
-            newHeight = Math.round(newWidth * ratio);
+            newHeight = Math.round(newWidth * (width/ height));
         } else {
             newHeight = Math.round(domHeight * ((100 - constants.previewBorderSpace) / 100));
-            newWidth = Math.round(newHeight * ratio);
+            newWidth = Math.round(newHeight * (height / width));
         }
 
         if (width >= height){
@@ -184,6 +189,15 @@ function calculateCanvasSize(domWidth : number, domHeight : number, width : numb
             'left': newLeft
         });
     })
+}
+
+/**
+ * @description generate custom event
+ * @param {string} key
+ * @param detail
+ */
+function customEvent(key: string, detail: any){
+    return new CustomEvent(key, {detail: detail});
 }
 
 export default objectInstance;

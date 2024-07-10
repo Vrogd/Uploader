@@ -17,10 +17,10 @@ export function upload(parent: Upload, file: typeFile) : void {
         const ajax = new XMLHttpRequest();
         if (ajax.upload){
             ajax.upload.addEventListener("progress", (e : ProgressEvent<XMLHttpRequestEventTarget>) => {
-                uploadProgressHandler(file, e);
+                uploadProgressHandler(file, e, parent);
             }, false);
             ajax.addEventListener("load", (e : ProgressEvent<XMLHttpRequestEventTarget>) => {
-                uploadLoadHandler(file, e);
+                uploadLoadHandler(file, e, parent);
             }, false);
             ajax.addEventListener("error", uploadErrorhandler, false);
             ajax.addEventListener("abort", uploadAbortHandler, false);
@@ -36,9 +36,9 @@ export function upload(parent: Upload, file: typeFile) : void {
  * @param {ProgressEvent} e event
  * @return void
  */
-function uploadProgressHandler(file : typeFile, e : ProgressEvent) : void {
+function uploadProgressHandler(file : typeFile, e : ProgressEvent, parent: Upload) : void {
     file.progress = Math.round((e.loaded / e.total) * 100)
-    objectInstance.updateFileData(file);
+    objectInstance.updateFileData(file, parent);
 }
 /**
  * @description load event handler
@@ -46,8 +46,8 @@ function uploadProgressHandler(file : typeFile, e : ProgressEvent) : void {
  * @param {ProgressEvent} e event
  * @return void
  */
-function uploadLoadHandler(file : typeFile, e : ProgressEvent) : void {
-    objectInstance.updateFileData(file);
+function uploadLoadHandler(file : typeFile, e : ProgressEvent, parent: Upload) : void {
+    objectInstance.updateFileData(file, parent);
 }
 /**
  * @description error event handler

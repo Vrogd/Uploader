@@ -13,6 +13,7 @@ import {objectInstance} from "./events"
 export class Upload {
     private fallback: boolean = false;
     public maxAmountOfFiles : Number = 5;
+    public component : null|HTMLElement = null;
     public input: null| HTMLElement = null;
     public files = filesList;
     public image : boolean = true;
@@ -73,7 +74,6 @@ export class Upload {
             this.files.callback?.(this.files.list.filter((file: typeFile) => file.type === this.tabActive));
         }
     }
-
     /**
      * @description add event listeners
      * @param {HTMLElement | Element} wrapper dom element
@@ -81,11 +81,28 @@ export class Upload {
      */
     public dom = (wrapper? : HTMLElement | Element) : void  => {
         if (wrapper && wrapper instanceof HTMLElement){
+            this.component = wrapper;
             this.input = wrapper.querySelector('input[type="file"]');
             if (this.input instanceof HTMLElement){
                 this.input.addEventListener('change', (e : Event) => this.eventChange(e));
             }
         }
+    }
+    /**
+     * @description download file
+     * @param {typeFile} file
+     * @return void
+     */
+    public download = (file : typeFile) : void => {
+        console.log(file, 'download')
+    }
+    /**
+     * @description delete file
+     * @param {typeFile} file
+     * @return void
+     */
+    public delete = (file : typeFile) : void => {
+        console.log(file, 'delete')
     }
 }
 
