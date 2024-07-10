@@ -1,8 +1,8 @@
 import type {Tabs} from "./tabs";
 
 export type typeFile = {
-    id ? : string,
-    url ? : string
+    id? : string,
+    url? : string|null,
     file? : File | Blob | string,
     progress?: Number | null,
     failed: boolean

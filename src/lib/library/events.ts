@@ -33,6 +33,7 @@ export const objectInstance = {
     /**
      * @description create new instance
      * @param {typeFile} file file object
+     * @param {Upload} parent
      * @return void
      */
     updateFileData(file : typeFile, parent: Upload) : void {
@@ -40,10 +41,8 @@ export const objectInstance = {
             file.size = formatFileSize(file.file.size, 2);
             file.name = file.file.name;
             if (file.file.type.includes('image') && !file.isPreviewAble){
-                objectInstance.fileReader(file).then(() => {
+                objectInstance.fileReader(file, parent).then(() => {
                     filesList.update(file);
-                    parent.component.dispatchEvent(customEvent(constants.uploadEvent, file));
-                    console.log(parent, 'class')
                 }).catch((e) => {
                     console.error(constants.prefixError + ' failed to set preview', e);
                 })
@@ -56,9 +55,10 @@ export const objectInstance = {
     /**
      * @description read file / get preview
      * @param {typeFile} file file object
+     * @param {Upload} parent
      * @return void
      */
-    fileReader(file : typeFile) : Promise<void> {
+    fileReader(file : typeFile, parent: Upload| undefined) : Promise<void> {
         return new Promise((resolve: any) => {
             if (file.file && file.file instanceof File){
                 const request = new XMLHttpRequest();
@@ -79,9 +79,18 @@ export const objectInstance = {
                         file.url = image.src;
                         renderPreview(file, image, canvas).then(()=>{
                             filesList.update(file);
+                            if (parent) parent.component.dispatchEvent(customEvent(constants.uploadEvent, file));
                         })
                     };
                 };
+                request.onerror = function (){
+                    console.log('error')
+                    if (parent) parent.component.dispatchEvent(customEvent(constants.uploadEvent, file));
+                }
+                request.onabort = function (){
+                    console.log('abort')
+                    if (parent) parent.component.dispatchEvent(customEvent(constants.uploadEvent, file));
+                }
                 request.send();
                 resolve();
             }
@@ -196,7 +205,7 @@ function calculateCanvasSize(domWidth : number, domHeight : number, width : numb
  * @param {string} key
  * @param detail
  */
-function customEvent(key: string, detail: any){
+export function customEvent(key: string, detail: any){
     return new CustomEvent(key, {detail: detail});
 }
 

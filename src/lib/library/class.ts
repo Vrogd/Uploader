@@ -3,7 +3,8 @@ import {upload} from "./functions";
 import type {typeOptions} from "../../types/options";
 import type {Tabs} from "../../types/tabs";
 import type {typeFile} from "../../types/file";
-import {objectInstance} from "./events"
+import {customEvent, objectInstance} from "./events"
+import {constants} from "./constants";
 
 /**
  * @description upload class
@@ -94,7 +95,19 @@ export class Upload {
      * @return void
      */
     public download = (file : typeFile) : void => {
-        console.log(file, 'download')
+        try {
+            if (file.url){
+                const link = document.createElement("a");
+                link.download = file.name;
+                link.href = file.url;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                this.component.dispatchEvent(customEvent(constants.downloadEvent, file));
+            }
+        } catch (e){
+            console.error(constants.prefixError + ' failed to download file image');
+        }
     }
     /**
      * @description delete file
