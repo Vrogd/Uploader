@@ -6,10 +6,15 @@ import type {typeFile} from "../../types/file";
  * @description data object
  * @type {typeFileList} hold data of files
  */
-export const filesList : typeFileList = {
+export const filesList = {
     list: <typeFile[]>[],
     callback: <((files : typeFile[]) => void)| null> null,
-    update: function (item : typeFile){
+    /**
+     * @description add
+     * @param {typeFile} item
+     * @return void
+     */
+    update: function (item : typeFile) : void {
         if (item.hasOwnProperty('id') && typeof item.id === 'string'){
             const find = this.list.find((file : typeFile) => {
                 if (item.id === file.id) return file;
@@ -25,5 +30,9 @@ export const filesList : typeFileList = {
             item.id = generateId(30);
             this.list.push(item);
         }
+    },
+    delete: function (item : typeFile) : void {
+        this.list = this.list.filter((file: typeFile) => file.url !== item.url)
+        this.callback(this.list);
     }
 }

@@ -16,6 +16,7 @@ export function upload(parent: Upload, file: typeFile) : void {
         formData.append("file", file.file);
         const ajax = new XMLHttpRequest();
         if (ajax.upload){
+            objectInstance.updateFileData(file, parent);
             ajax.upload.addEventListener("progress", (e : ProgressEvent<XMLHttpRequestEventTarget>) => {
                 uploadProgressHandler(file, e, parent);
             }, false);
@@ -25,7 +26,7 @@ export function upload(parent: Upload, file: typeFile) : void {
             ajax.addEventListener("error", uploadErrorhandler, false);
             ajax.addEventListener("abort", uploadAbortHandler, false);
             ajax.open("POST", "/file");
-            ajax.send(formData);
+            ajax.send(formData as XMLHttpRequestBodyInit);
         }
     }
 }

@@ -203,9 +203,10 @@ function calculateCanvasSize(domWidth : number, domHeight : number, width : numb
 /**
  * @description generate custom event
  * @param {string} key
- * @param detail
+ * @param {any} detail
+ * @return CustomEvent
  */
-export function customEvent(key: string, detail: any){
+export function customEvent(key: string, detail: any) : CustomEvent{
     return new CustomEvent(key, {detail: detail});
 }
 

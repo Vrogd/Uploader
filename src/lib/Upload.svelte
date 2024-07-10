@@ -4,6 +4,7 @@
     import {library} from "./index";
     import {constants} from "./library/constants";
     export let component = null;
+
     let upload = new library.upload();
     let updater = 0;
     const dispatch = createEventDispatcher();
@@ -18,14 +19,13 @@
     const renderPreview = (node, file) => library.objectInstance.previewEvent(file, node);
     onMount(() => {
         upload.dom(component)
+        // upload event
         component.addEventListener(constants.uploadEvent, function (e){
             dispatch(constants.uploadEvent, e.detail);
         })
-        component.addEventListener(constants.downloadEvent, function (e){
-            console.log('download', e)
-        })
+        // delete event
         component.addEventListener(constants.deleteEvent, function (e){
-            console.log('delete', e)
+            dispatch(constants.deleteEvent, e.detail);
         })
     });
 </script>

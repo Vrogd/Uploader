@@ -115,7 +115,8 @@ export class Upload {
      * @return void
      */
     public delete = (file : typeFile) : void => {
-        console.log(file, 'delete')
+        this.files.delete(file);
+        this.component.dispatchEvent(customEvent(constants.deleteEvent, file));
     }
 }
 
