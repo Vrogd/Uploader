@@ -5,6 +5,7 @@ import type {typeFile} from "../../types/file";
 import type {canvasSize} from "../../types/size";
 import type {Tabs} from "../../types/tabs";
 import {Upload} from "./class";
+
 /**
  * @description update and create of files
  * @type {object} objectInstance
@@ -76,8 +77,8 @@ export const objectInstance = {
                         file.preview = canvas;
                         const image = new Image();
                         image.src = e.target.result;
-                        file.url = image.src;
                         renderPreview(file, image, canvas).then(()=>{
+                            file.url = e.target.result;
                             filesList.update(file);
                             if (parent) parent.component.dispatchEvent(customEvent(constants.uploadEvent, file));
                         })
@@ -114,56 +115,46 @@ export const objectInstance = {
  * @param {typeFile} file current file
  * @param {HTMLImageElement} image
  * @param canvas
- * @return void
+ * @return {Promise<unknown>}
  */
 function renderPreview(file : typeFile, image: HTMLImageElement, canvas : HTMLCanvasElement) : Promise<unknown> {
     return new Promise(((resolve: unknown) => {
-        image.onload = function (){
-            calculateCanvasSize(file.previewElement.clientWidth, file.previewElement.clientHeight, image.width, image.height).then((size) => {
-                canvas.width = size.width;
-                canvas.height = size.height;
-                canvas.setAttribute('data-width', String(size.width));
-                canvas.setAttribute('data-height', String(size.height))
-                const ctx = canvas.getContext('2d');
-                //observer(file, canvas, image);
-                ctx.drawImage(image, 0, 0, size.height, size.width);
-            })
+        const clientWidth = file.previewElement.clientWidth;
+        const clientHeight = file.previewElement.clientHeight;
+        image.addEventListener("load", function() {
+            const size = calculateCanvasSize(clientWidth, clientHeight, image.width, image.height);
+            canvas.width = size.width;
+            canvas.height = size.height;
+            canvas.setAttribute('data-width', String(size.width));
+            canvas.setAttribute('data-height', String(size.height))
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, clientWidth, clientHeight);
+            ctx.drawImage(image, size.left, size.top);
+            ctx.scale(1, 1);
             resolve();
-        }
-        image.onerror = function (){
+        }, false);
+        image.addEventListener("error", function() {
             console.error(constants.prefixError + ' failed to load image');
             resolve();
-        }
+        }, false)
     }))
 
 }
 
 /**
  * @description observe html changes size
- * @param {typeFile} file current file
- * @param {HTMLCanvasElement} canvas html element of canvas
- * @param {HTMLImageElement} image current image
+ * @param {HTMLElement} dom
+ * @param {typeFile[]} files
  * @return void
  */
-function observer(file:typeFile, canvas : HTMLCanvasElement, image: HTMLImageElement) : void {
+export function observer(dom: HTMLElement, files: typeFile[]) : void {
     const resizeObserver = new ResizeObserver((entries: ResizeObserverEntry[]) => {
+        console.log(entries)
        for (const entry: ResizeObserverEntry of entries){
-           const width : number = Math.round(entry.contentRect.width);
-           const height: number = Math.round(entry.contentRect.height);
-           const oldWidth: number = Math.round(canvas.width);
-           const oldHeight : number = Math.round(canvas.height)
 
-           if (width > constants.previewSizeLimit || height > constants.previewSizeLimit){
-               calculateCanvasSize(width, height, oldWidth, oldHeight).then((size: canvasSize) => {
-                   canvas.width = size.width;
-                   canvas.height = size.height;
-                   const ctx = canvas.getContext('2d');
-                   ctx.drawImage(image, size.left, size.top, size.height, size.width);
-               });
-           }
        }
     });
-    resizeObserver.observe(file.previewElement);
+    resizeObserver.observe(dom);
 }
 
 /**
@@ -174,30 +165,32 @@ function observer(file:typeFile, canvas : HTMLCanvasElement, image: HTMLImageEle
  * @param {number} height current image height
  * @return Promise<canvasSize|object>
  */
-function calculateCanvasSize(domWidth : number, domHeight : number, width : number, height: number) : Promise<canvasSize> {
-    return new Promise((resolve: unknown) => {
-        let newWidth, newHeight, newTop = 0, newLeft = 0;
-        const widthBigger = domWidth > domHeight;
-        if (widthBigger){
-            newWidth = Math.round(domWidth * ((100 - constants.previewBorderSpace) / 100));
-            newHeight = Math.round(newWidth * (width/ height));
-        } else {
-            newHeight = Math.round(domHeight * ((100 - constants.previewBorderSpace) / 100));
-            newWidth = Math.round(newHeight * (height / width));
-        }
+function calculateCanvasSize(domWidth : number, domHeight : number, width : number, height: number) : canvasSize {
+    let newWidth, newHeight, newTop = 0, newLeft = 0;
+    const widthBigger = width >= height;
+    if (widthBigger){
+        newWidth = Math.floor(width * ((100 - constants.previewBorderSpace) / 100));
+        newHeight = Math.floor(height * (height/ width));
+    } else {
+        newHeight = Math.floor(height * ((100 - constants.previewBorderSpace) / 100));
+        newWidth = Math.floor(width * (width / height));
+    }
 
-        if (width >= height){
-            newTop = Math.round((domHeight - height) / 2);
-        } else {
-            newLeft = Math.round((domWidth - width) / 2);
-        }
-        resolve({
-            'width': newWidth,
-            'height': newHeight,
-            'top': newTop,
-            'left': newLeft
-        });
-    })
+    newLeft =  Math.floor((domWidth - newWidth) / 2);
+    newTop = Math.floor((domHeight - newHeight) / 2);
+
+    console.log({
+        'width': newWidth,
+        'height': newHeight,
+        'top': newTop,
+        'left': newLeft
+    }, width, height, domWidth, domHeight ,'dsf', widthBigger)
+    return {
+        'width': newWidth,
+        'height': newHeight,
+        'top': newTop,
+        'left': newLeft
+    };
 }
 
 /**

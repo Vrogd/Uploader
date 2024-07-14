@@ -3,7 +3,7 @@ import {upload} from "./functions";
 import type {typeOptions} from "../../types/options";
 import type {Tabs} from "../../types/tabs";
 import type {typeFile} from "../../types/file";
-import {customEvent, objectInstance} from "./events"
+import {customEvent, objectInstance, observer} from "./events"
 import {constants} from "./constants";
 
 /**
@@ -83,6 +83,7 @@ export class Upload {
     public dom = (wrapper? : HTMLElement | Element) : void  => {
         if (wrapper && wrapper instanceof HTMLElement){
             this.component = wrapper;
+            observer(wrapper, this.files.list);
             this.input = wrapper.querySelector('input[type="file"]');
             if (this.input instanceof HTMLElement){
                 this.input.addEventListener('change', (e : Event) => this.eventChange(e));

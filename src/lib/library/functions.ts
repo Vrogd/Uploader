@@ -35,6 +35,7 @@ export function upload(parent: Upload, file: typeFile) : void {
  * @description progress event handler
  * @param {typeFile} file
  * @param {ProgressEvent} e event
+ * @param {upload} parent
  * @return void
  */
 function uploadProgressHandler(file : typeFile, e : ProgressEvent, parent: Upload) : void {
@@ -45,6 +46,7 @@ function uploadProgressHandler(file : typeFile, e : ProgressEvent, parent: Uploa
  * @description load event handler
  * @param {typeFile} file
  * @param {ProgressEvent} e event
+ * @param {upload} parent
  * @return void
  */
 function uploadLoadHandler(file : typeFile, e : ProgressEvent, parent: Upload) : void {
