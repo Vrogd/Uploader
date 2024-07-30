@@ -1,11 +1,15 @@
 <script lang="ts">
-    import {onMount , createEventDispatcher} from 'svelte';
+    import {onMount, createEventDispatcher} from 'svelte';
     import type {typeFile} from "../types/file";
     import {library} from "./index";
     import {constants} from "./library/constants";
-    export let component = null;
 
-    let upload = new library.upload();
+    // options
+    export let component = null;
+    export let crop : boolean = constants.defaultCropEnabled;
+
+    // create class
+    let upload = new library.upload({crop: crop});
     let updater = 0;
     const dispatch = createEventDispatcher();
 
@@ -15,6 +19,7 @@
         updater++;
     }
 
+    // init
     let fileList;
     const renderPreview = (node, file) => library.objectInstance.previewEvent(file, node);
     onMount(() => {
@@ -26,6 +31,10 @@
         // delete event
         component.addEventListener(constants.deleteEvent, function (e){
             dispatch(constants.deleteEvent, e.detail);
+        })
+        // crop event
+        component.addEventListener(constants.CropEvent, function (e){
+            dispatch(constants.CropEvent, e.detail);
         })
     });
 </script>
@@ -56,6 +65,11 @@
                                             <span>{file.size}</span>
                                         </span>
                                         <span class="actions">
+                                            {#if upload.hasCrop(file)}
+                                                <button on:click="{() => upload.crop(file)}">
+                                                    <i class="fa-solid fa-crop"></i>
+                                                </button>
+                                            {/if}
                                             <button on:click="{() => upload.download(file)}">
                                                 <i class="fa-solid fa-cloud-arrow-down"></i>
                                             </button>

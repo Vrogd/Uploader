@@ -92,7 +92,7 @@ export class Upload {
     }
     /**
      * @description download file
-     * @param {typeFile} file
+     * @param {typeFile} file file object
      * @return void
      */
     public download = (file : typeFile) : void => {
@@ -112,12 +112,28 @@ export class Upload {
     }
     /**
      * @description delete file
-     * @param {typeFile} file
+     * @param {typeFile} file file object
      * @return void
      */
     public delete = (file : typeFile) : void => {
         this.files.delete(file);
         this.component.dispatchEvent(customEvent(constants.deleteEvent, file));
+    }
+    /**
+     * @description check if crop can be shown
+     * @param {typeFile} file file object
+     * @return boolean
+     */
+    public hasCrop = (file : typeFile) : boolean => {
+        return (this.image && file.type === 'image');
+    }
+    /**
+     * @description check if crop can be shown
+     * @param {typeFile} file file object
+     * @return void
+     */
+    public crop = (file: typeFile) : void => {
+        this.component.dispatchEvent(customEvent(constants.CropEvent, file));
     }
 }
 
