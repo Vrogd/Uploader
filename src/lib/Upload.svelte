@@ -83,7 +83,9 @@
                                         <span class="bar" style="width: {file.progress}%"></span>
                                     </div>
                                     {#if file.isPreviewAble}
-                                        <div class="preview" use:renderPreview={file}></div>
+                                        <div class="preview" use:renderPreview={file}>
+                                            <div class="wrapper"></div>
+                                        </div>
                                     {/if}
                                 </div>
                             {/if}
