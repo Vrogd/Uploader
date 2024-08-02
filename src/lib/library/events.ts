@@ -121,19 +121,16 @@ function renderPreview(file : typeFile, image: HTMLImageElement, canvas : HTMLCa
     return new Promise(((resolve: unknown) => {
         image.addEventListener("load", function() {
             setTimeout(() => {
-                if (image.complete){
-                    const clientWidth = file.previewElement?.parentElement.clientWidth;
-                    const clientHeight = file.previewElement?.parentElement.clientHeight;
-                    const size = calculateCanvasSize(clientWidth, clientHeight, image.width, image.height);
-                    canvas.width = size.width;
-                    canvas.height = size.height;
-                    canvas.setAttribute('data-width', String(size.width));
-                    canvas.setAttribute('data-height', String(size.height))
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(image, size.left, size.top);
-                    ctx.drawImage(image, size.left, size.top)
-                    resolve();
-                }
+                const clientWidth = file.previewElement?.parentElement.clientWidth;
+                const clientHeight = file.previewElement?.parentElement.clientHeight;
+                const size = calculateCanvasSize(clientWidth, clientHeight, image.width, image.height);
+                canvas.width = size.width;
+                canvas.height = size.height;
+                canvas.setAttribute('data-width', String(size.width));
+                canvas.setAttribute('data-height', String(size.height))
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(image, size.left, size.top);
+                resolve();
             }, 0)
         }, false);
         image.addEventListener("error", function() {
@@ -186,29 +183,28 @@ function calculateCanvasSize(domWidth : number, domHeight : number, width : numb
     const testWidth2 = domWidth  < width;
     const testHeight2 = domHeight < height;
     if (testWidth  >= testHeight){
-        if (testWidth2 > domWidth){
+        if (testWidth2){
             console.log(1)
             newWidth = Math.floor(width * ((100 - constants.previewBorderSpace) / 100));
             newHeight = Math.floor(newWidth * (height/ width));
         } else {
             console.log(2)
-            newHeight = domHeight * ((100 - constants.previewBorderSpace) / 100);
+            newHeight = Math.floor(domHeight * ((100 - constants.previewBorderSpace) / 100));
             newWidth = Math.floor(newHeight * (width / height));
         }
     } else {
-        if (testHeight2 > domHeight) {
-            console.log(3)
-            newHeight = Math.floor(height * ((100 - constants.previewBorderSpace) / 100));
-            newWidth = Math.floor(newHeight * (width / height));
-
-        } else {
+        if (testHeight2) {
             console.log(4)
+            newWidth = Math.floor(domWidth * ((100 - constants.previewBorderSpace) / 100));
+            newHeight = Math.floor(newWidth * (height / width));
+        } else {
+            console.log(3, testWidth2, domWidth, testHeight2, domHeight)
             newWidth = Math.floor(domWidth * ((100 - constants.previewBorderSpace) / 100));
             newHeight = Math.floor(newWidth * (height / width));
         }
     }
-    newLeft =  Math.floor((domWidth - newWidth) / 2);
-    newTop =  Math.floor((domHeight - newHeight) / 2);
+    newLeft =  Math.ceil(((newWidth - width) / 2) / 2) * 2;
+    newTop = Math.ceil(((newHeight - height) / 2) / 2) * 2;
 
     console.log({
         'width': newWidth,
