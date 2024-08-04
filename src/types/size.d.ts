@@ -3,4 +3,5 @@ export type canvasSize =  {
     'height': number,
     'top': number,
     'left': number
+    'scale' : number
 }
