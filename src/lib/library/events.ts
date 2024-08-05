@@ -113,24 +113,27 @@ export const objectInstance = {
 /**
  * @description show image in canvas
  * @param {typeFile} file current file
- * @param {HTMLImageElement} image
- * @param canvas
+ * @param {HTMLImageElement} image image
+ * @param {HTMLCanvasElement} canvas canvas element
  * @return {Promise<unknown>}
  */
 function renderPreview(file : typeFile, image: HTMLImageElement, canvas : HTMLCanvasElement) : Promise<unknown> {
     return new Promise(((resolve: unknown) => {
         image.addEventListener("load", function() {
             setTimeout(() => {
-                const clientWidth = file.previewElement?.parentElement.clientWidth;
-                const clientHeight = 8.5 * parseFloat(getComputedStyle(document.documentElement).fontSize);
-                const size = calculateCanvasSize(clientWidth, clientHeight, image.width, image.height);
-                console.log(size)
-                canvas.width = size.width;
-                canvas.height = size.height;
-                canvas.setAttribute('data-width', String(size.width));
-                canvas.setAttribute('data-height', String(size.height))
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(image, size.left, size.top, size.width, size.height);
+                const clientWidth = file.previewElement?.clientWidth;
+                const clientHeight = constants.previewHeight * parseFloat(getComputedStyle(document.documentElement).fontSize);
+                if (clientHeight && clientWidth) {
+                    const size : canvasSize = calculateCanvasSize(clientWidth, clientHeight, image.width, image.height);
+                    canvas.width = size.width;
+                    canvas.height = size.height;
+                    canvas.setAttribute('data-width', String(size.width));
+                    canvas.setAttribute('data-height', String(size.height))
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(image, size.left, size.top, size.width, size.height);
+                } else {
+                    console.error(constants.prefixError + ' dom missing width / height');
+                }
                 resolve();
             }, 0)
         }, false);
@@ -139,34 +142,6 @@ function renderPreview(file : typeFile, image: HTMLImageElement, canvas : HTMLCa
             resolve();
         }, false)
     }))
-
-}
-
-/**
- * @description observe html changes size
- * @param {HTMLElement} dom
- * @param {typeFile[]} files
- * @return void
- */
-export function observer(dom: HTMLElement, canvas : HTMLCanvasElement, image: HTMLImageElement) : void {
-    const resizeObserver = new ResizeObserver((entries: ResizeObserverEntry[]) => {
-        console.log(entries)
-       for (const entry: ResizeObserverEntry of entries){
-           const width : number = Math.round(entry.contentRect.width);
-           const height: number = Math.round(entry.contentRect.height);
-           const oldWidth: number = Math.round(canvas.width);
-           const oldHeight : number = Math.round(canvas.height)
-
-           if (width > constants.previewSizeLimit && height > constants.previewSizeLimit){
-               const size:canvasSize = calculateCanvasSize(width, height, oldWidth, oldHeight);
-               canvas.width = size.width;
-               canvas.height = size.height;
-               const ctx = canvas.getContext('2d');
-               ctx.drawImage(image, size.left, size.top, size.height, size.width);
-           }
-       }
-    });
-    resizeObserver.observe(dom);
 }
 
 /**
@@ -178,46 +153,21 @@ export function observer(dom: HTMLElement, canvas : HTMLCanvasElement, image: HT
  * @return Promise<canvasSize|object>
  */
 function calculateCanvasSize(domWidth : number, domHeight : number, width : number, height: number) : canvasSize {
-    let newWidth, newHeight, newTop = 0, newLeft = 0;
-    const testWidth = Math.abs(domWidth - width);
-    const testHeight = Math.abs(domHeight - height);
-    const testWidth2 = domWidth  < width;
-    const testHeight2 = domHeight < height;
-    if (testWidth  >= testHeight){
-        if (testWidth2){
-            console.log(1)
-            newWidth = Math.floor(domWidth * ((100 - constants.previewBorderSpace) / 100));
-            newHeight = Math.floor(newWidth * (height/ width));
-        } else {
-            console.log(2)
-            newHeight = Math.floor(domHeight * ((100 - constants.previewBorderSpace) / 100));
-            newWidth = Math.floor(newHeight * (width / height));
-        }
-    } else {
-        if (testHeight2) {
-            console.log(4)
-            newWidth = Math.floor(domWidth * (100 - constants.previewBorderSpace) / 100);
-            newHeight = Math.floor(newWidth * (height / width));
-        } else {
-            console.log(3)
-            newWidth = Math.floor(domWidth * ((100 - constants.previewBorderSpace) / 100));
-            newHeight = Math.floor(newWidth * (height / width));
-        }
-    }
+    let newWidth, newHeight, newTop, newLeft;
+    newWidth = Math.ceil(domWidth);
+    newHeight = Math.ceil(newWidth * (height/ width));
     if (newHeight < (domHeight * (100 - constants.previewBorderSpace) / 100)){
-        newHeight = Math.floor(domHeight * ((100 - constants.previewBorderSpace) / 100));
-        newWidth = Math.floor(newHeight * (width / height));
+        newHeight = Math.ceil(domHeight);
+        newWidth = Math.ceil(newHeight * (width / height));
     }
-
-    newLeft =  Math.floor(((domWidth - newWidth) / 2));
-    newTop = Math.floor(((domHeight- newHeight) / 2));
+    newLeft = Math.round(((domWidth - newWidth) / 2));
+    newTop = Math.round(((domHeight- newHeight) / 2));
 
     return {
         'width': newWidth,
         'height': newHeight,
         'top': newTop,
-        'left': newLeft,
-        'scale' : newWidth / width
+        'left': newLeft
     };
 }
 
@@ -225,7 +175,7 @@ function calculateCanvasSize(domWidth : number, domHeight : number, width : numb
  * @description generate custom event
  * @param {string} key
  * @param {any} detail
- * @return CustomEvent
+ * @return {CustomEvent} CustomEvent
  */
 export function customEvent(key: string, detail: any) : CustomEvent{
     return new CustomEvent(key, {detail: detail});

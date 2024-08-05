@@ -6,6 +6,7 @@ export const constants = {
     defaultCropEnabled : <boolean> false,
     prefixError: <string> '[Upload]',
     previewBorderSpace: <number> 2,
+    previewHeight: <number> 8.5, // height of preview
     previewSizeLimit: <number> 50,
     uploadEvent: <string>'customUpload',
     deleteEvent: <string>'customDelete',
