@@ -7,8 +7,7 @@ export const library = {
    'upload' : Class,
    'objectInstance': objectInstance,
 }
-
-export { Upload as Upload };
 // remove when debugging
 export default Upload;
 
+export { Upload as Upload };
