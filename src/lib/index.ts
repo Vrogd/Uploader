@@ -9,4 +9,6 @@ export const library = {
 }
 
 export { Upload as Upload };
+// remove when debugging
+export default Upload;
 
