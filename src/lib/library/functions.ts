@@ -1,6 +1,7 @@
 import type {Upload} from "./class";
 import {objectInstance} from "./events";
 import type {typeFile} from "../../types/file";
+import {constants} from "./constants";
 
 /**
  * @description file upload function
@@ -19,9 +20,6 @@ export function upload(parent: Upload, file: typeFile) : void {
             objectInstance.updateFileData(file, parent);
             ajax.upload.addEventListener("progress", (e : ProgressEvent<XMLHttpRequestEventTarget>) => {
                 uploadProgressHandler(file, e, parent);
-            }, false);
-            ajax.addEventListener("load", (e : ProgressEvent<XMLHttpRequestEventTarget>) => {
-                uploadLoadHandler(file, e, parent);
             }, false);
             ajax.addEventListener("error", uploadErrorhandler, false);
             ajax.addEventListener("abort", uploadAbortHandler, false);
@@ -42,23 +40,14 @@ function uploadProgressHandler(file : typeFile, e : ProgressEvent, parent: Uploa
     file.progress = Math.round((e.loaded / e.total) * 100)
     objectInstance.updateFileData(file, parent);
 }
-/**
- * @description load event handler
- * @param {typeFile} file
- * @param {ProgressEvent} e event
- * @param {upload} parent
- * @return void
- */
-function uploadLoadHandler(file : typeFile, e : ProgressEvent, parent: Upload) : void {
-    objectInstance.updateFileData(file, parent);
-}
+
 /**
  * @description error event handler
  * @param {ProgressEvent} e event
  * @return void
  */
 function uploadErrorhandler(e : Event) : void {
-    console.log('error', e)
+    console.error(constants.prefixError + ' failed to upload file ', e);
 }
 
 /**
@@ -67,7 +56,7 @@ function uploadErrorhandler(e : Event) : void {
  * @return void
  */
 function uploadAbortHandler(e : Event): void {
-    console.log('abort', e)
+    console.error(constants.prefixError + ' aborted file upload ', e);
 }
 
 /**
@@ -87,15 +76,15 @@ export function formatFileSize(bytes : number, decimalPoint : number = 2){
  * @param {number} dec number
  * @return {string}
  */
-function dec2hex (dec : number) : string {
-    return dec.toString().padStart(2, "0");
+function dec2hex(dec : number) : string {
+    return dec.toString(16).padStart(2, "0");
 }
 /**
  * @description generate new string id
  * @param {number} len total of number
  * @return {string}
  */
-export function generateId (len : number) : string {
+export function generateId(len : number) : string {
     const arr = new Uint8Array((len || 40) / 2);
     window.crypto.getRandomValues(arr);
     return Array.from(arr, dec2hex).join('');

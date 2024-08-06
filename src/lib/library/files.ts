@@ -32,7 +32,7 @@ export const filesList = {
         }
     },
     delete: function (item : typeFile) : void {
-        this.list = this.list.filter((file: typeFile) => file.url !== item.url)
+        this.list = this.list.filter((file: typeFile) => file.id !== item.id)
         this.callback(this.list);
     }
 }

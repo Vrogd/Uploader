@@ -23,17 +23,20 @@
     let fileList;
     const renderPreview = (node, file) => library.objectInstance.previewEvent(file, node);
     onMount(() => {
-        upload.dom(component)
-        // upload event
-        component.addEventListener(constants.uploadEvent, function (e){
-            dispatch(constants.uploadEvent, e.detail);
+        upload.dom(component);
+        let timeout : any[] = [];
+        component.addEventListener(constants.uploadEvent, function (e : CustomEvent){
+            clearTimeout(timeout[e.detail.id]);
+            timeout[e.detail.id] = setTimeout(() => {
+                dispatch(constants.uploadEvent, e.detail);
+            }, constants.timeoutEvents)
         })
         // delete event
-        component.addEventListener(constants.deleteEvent, function (e){
+        component.addEventListener(constants.deleteEvent, function (e: CustomEvent){
             dispatch(constants.deleteEvent, e.detail);
         })
         // crop event
-        component.addEventListener(constants.CropEvent, function (e){
+        component.addEventListener(constants.CropEvent, function (e: CustomEvent){
             dispatch(constants.CropEvent, e.detail);
         })
     });

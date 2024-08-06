@@ -9,5 +9,5 @@ export const library = {
 }
 // remove when debugging
 export default Upload;
-
+export type { typeFile as File } from "../types/file";
 export { Upload as Upload };
