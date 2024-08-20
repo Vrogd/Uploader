@@ -23,10 +23,12 @@
   display: block;
   background:  var(--main-color);
   border-radius: .3rem;
-  outline: .05rem solid var(--main-color-high);
+  outline: .1rem solid var(--main-color-high);
   overflow: hidden;
   transform: rotate(0);
-  margin-bottom: .4rem;
+  &:not(:last-child) {
+    margin-bottom: .4rem;
+  }
 }
 
 // preview item
