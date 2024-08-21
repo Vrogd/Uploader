@@ -7,4 +7,5 @@ export type typeOptions =  {
     imageExtensions ?: string[],
     videoExtensions ?: string[],
     crop ?:boolean
+    blobList?: string
 }

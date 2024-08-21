@@ -20,9 +20,11 @@ export class Upload {
     public image : boolean = true;
     public video : boolean = true;
     public other : boolean = false;
-    public tabActive : Tabs = 'image'
+    public tabActive : Tabs = 'image';
+    public windowBlobList : string = 'UploadBlobs';
     constructor(object: typeOptions = {}) {
         if (object.wrapper) this.dom(object.wrapper);
+        if (object.blobList) this.windowBlobList = object.blobList;
     }
     /**
      * @description on change event file list
