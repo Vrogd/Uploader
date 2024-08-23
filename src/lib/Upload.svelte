@@ -21,7 +21,7 @@
 
     // init
     let fileList;
-    const renderPreview = (node, file) => library.objectInstance.previewEvent(file, node);
+    const renderPreview = (node, file) => library.functions.previewEvent(file, node);
     onMount(() => {
         upload.dom(component);
         let timeout : any[] = [];

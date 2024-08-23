@@ -3,7 +3,7 @@ import {upload} from "./functions";
 import type {typeOptions} from "../../types/options";
 import type {Tabs} from "../../types/tabs";
 import type {typeFile} from "../../types/file";
-import {customEvent, objectInstance} from "./events"
+import {customEvent, functions} from "./events"
 import {constants} from "./constants";
 
 /**
@@ -34,7 +34,7 @@ export class Upload {
     private eventChange = (e : Event) : void => {
         if (e.target instanceof HTMLInputElement && e.target.files instanceof FileList && Object.keys(e.target.files).length){
             for (const file of e.target.files){
-                if (file instanceof File) upload(this, objectInstance.new(file, this.tabActive));
+                if (file instanceof File) upload(this, functions.new(file, this.tabActive));
             }
         }
     }
@@ -54,7 +54,7 @@ export class Upload {
         if (e.dataTransfer && "files" in e.dataTransfer) {
             const files = e.dataTransfer.files;
             for (const file of files){
-                if (file instanceof File) upload(this, objectInstance.new(file, this.tabActive));
+                if (file instanceof File) upload(this, functions.new(file, this.tabActive));
             }
         }
     }
@@ -135,6 +135,15 @@ export class Upload {
      */
     public crop = (file: typeFile) : void => {
         this.component.dispatchEvent(customEvent(constants.CropEvent, file));
+    }
+
+    /**
+     * save blob to window list
+     * @param {string} url
+     * @param {Blob} blob
+     */
+    public blob = (url: string, blob : any) : void => {
+        console.log(blob, url)
     }
 }
 

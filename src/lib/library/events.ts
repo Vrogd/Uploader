@@ -10,7 +10,7 @@ import {Upload} from "./class";
  * @description update and create of files
  * @type {object} objectInstance
  */
-export const objectInstance = {
+export const functions = {
     /**
      * @description create new instance
      * @param {File} file file upload or drag
@@ -28,6 +28,8 @@ export const objectInstance = {
             'type' : tab
         }
     },
+
+
     update: function (){
 
     },
@@ -42,7 +44,7 @@ export const objectInstance = {
             file.size = formatFileSize(file.file.size, 2);
             file.name = file.file.name;
             if (file.file.type.includes('image') && !file.isPreviewAble){
-                objectInstance.fileReader(file, parent).then(() => {
+                functions.fileReader(file, parent).then(() => {
                     filesList.update(file);
                 }).catch((e) => {
                     console.error(constants.prefixError + ' failed to set preview', e);
@@ -66,19 +68,16 @@ export const objectInstance = {
                 request.open('GET', URL.createObjectURL(file.file), true);
                 request.responseType = 'blob';
                 request.onload = function() {
-                    if (request.status === 200) {
-                        // todo store blob later
-                    }
                     const reader = new FileReader();
                     const canvas = document.createElement('canvas');
                     reader.readAsDataURL(request.response);
                     reader.onload =  function(e: any){
                         file.isPreviewAble = true
                         file.preview = canvas;
+                        file.url = e.target.result;
                         const image = new Image();
                         image.src = e.target.result;
                         renderPreview(file, image, canvas).then(()=>{
-                            file.url = e.target.result;
                             filesList.update(file);
                             if (parent) parent.component.dispatchEvent(customEvent(constants.uploadEvent, file));
                         })
@@ -181,4 +180,4 @@ export function customEvent(key: string, detail: any) : CustomEvent{
     return new CustomEvent(key, {detail: detail});
 }
 
-export default objectInstance;
+export default functions;

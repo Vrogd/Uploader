@@ -1,5 +1,5 @@
 import type {Upload} from "./class";
-import {objectInstance} from "./events";
+import {functions} from "./events";
 import type {typeFile} from "../../types/file";
 import {constants} from "./constants";
 
@@ -17,7 +17,7 @@ export function upload(parent: Upload, file: typeFile) : void {
         formData.append("file", file.file);
         const ajax = new XMLHttpRequest();
         if (ajax.upload){
-            objectInstance.updateFileData(file, parent);
+            functions.updateFileData(file, parent);
             ajax.upload.addEventListener("progress", (e : ProgressEvent<XMLHttpRequestEventTarget>) => {
                 uploadProgressHandler(file, e, parent);
             }, false);
@@ -38,7 +38,7 @@ export function upload(parent: Upload, file: typeFile) : void {
  */
 function uploadProgressHandler(file : typeFile, e : ProgressEvent, parent: Upload) : void {
     file.progress = Math.round((e.loaded / e.total) * 100)
-    objectInstance.updateFileData(file, parent);
+    functions.updateFileData(file, parent);
 }
 
 /**
