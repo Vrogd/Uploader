@@ -5,6 +5,7 @@ import type {Tabs} from "../../types/tabs";
 import type {typeFile} from "../../types/file";
 import {customEvent, functions} from "./events"
 import {constants} from "./constants";
+import type {fileBlob} from "../../types/fileBlob";
 
 /**
  * @description upload class
@@ -138,12 +139,29 @@ export class Upload {
     }
 
     /**
-     * save blob to window list
+     * save / get blob to window list / based on change date
      * @param {string} url
      * @param {Blob} blob
+     * @param {number} modified
+     * @return void
      */
-    public blob = (url: string, blob : any) : void => {
-        console.log(blob, url)
+    public blob = (url: string, modified : number, blob : Blob|null = null) : Blob | void => {
+        if (!Array.isArray(window[this.windowBlobList])){
+            window[this.windowBlobList] = [];
+        }
+        if (blob instanceof Blob){
+            const newObject: fileBlob = {
+                'url' : url,
+                'blob' : blob,
+                'modified' : modified
+            }
+            window[this.windowBlobList].push(newObject);
+        } else if (Object.keys(window[this.windowBlobList]).length){
+            const hasObject = (window[this.windowBlobList].find((item) => {
+                if (item.url === url && item.modified === modified) return item;
+            }));
+            if (hasObject) return hasObject.blob;
+        }
     }
 }
 
