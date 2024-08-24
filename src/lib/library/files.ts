@@ -1,5 +1,5 @@
 import type {typeFileList} from "../../types/fileList";
-import {generateId} from "./functions";
+import {generateId} from "./events";
 import type {typeFile} from "../../types/file";
 
 /**

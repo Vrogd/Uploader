@@ -1,214 +1,91 @@
-import {constants} from "./constants";
-import {filesList} from "./files";
-import {formatFileSize} from "./functions";
+import type {Upload} from "./class";
+import {functions} from "./functions";
 import type {typeFile} from "../../types/file";
-import type {canvasSize} from "../../types/size";
-import type {Tabs} from "../../types/tabs";
-import {Upload} from "./class";
+import {constants} from "./constants";
 
 /**
- * @description update and create of files
- * @type {object} objectInstance
+ * @description file upload function
+ * track all data and update list
+ * @param {upload} parent
+ * @param {File} file file object
+ * @return void
  */
-export const functions = {
-    /**
-     * @description create new instance
-     * @param {File} file file upload or drag
-     * @param {Tabs} tab active tab
-     * @return {typeFile} new file object
-     */
-    new : function (file: File, tab: Tabs ) {
-        return <typeFile> {
-            'file': file,
-            'progress': 0,
-            'isPreviewAble' : false,
-            'preview': null,
-            'name': null,
-            'size': null,
-            'type' : tab
-        }
-    },
-    /**
-     * @description create new instance
-     * @param {typeFile} file file object
-     * @param {Upload} parent
-     * @return void
-     */
-    updateFileData(file: typeFile, parent: Upload) : void {
-        if (file.file instanceof File){
-            file.size = formatFileSize(file.file.size, 2);
-            file.name = file.file.name;
-            if (file.file.type.includes('image') && !file.isPreviewAble){
-                functions.fileReader(file, parent).then(() => {
-                    filesList.update(file);
-                }).catch((e) => {
-                    console.error(constants.prefixError + ' failed to set preview', e);
-                })
-            } else {
-                filesList.update(file);
-                parent.component.dispatchEvent(customEvent(constants.uploadEvent, file));
-            }
-        }
-    },
-    /**
-     * @description read file / get preview
-     * @param {typeFile} file file object
-     * @param {Upload} parent
-     * @return void
-     */
-    fileReader(file : typeFile, parent: Upload|undefined) : Promise<void> {
-        return new Promise((resolve: any) => {
-            if (file.file && file.file instanceof File){
-                const canvas = document.createElement('canvas');
-                const blob = parent.blob(file.file.name, file.file.lastModified)
-                if (blob){
-                    const url :string =  URL.createObjectURL(blob)
-                    file.isPreviewAble = true
-                    file.preview = canvas;
-                    file.url = url;
-                    const image = new Image();
-                    image.src = url;
-                    renderPreview(file, image, canvas).then(()=>{
-                        filesList.update(file);
-                        if (parent) parent.component.dispatchEvent(customEvent(constants.uploadEvent, file));
-                    })
-                    resolve()
-                } else {
-                    functions.loadPreview(file, parent, canvas).then(() => resolve()).catch(() => {
-                        console.error(constants.prefixError + ' failed load to preview');
-                        resolve();
-                    });
-                }
-            }
-        })
-    },
-    /**
-     * @description load preview from request / not stored yet
-     * @param {typeFile} file file
-     * @param {Upload | null} parent main class
-     * @param {HTMLCanvasElement} canvas html canvas
-     * @return {Promise<void>}
-     */
-    loadPreview(file: typeFile, parent: Upload|undefined, canvas: HTMLCanvasElement) : Promise<void>{
-        return new Promise((resolve: any) => {
-            if (file.file && file.file instanceof File) {
-                const request = new XMLHttpRequest();
-                request.open('GET', URL.createObjectURL(file.file), true);
-                request.responseType = 'blob';
-                request.onload = function () {
-                    const reader = new FileReader();
-                    reader.readAsDataURL(request.response);
-                    reader.onload = function (e: any) {
-                        if (file.file instanceof File) {
-                            const blob = request.response;
-                            if (blob instanceof Blob) parent.blob(file.file.name, file.file.lastModified, blob);
-                        }
-                        file.isPreviewAble = true
-                        file.preview = canvas;
-                        file.url = e.target?.result;
-                        const image = new Image();
-                        image.src = e.target.result;
-                        renderPreview(file, image, canvas).then(() => {
-                            filesList.update(file);
-                            if (parent) parent.component.dispatchEvent(customEvent(constants.uploadEvent, file));
-                        })
-                    };
-                };
-                request.onerror = function () {
-                    console.log('error')
-                    if (parent) parent.component.dispatchEvent(customEvent(constants.uploadEvent, file));
-                }
-                request.onabort = function () {
-                    console.log('abort')
-                    if (parent) parent.component.dispatchEvent(customEvent(constants.uploadEvent, file));
-                }
-                request.send();
-            }
-            resolve();
-        });
-    },
-    /**
-     * @description render dom element if available
-     * @param {typeFile} file current file
-     * @param {HTMLElement} node dom element
-     * @return void
-     */
-    previewEvent(file: typeFile, node: HTMLElement): void{
-        if(file.preview instanceof HTMLCanvasElement){
-            node.appendChild(file.preview)
+export function upload(parent: Upload, file: typeFile) : void {
+    if (file.file instanceof File){
+        parent.files.update(file);
+        let formData = new FormData();
+        formData.append("file", file.file);
+        const ajax = new XMLHttpRequest();
+        if (ajax.upload){
+            functions.updateFileData(file, parent);
+            ajax.upload.addEventListener("progress", (e : ProgressEvent<XMLHttpRequestEventTarget>) => {
+                uploadProgressHandler(file, e, parent);
+            }, false);
+            ajax.addEventListener("error", uploadErrorhandler, false);
+            ajax.addEventListener("abort", uploadAbortHandler, false);
+            ajax.open("POST", "/file");
+            ajax.send(formData as XMLHttpRequestBodyInit);
         }
     }
 }
 
 /**
- * @description show image in canvas
- * @param {typeFile} file current file
- * @param {HTMLImageElement} image image
- * @param {HTMLCanvasElement} canvas canvas element
- * @return {Promise<unknown>}
+ * @description progress event handler
+ * @param {typeFile} file
+ * @param {ProgressEvent} e event
+ * @param {upload} parent
+ * @return void
  */
-function renderPreview(file: typeFile, image: HTMLImageElement, canvas: HTMLCanvasElement) : Promise<unknown> {
-    return new Promise(((resolve: unknown) => {
-        image.addEventListener("load", function() {
-            setTimeout(() => {
-                const clientWidth = file.previewElement?.clientWidth;
-                const clientHeight = constants.previewHeight * parseFloat(getComputedStyle(document.documentElement).fontSize);
-                if (clientHeight && clientWidth) {
-                    const size : canvasSize = calculateCanvasSize(clientWidth, clientHeight, image.width, image.height);
-                    canvas.width = size.width;
-                    canvas.height = size.height;
-                    canvas.setAttribute('data-width', String(size.width));
-                    canvas.setAttribute('data-height', String(size.height))
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(image, size.left, size.top, size.width, size.height);
-                } else {
-                    console.error(constants.prefixError + ' dom missing width / height');
-                }
-                resolve();
-            }, 0)
-        }, false);
-        image.addEventListener("error", function() {
-            console.error(constants.prefixError + ' failed to load image');
-            resolve();
-        }, false)
-    }))
+function uploadProgressHandler(file : typeFile, e : ProgressEvent, parent: Upload) : void {
+    file.progress = Math.round((e.loaded / e.total) * 100)
+    functions.updateFileData(file, parent);
 }
 
 /**
- * @description calculate canvas size on resize
- * @param {number} domWidth current dom width
- * @param {number} domHeight current dom height
- * @param {number} width current image width
- * @param {number} height current image height
- * @return Promise<canvasSize|object>
+ * @description error event handler
+ * @param {ProgressEvent} e event
+ * @return void
  */
-function calculateCanvasSize(domWidth: number, domHeight: number, width: number, height: number) : canvasSize {
-    let newWidth, newHeight, newTop, newLeft;
-    newWidth = Math.ceil(domWidth);
-    newHeight = Math.ceil(newWidth * (height/ width));
-    if (newHeight < (domHeight * (100 - constants.previewBorderSpace) / 100)){
-        newHeight = Math.ceil(domHeight);
-        newWidth = Math.ceil(newHeight * (width / height));
-    }
-    newLeft = Math.round(((domWidth - newWidth) / 2));
-    newTop = Math.round(((domHeight- newHeight) / 2));
-
-    return {
-        'width': newWidth,
-        'height': newHeight,
-        'top': newTop,
-        'left': newLeft
-    };
+function uploadErrorhandler(e : Event) : void {
+    console.error(constants.prefixError + ' failed to upload file ', e);
 }
 
 /**
- * @description generate custom event
- * @param {string} key
- * @param {any} detail
- * @return {CustomEvent} CustomEvent
+ * @description progress event handler
+ * @param {ProgressEvent} e event
+ * @return void
  */
-export function customEvent(key: string, detail: any) : CustomEvent{
-    return new CustomEvent(key, {detail: detail});
+function uploadAbortHandler(e : Event): void {
+    console.error(constants.prefixError + ' aborted file upload ', e);
 }
 
-export default functions;
+/**
+ * @description format file size
+ * @param {number} bytes
+ * @param {number} decimalPoint
+ * @return {string}
+ */
+export function formatFileSize(bytes : number, decimalPoint : number = 2){
+    if(bytes == 0) return '0 Bytes';
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
+    const i = Math.floor(Math.log(bytes) / Math.log(1024));
+    return parseFloat((bytes / Math.pow(1024, i)).toFixed(decimalPoint)) + ' ' + sizes[i];
+}
+/**
+ * @description decimal to hex string
+ * @param {number} dec number
+ * @return {string}
+ */
+function dec2hex(dec : number) : string {
+    return dec.toString(16).padStart(2, "0");
+}
+/**
+ * @description generate new string id
+ * @param {number} len total of number
+ * @return {string}
+ */
+export function generateId(len : number) : string {
+    const arr = new Uint8Array((len || 40) / 2);
+    window.crypto.getRandomValues(arr);
+    return Array.from(arr, dec2hex).join('');
+}

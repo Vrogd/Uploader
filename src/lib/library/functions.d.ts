@@ -1,23 +1,36 @@
-import type { Upload } from "./class";
 import type { typeFile } from "../../types/file";
+import type { Tabs } from "../../types/tabs";
 /**
- * @description file upload function
- * track all data and update list
- * @param {upload} parent
- * @param {File} file file object
- * @return void
+ * @description update and create of files
+ * @type {object} objectInstance
  */
-export declare function upload(parent: Upload, file: typeFile): void;
-/**
- * @description format file size
- * @param {number} bytes
- * @param {number} decimalPoint
- * @return {string}
- */
-export declare function formatFileSize(bytes: number, decimalPoint?: number): string;
-/**
- * @description generate new string id
- * @param {number} len total of number
- * @return {string}
- */
-export declare function generateId(len: number): string;
+export declare const objectInstance: {
+    /**
+     * @description create new instance
+     * @param {File} file file upload or drag
+     * @param {Tabs} tab active tab
+     * @return {typeFile} new file object
+     */
+    new: (file: File, tab: Tabs) => typeFile;
+    update: () => void;
+    /**
+     * @description create new instance
+     * @param {typeFile} file file object
+     * @return void
+     */
+    updateFileData(file: typeFile): void;
+    /**
+     * @description read file / get preview
+     * @param {typeFile} file file object
+     * @return void
+     */
+    fileReader(file: typeFile): Promise<void>;
+    /**
+     * @description render dom element if available
+     * @param {typeFile} file current file
+     * @param {HTMLElement} node dom element
+     * @return void
+     */
+    previewEvent(file: typeFile, node: HTMLElement): void;
+};
+export default objectInstance;

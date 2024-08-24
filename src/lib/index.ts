@@ -1,7 +1,7 @@
 import Upload from './Upload.svelte';
 
 import { Upload as Class } from "./library/class";
-import { functions } from "./library/events";
+import { functions } from "./library/functions";
 
 export const library = {
    'upload': Class,

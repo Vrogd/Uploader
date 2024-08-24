@@ -9,12 +9,6 @@
   flex-direction: column;
   display: flex;
   color: var(--text-color);
-  canvas {
-    //width:auto;
-    //height: auto;
-    //max-width:100%;
-    //height:100%;
-  }
 }
 // preview item
 #{'.' +  #{$componentItem}}{
@@ -22,7 +16,7 @@
   position: relative;
   display: block;
   background:  var(--main-color);
-  border-radius: .3rem;
+  border-radius: .3rem .3rem .1rem .1rem;
   outline: .1rem solid var(--main-color-high);
   overflow: hidden;
   transform: rotate(0);
@@ -40,14 +34,15 @@
     position: absolute;
     display: flex;
     z-index: 3;
-    height: 0.3rem;
+    height: #{$componentBarHeight};
     bottom: 0;
     margin-top: auto;
-    border-top: 2px solid var(--text-color);
+    border-top: 1px solid var(--text-color);
+    border-bottom: 1px solid var(--text-color);
     background-color: var(--main-color);
     .bar {
       position: absolute;
-      height: .8rem;
+      height: #{$componentBarHeight};
       width: 30%;
       transition: .4s width ease-out;
       background: var(--high-color);
@@ -101,8 +96,8 @@
     transition-delay: 200ms;
     button {
       opacity: .85;
-      padding: 0.4rem 0.4rem;
-      margin-left: .4rem;
+      padding: #{$componentBarHeight} #{$componentBarHeight};
+      margin-left: #{$componentBarHeight};
       border-radius: 50%;
       width: 2.6rem !important;
       height: 2.6rem !important;

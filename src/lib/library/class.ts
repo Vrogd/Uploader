@@ -1,9 +1,9 @@
 import {filesList} from "./files";
-import {upload} from "./functions";
+import {upload} from "./events";
 import type {typeOptions} from "../../types/options";
 import type {Tabs} from "../../types/tabs";
 import type {typeFile} from "../../types/file";
-import {customEvent, functions} from "./events"
+import {customEvent, functions} from "./functions"
 import {constants} from "./constants";
 import type {fileBlob} from "../../types/fileBlob";
 
@@ -137,13 +137,12 @@ export class Upload {
     public crop = (file: typeFile) : void => {
         this.component.dispatchEvent(customEvent(constants.CropEvent, file));
     }
-
     /**
-     * save / get blob to window list / based on change date
-     * @param {string} url
-     * @param {Blob} blob
-     * @param {number} modified
-     * @return void
+     * @description save / get blob to window list / based on change date
+     * @param {string} url current file url / name
+     * @param {Blob} blob blob element
+     * @param {number} modified date of file creation on people pc
+     * @return {Blob|void}
      */
     public blob = (url: string, modified : number, blob : Blob|null = null) : Blob | void => {
         if (!Array.isArray(window[this.windowBlobList])){
