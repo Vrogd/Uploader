@@ -8,4 +8,5 @@ export type typeOptions =  {
     videoExtensions ?: string[],
     crop ?:boolean
     blobList?: string
+    backend: boolean
 }

@@ -36,8 +36,8 @@
             dispatch(constants.deleteEvent, e.detail);
         })
         // crop event
-        component.addEventListener(constants.CropEvent, function (e: CustomEvent){
-            dispatch(constants.CropEvent, e.detail);
+        component.addEventListener(constants.cropEvent, function (e: CustomEvent){
+            dispatch(constants.cropEvent, e.detail);
         })
     });
 </script>
@@ -68,14 +68,16 @@
                                             <span>{file.size}</span>
                                         </span>
                                         <span class="actions">
-                                            {#if upload.hasCrop(file)}
+                                            {#if upload.hasCrop(file) && file.completed }
                                                 <button on:click="{() => upload.crop(file)}">
                                                     <i class="fa-solid fa-crop"></i>
                                                 </button>
                                             {/if}
-                                            <button on:click="{() => upload.download(file)}">
-                                                <i class="fa-solid fa-cloud-arrow-down"></i>
-                                            </button>
+                                            {#if file.completed }
+                                                <button on:click="{() => upload.download(file)}">
+                                                    <i class="fa-solid fa-cloud-arrow-down"></i>
+                                                </button>
+                                            {/if}
                                             <button on:click="{() => upload.delete(file)}">
                                                 <i class="fa-solid fa-trash"></i>
                                             </button>
@@ -119,7 +121,7 @@
              on:keydown="{() => {upload.eventUpload()}}"
              on:drop={(e) => {upload.eventDrop(e)}}
              on:dragover={(e) => {upload.eventPrevent(e)}}>
-            <input type="file" name="files">
+            <input type="file" multiple name="files">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 489.4 489.4"><path d="M382.4 422.75H277.4v-106.1h34.7c8.8 0 14-10 8.8-17.2l-67.5-93.4c-4.3-6-13.2-6-17.5 0l-67.5 93.4c-5.2 7.2-.1 17.2 8.8 17.2h34.7v106.1H94.3c-52.5-2.9-94.3-52-94.3-105.2 0-36.7 19.9-68.7 49.4-86-2.7-7.3-4.1-15.1-4.1-23.3 0-37.5 30.3-67.8 67.8-67.8 8.1 0 15.9 1.4 23.2 4.1 21.7-46 68.5-77.9 122.9-77.9 70.4.1 128.4 54 135 122.7 54.1 9.3 95.2 59.4 95.2 116.1 0 60.6-47.2 113.1-107 117.3z"/></svg>
             <label for="files" id="files"></label> upload
         </div>

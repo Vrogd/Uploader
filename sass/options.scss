@@ -13,9 +13,10 @@ $componentItemImage: #{$componentName} + '-item-image';
 //colors
 $componentMainColor: #202a44 !default;
 $componentSecondaryColor: #1d1d2a !default;
-$componentHighlightColor: #1d2f56 !default;
+$componentHighlightColor: #283c70 !default;
+$componentErrorColor: #b41717 !default;
 //font
 $componentFontFamily: "Calibri Light", serif !default;
 $componentMinHeight: 220px;
 $componentMinWidth: 220px;
-$componentBarHeight: .3rem;
+$componentBarHeight: .4rem;

@@ -1,5 +1,5 @@
 import type {Upload} from "./class";
-import {functions} from "./functions";
+import {customEvent, functions} from "./functions";
 import type {typeFile} from "../../types/file";
 import {constants} from "./constants";
 
@@ -21,8 +21,33 @@ export function upload(parent: Upload, file: typeFile) : void {
             ajax.upload.addEventListener("progress", (e : ProgressEvent<XMLHttpRequestEventTarget>) => {
                 uploadProgressHandler(file, e, parent);
             }, false);
-            ajax.addEventListener("error", uploadErrorhandler, false);
-            ajax.addEventListener("abort", uploadAbortHandler, false);
+            ajax.upload.addEventListener("error", (e) => {
+                console.log(e)
+                uploadErrorhandler(e);
+            }, false);
+            ajax.upload.addEventListener("abort", (e) => {
+                uploadAbortHandler(e);
+                console.log(e)
+            }, false);
+            ajax.upload.addEventListener("timeout", (e) => {
+                console.log(e, 'timeout')
+            }, false);
+            ajax.upload.addEventListener("loadend", () => {
+                uploadLoadEndHandler(file, parent)
+            });
+            ajax.addEventListener("load", () => {
+                if (ajax.status === 404) {
+                    // Handle 404 error
+                    console.error('File not found (404)');
+                    // You can call a specific handler or perform any other action here
+                } else if (ajax.status >= 200 && ajax.status < 300) {
+                    // Success, handle the response
+                    console.log('File uploaded successfully');
+                } else {
+                    // Handle other HTTP errors
+                    console.error(`Error: ${ajax.status}`);
+                }
+            });
             ajax.open("POST", "/file");
             ajax.send(formData as XMLHttpRequestBodyInit);
         }
@@ -31,13 +56,16 @@ export function upload(parent: Upload, file: typeFile) : void {
 
 /**
  * @description progress event handler
- * @param {typeFile} file
+ * @param {typeFile} file current file
  * @param {ProgressEvent} e event
- * @param {upload} parent
+ * @param {upload} parent main class
  * @return void
  */
 function uploadProgressHandler(file : typeFile, e : ProgressEvent, parent: Upload) : void {
-    file.progress = Math.round((e.loaded / e.total) * 100)
+    file.progress = Math.round((e.loaded / e.total) * 100);
+    if (file.progress === 100 && !constants.enableBackend){
+        file.completed = true;
+    }
     functions.updateFileData(file, parent);
 }
 
@@ -57,6 +85,17 @@ function uploadErrorhandler(e : Event) : void {
  */
 function uploadAbortHandler(e : Event): void {
     console.error(constants.prefixError + ' aborted file upload ', e);
+}
+
+/**
+ * @description upload completed
+ * @param {typeFile} file file object
+ * @param {Upload} parent class
+ * @return void
+ */
+function uploadLoadEndHandler(file : typeFile, parent: Upload): void {
+    file.completed = true;
+    if (parent) parent.component.dispatchEvent(customEvent(constants.uploadEvent, file));
 }
 
 /**

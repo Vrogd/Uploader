@@ -46,7 +46,6 @@ export const functions = {
                 })
             } else {
                 filesList.update(file);
-                parent.component.dispatchEvent(customEvent(constants.uploadEvent, file));
             }
         }
     },
@@ -101,16 +100,13 @@ export const functions = {
                         image.src = e.target.result;
                         renderPreview(file, image, canvas).then(() => {
                             filesList.update(file);
-                            if (parent) parent.component.dispatchEvent(customEvent(constants.uploadEvent, file));
                         })
                     };
                 };
                 request.onerror = function () {
-                    if (parent) parent.component.dispatchEvent(customEvent(constants.uploadEvent, file));
                     console.error(constants.prefixError + ' error failed to load file');
                 }
                 request.onabort = function () {
-                    if (parent) parent.component.dispatchEvent(customEvent(constants.uploadEvent, file));
                     console.error(constants.prefixError + ' abort file load');
                 }
                 request.send();
@@ -136,7 +132,6 @@ export const functions = {
             image.src = url;
             renderPreview(file, image, canvas).then(()=>{
                 filesList.update(file);
-                if (parent) parent.component.dispatchEvent(customEvent(constants.uploadEvent, file));
             })
             resolve();
         })
@@ -151,6 +146,9 @@ export const functions = {
         if(file.preview instanceof HTMLCanvasElement){
             node.appendChild(file.preview)
         }
+    },
+    completed(file){
+
     }
 }
 

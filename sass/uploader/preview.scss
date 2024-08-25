@@ -16,7 +16,7 @@
   position: relative;
   display: block;
   background:  var(--main-color);
-  border-radius: .3rem .3rem .1rem .1rem;
+  border-radius: .3rem .3rem .2rem .2rem;
   outline: .1rem solid var(--main-color-high);
   overflow: hidden;
   transform: rotate(0);
@@ -38,7 +38,6 @@
     bottom: 0;
     margin-top: auto;
     border-top: 1px solid var(--text-color);
-    border-bottom: 1px solid var(--text-color);
     background-color: var(--main-color);
     .bar {
       position: absolute;

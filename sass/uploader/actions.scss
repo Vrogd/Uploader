@@ -5,6 +5,8 @@
   --second-color: #{$componentSecondaryColor};
   --high-color: #{$componentHighlightColor};
   --text-color: white;
+  --text-error: #{$componentErrorColor};
+
   font-family: #{$componentFontFamily};
   text-align: center;
   background-color: var(--main-color);

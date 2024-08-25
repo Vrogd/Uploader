@@ -21,11 +21,24 @@ export class Upload {
     public image : boolean = true;
     public video : boolean = true;
     public other : boolean = false;
+    public backend : boolean = false; // enable file request if not add ad callback event
     public tabActive : Tabs = 'image';
     public windowBlobList : string = 'UploadBlobs';
-    constructor(object: typeOptions = {}) {
-        if (object.wrapper) this.dom(object.wrapper);
-        if (object.blobList) this.windowBlobList = object.blobList;
+    constructor(object: typeOptions | undefined) {
+       this.setSettings(object)
+    }
+    /**
+     * @description set settings
+     * @param {typeOptions} options all options
+     * @return void
+     */
+    private setSettings = (options : typeOptions | undefined) : void => {
+        if (options.wrapper) this.dom(options.wrapper);
+        if (options.blobList) this.windowBlobList = options.blobList;
+        if (typeof options.backend === 'boolean') this.backend = options.backend;
+        if (typeof options.enableImage === 'boolean') this.image = options.enableImage;
+        if (typeof options.enableVideo === 'boolean') this.video = options.enableVideo;
+        if (typeof options.enableOther === 'boolean') this.other = options.enableOther;
     }
     /**
      * @description on change event file list
@@ -135,7 +148,7 @@ export class Upload {
      * @return void
      */
     public crop = (file: typeFile) : void => {
-        this.component.dispatchEvent(customEvent(constants.CropEvent, file));
+        this.component.dispatchEvent(customEvent(constants.cropEvent, file));
     }
     /**
      * @description save / get blob to window list / based on change date

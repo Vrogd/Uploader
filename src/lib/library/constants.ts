@@ -1,4 +1,6 @@
 export const constants = {
+    enableBackend : <boolean> false,
+    booleanSettings : <string[]> [],
     previewExtensions : <string[]> ['png', 'jpg', 'jpeg', 'webp'],
     previewVideoExtensions : <string[]>  ['mp4'],
     imageDefaultExtensions : <string[]>  ['png', 'jpg', 'jpeg', 'webp', 'gif', 'svg'],
@@ -12,5 +14,5 @@ export const constants = {
     uploadEvent: <string>'customUpload',
     deleteEvent: <string>'customDelete',
     downloadEvent: <string>'customDownload',
-    CropEvent: <string>'customCrop',
+    cropEvent: <string>'customCrop',
 } as const
