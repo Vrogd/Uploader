@@ -46,8 +46,27 @@
   }
 }
 
+// main class
+#{'.' +  #{$componentSubmitActions}}{
+  display: flex;
+  &:not(.#{$componentSubmitClassExternal}){
+    width: 100%;
+  }
+  // pick files
+  #{'.' +  #{$componentSubmitClass}}{
+    width: 90%;
+  }
+  // external
+  #{'.' +  #{$componentSubmitClassExternal}}{
+    width: 10%;
+    svg {
+      margin: auto !important;
+    }
+  }
+}
+
 // submit class
-#{'.' +  #{$componentSubmitClass}}{
+#{'.' +  #{$componentSubmitClass}}, #{'.' +  #{$componentSubmitClassExternal}}{
   background-color: var(--main-color);
   padding: 0.5rem 1rem;
   margin: .2rem 0;
@@ -59,7 +78,7 @@
   text-decoration: none;
   user-select: none;
   svg{
-    width: 2rem;
+    max-width: 2rem;
     vertical-align: middle;
     fill: var(--text-color);
     transition: opacity, 0.3s, ease-in-out;

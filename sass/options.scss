@@ -4,7 +4,10 @@ $componentTab: 'tab';
 $componentWrapperClass: #{$componentName}+ "-wrapper";
 $componentTabsClass: #{$componentName} + "-tabs";
 $componentDragClass: #{$componentName} + "-drag";
+
+$componentSubmitActions : #{$componentName} + "-actions";
 $componentSubmitClass: #{$componentName} + "-submit";
+$componentSubmitClassExternal: #{$componentName} + "-submit-external";
 
 $componentPreviewClass: #{$componentName} + "-preview";
 // items
