@@ -24,6 +24,10 @@ export class Upload {
     public backend : boolean = false; // enable file request if not add ad callback event
     public tabActive : Tabs = 'image';
     public windowBlobList : string = 'UploadBlobs';
+    public external : boolean = false; // when clicked open external
+    public options : any  = {
+        enableExternal : true,
+    }
     constructor(object: typeOptions | undefined) {
        this.setSettings(object)
     }
@@ -174,6 +178,20 @@ export class Upload {
             }));
             if (hasObject) return hasObject.blob;
         }
+    }
+    /**
+     * @description decide when to show external input
+     * @return void
+     */
+    public isExternal = () : boolean => {
+        return this.options.enableExternal && this.tabActive === 'image' || this.tabActive === 'video'
+    }
+    /**
+     * @description toggle external window
+     * @return void
+     */
+    public toggleExternal = () : void => {
+        this.options.enableExternal = !(this.options.enableExternal)
     }
 }
 
