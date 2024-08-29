@@ -18,17 +18,18 @@ export class Upload {
     public component : null|HTMLElement = null;
     public input: null| HTMLElement = null;
     public files = filesList;
-    public image : boolean = true;
-    public video : boolean = true;
-    public other : boolean = false;
     public backend : boolean = false; // enable file request if not add ad callback event
     public tabActive : Tabs = 'image';
     public windowBlobList : string = 'UploadBlobs';
     public external : boolean = false; // when clicked open external
     public options : any  = {
         enableExternal : true,
+        enableImage: true,
+        enableVideo : true,
+        enableOther : true,
+        enableBackend: true
     }
-    constructor(object: typeOptions | undefined) {
+    constructor(object: unknown | undefined) {
        this.setSettings(object)
     }
     /**
@@ -36,13 +37,13 @@ export class Upload {
      * @param {typeOptions} options all options
      * @return void
      */
-    private setSettings = (options : typeOptions | undefined) : void => {
+    private setSettings = (options : unknown | undefined) : void => {
         if (options.wrapper) this.dom(options.wrapper);
         if (options.blobList) this.windowBlobList = options.blobList;
-        if (typeof options.backend === 'boolean') this.backend = options.backend;
-        if (typeof options.enableImage === 'boolean') this.image = options.enableImage;
-        if (typeof options.enableVideo === 'boolean') this.video = options.enableVideo;
-        if (typeof options.enableOther === 'boolean') this.other = options.enableOther;
+        if (typeof options.backend === 'boolean') this.options.enableBackend = options.backend;
+        if (typeof options.image === 'boolean') this.options.enableImage = options.enableImage;
+        if (typeof options.video === 'boolean') this.options.enableVideo = options.enableVideo;
+        if (typeof options.other === 'boolean') this.options.enableOther = options.enableOther;
     }
     /**
      * @description on change event file list
@@ -144,7 +145,7 @@ export class Upload {
      * @return boolean
      */
     public hasCrop = (file : typeFile) : boolean => {
-        return (this.image && file.type === 'image');
+        return (this.options.enableImage && file.type === 'image');
     }
     /**
      * @description check if crop can be shown
@@ -185,6 +186,13 @@ export class Upload {
      */
     public isExternal = () : boolean => {
         return this.options.enableExternal && this.tabActive === 'image' || this.tabActive === 'video'
+    }
+    /**
+     * @description if other tab show different dat / no preview / compact
+     * @return {boolean}
+     */
+    public isCompact = () : boolean => {
+        return this.tabActive === 'other';
     }
     /**
      * @description toggle external window
