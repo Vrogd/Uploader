@@ -1,7 +1,7 @@
 #{'.' +  #{$componentWrapperClass}}{
   --main-color: #{$componentMainColor};
   --main-color-high: #{darken($componentMainColor, 7)};
-  --main-color-low: #{lighten($componentMainColor, 10)};
+  --main-color-low: #{lighten($componentMainColor, 7)};
   --second-color: #{$componentSecondaryColor};
   --high-color: #{$componentHighlightColor};
   --text-color: white;

@@ -100,14 +100,44 @@
       padding-bottom: .8rem !important;
     }
   }
-  // external input
-  #{'.' +  #{$componentClassExternal}} {
-    .row {
-      display: flex;
-    }
-    .form-label {
-      display: flex;
-      width: 40%;
+}
+
+// external input
+#{'.' +  #{$componentClassExternal}} {
+  background: var(--main-color-high);
+  border-top: 2px solid var(--main-color-low);
+  border-bottom: 2px solid var(--main-color-low);
+  transition: height .3s linear;
+  .row {
+    padding: .4rem 0;
+    display: flex;
+  }
+  label{
+    display: flex;
+    align-items: center;
+    width: auto;
+    color: var(--text-color);
+    padding: 0 2rem;
+    font-size: .9rem;
+    font-weight: bold;
+  }
+  input {
+    border: none;
+    border-radius: .13rem;
+    font-size: 0.74rem;
+    line-height: calc(0.74rem*.93);
+    color: var(--text-color);
+    background: var(--main-color-low);
+    transition: all .3s ease;
+    height: 1.6rem;
+    max-height: 1.6rem;
+    outline: 1px solid var(--main-color-low);
+    box-shadow: none;
+    padding: 0 .2rem;
+    display: flex;
+    min-width: 60%;
+    &:focus, &:focus-within{
+      outline-color: var(--text-color);
     }
   }
 }
