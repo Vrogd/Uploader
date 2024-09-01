@@ -101,6 +101,16 @@
                  {/if}
             </div>
         {/if}
+        {#key updater}
+            {#if upload.isExternal()}
+                <div class="uploader-external">
+                    <div class="row">
+                        <label class="form-label" for="external-input-link">link : </label>
+                        <input class="form-field" id="external-input-link" type="text" placeholder="http(s)://">
+                    </div>
+                </div>
+            {/if}
+        {/key}
         <div class="uploader-actions" style="display: flex">
             <div class="uploader-submit" role="button" tabindex="0"
                  on:click="{() => {upload.eventUpload()}}"

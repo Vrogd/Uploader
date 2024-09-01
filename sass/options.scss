@@ -5,6 +5,7 @@ $componentWrapperClass: #{$componentName}+ "-wrapper";
 $componentTabsClass: #{$componentName} + "-tabs";
 $componentDragClass: #{$componentName} + "-drag";
 
+$componentClassExternal : #{$componentName} + "-external";
 $componentSubmitActions : #{$componentName} + "-actions";
 $componentSubmitClass: #{$componentName} + "-submit";
 $componentSubmitClassExternal: #{$componentName} + "-submit-external";

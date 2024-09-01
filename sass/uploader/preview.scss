@@ -100,6 +100,16 @@
       padding-bottom: .8rem !important;
     }
   }
+  // external input
+  #{'.' +  #{$componentClassExternal}} {
+    .row {
+      display: flex;
+    }
+    .form-label {
+      display: flex;
+      width: 40%;
+    }
+  }
 }
 
 // image preview

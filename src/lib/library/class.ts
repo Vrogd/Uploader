@@ -185,7 +185,7 @@ export class Upload {
      * @return void
      */
     public isExternal = () : boolean => {
-        return this.options.enableExternal && this.tabActive === 'image' || this.tabActive === 'video'
+        return this.options.enableExternal && (this.tabActive === 'image' || this.tabActive === 'video') && this.external;
     }
     /**
      * @description if other tab show different dat / no preview / compact
@@ -199,7 +199,8 @@ export class Upload {
      * @return void
      */
     public toggleExternal = () : void => {
-        this.options.enableExternal = !(this.options.enableExternal)
+        this.external = !(this.external)
+        this.files.callback(this.files.list.filter((file: typeFile) => file.type === this.tabActive));
     }
 }
 
