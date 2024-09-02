@@ -10,8 +10,8 @@ import {constants} from "./constants";
  * @param {File} file file object
  * @return void
  */
-export function upload(parent: Upload, file: typeFile) : void {
-    if (file.file instanceof File){
+export function upload(parent: Upload, file: typeFile | string) : void {
+    if (file?.file instanceof File){
         parent.files.update(file);
         let formData = new FormData();
         formData.append("file", file.file);

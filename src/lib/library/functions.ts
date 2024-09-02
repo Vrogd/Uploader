@@ -17,15 +17,24 @@ export const functions = {
      * @param {Tabs} tab active tab
      * @return {typeFile} new file object
      */
-    new : function (file: File, tab: Tabs ) {
-        return <typeFile> {
-            'file': file,
+    new : function (file: File | string, tab: Tabs) {
+        const main = {
             'progress': 0,
             'isPreviewAble' : false,
             'preview': null,
             'name': null,
             'size': null,
             'type' : tab
+        }
+        if (file instanceof File) {
+            return <typeFile> Object.assign({
+                'file': file,
+            }, main);
+        } else {
+            return <typeFile> Object.assign({
+                'url': file,
+                'external' : true
+            }, main);
         }
     },
     /**
@@ -147,9 +156,15 @@ export const functions = {
             node.appendChild(file.preview)
         }
     },
-    completed(file){
-
+    /**
+     * @description validate url
+     * @param {string} url
+     * @return {boolean}
+     */
+    validateUrl(url :string) : boolean{
+        return !!(url.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g));
     }
+
 }
 
 /**

@@ -62,7 +62,17 @@ export class Upload {
      * @return void
      */
     public eventUpload = () : void => {
-        if (this.input instanceof HTMLInputElement) this.input.click();
+        if (!this.isExternal()){
+            if (this.input instanceof HTMLInputElement) this.input.click();
+        } else {
+            const element = this.component.querySelector('.uploader-external input');
+            if (element instanceof HTMLInputElement){
+                const string = element.value;
+                if (string && string.length > 5 && functions.validateUrl(string)){
+                    upload(this, functions.new(string, this.tabActive));
+                }
+            }
+        }
     }
     /**
      * @description drop file inside block
@@ -70,10 +80,12 @@ export class Upload {
      * @return void
      */
     public eventDrop = (e : DragEvent) : void => {
-        if (e.dataTransfer && "files" in e.dataTransfer) {
-            const files = e.dataTransfer.files;
-            for (const file of files){
-                if (file instanceof File) upload(this, functions.new(file, this.tabActive));
+        if (!this.isExternal){
+            if (e.dataTransfer && "files" in e.dataTransfer) {
+                const files = e.dataTransfer.files;
+                for (const file of files){
+                    if (file instanceof File) upload(this, functions.new(file, this.tabActive));
+                }
             }
         }
     }
