@@ -6,52 +6,89 @@ import {constants} from "./constants";
 /**
  * @description file upload function
  * track all data and update list
- * @param {upload} parent
+ * @param {upload} parent main class
  * @param {File} file file object
  * @return void
  */
-export function upload(parent: Upload, file: typeFile | string) : void {
-    if (file?.file instanceof File){
-        parent.files.update(file);
-        let formData = new FormData();
-        formData.append("file", file.file);
-        const ajax = new XMLHttpRequest();
-        if (ajax.upload){
-            functions.updateFileData(file, parent);
-            ajax.upload.addEventListener("progress", (e : ProgressEvent<XMLHttpRequestEventTarget>) => {
-                uploadProgressHandler(file, e, parent);
-            }, false);
-            ajax.upload.addEventListener("error", (e) => {
-                console.log(e)
-                uploadErrorhandler(e);
-            }, false);
-            ajax.upload.addEventListener("abort", (e) => {
-                uploadAbortHandler(e);
-                console.log(e)
-            }, false);
-            ajax.upload.addEventListener("timeout", (e) => {
-                console.log(e, 'timeout')
-            }, false);
-            ajax.upload.addEventListener("loadend", () => {
-                uploadLoadEndHandler(file, parent)
-            });
-            ajax.addEventListener("load", () => {
-                if (ajax.status === 404) {
-                    // Handle 404 error
-                    console.error('File not found (404)');
-                    // You can call a specific handler or perform any other action here
-                } else if (ajax.status >= 200 && ajax.status < 300) {
-                    // Success, handle the response
-                    console.log('File uploaded successfully');
-                } else {
-                    // Handle other HTTP errors
-                    console.error(`Error: ${ajax.status}`);
-                }
-            });
-            ajax.open("POST", "/file");
-            ajax.send(formData as XMLHttpRequestBodyInit);
-        }
+export function upload(parent: Upload, file: typeFile) : void {
+    parent.files.update(file);
+    if (file && file.file instanceof File){
+        uploadFile(parent, file);
+    } else {
+        uploadExternal(parent, file);
     }
+}
+
+/**
+ * @description upload file
+ * @param {upload} parent main class
+ * @param {typeFile} file
+ * @return void
+ */
+function uploadFile(parent: Upload, file: typeFile) : void {
+    const formData = new FormData();
+    formData.append("file", file.file);
+    const ajax = new XMLHttpRequest();
+    if (ajax.upload){
+        functions.updateFileData(file, parent);
+        ajax.upload.addEventListener("progress", (e : ProgressEvent<XMLHttpRequestEventTarget>) => {
+            uploadProgressHandler(file, e, parent);
+        }, false);
+        ajax.upload.addEventListener("error", (e) => {
+            console.log(e)
+            uploadErrorhandler(e);
+        }, false);
+        ajax.upload.addEventListener("abort", (e) => {
+            uploadAbortHandler(e);
+            console.log(e)
+        }, false);
+        ajax.upload.addEventListener("timeout", (e) => {
+            console.log(e, 'timeout')
+        }, false);
+        ajax.upload.addEventListener("loadend", () => {
+            uploadLoadEndHandler(file, parent)
+        });
+        ajax.addEventListener("load", () => {
+            if (ajax.status === 404) {
+                // Handle 404 error
+                console.error('File not found (404)');
+                // You can call a specific handler or perform any other action here
+            } else if (ajax.status >= 200 && ajax.status < 300) {
+                // Success, handle the response
+                console.log('File uploaded successfully');
+            } else {
+                // Handle other HTTP errors
+                console.error(`Error: ${ajax.status}`);
+            }
+        });
+        ajax.open("POST", "/file");
+        ajax.send(formData as XMLHttpRequestBodyInit);
+    }
+}
+
+/**
+ * @description upload external
+ * @param {upload} parent main class
+ * @param {typeFile} file
+ * @return void
+ */
+function uploadExternal(parent: Upload, file: typeFile) : void {
+    parent.files.update(file);
+    fetch(file.url).then(response => {
+        const contentType : string = response.headers.get('Content-Type');
+        if (file.type === 'image' && contentType && contentType.startsWith('image/')){
+            file.progress = 100;
+            file.completed = true;
+            file.name = file.url;
+            response.blob().then(blobResponse => {
+                file.size = formatFileSize(blobResponse.size, 2)
+                parent.files.update(file);
+                console.log(response, blobResponse)
+            })
+        } else {
+            console.log('error', response)
+        }
+    });
 }
 
 /**

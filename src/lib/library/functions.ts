@@ -151,18 +151,19 @@ export const functions = {
      * @param {HTMLElement} node dom element
      * @return void
      */
-    previewEvent(file: typeFile, node: HTMLElement): void{
+    previewEvent(file: typeFile, node: HTMLElement): void {
         if(file.preview instanceof HTMLCanvasElement){
             node.appendChild(file.preview)
         }
     },
     /**
      * @description validate url
-     * @param {string} url
+     * @param {string} url url to validate
      * @return {boolean}
      */
-    validateUrl(url :string) : boolean{
-        return !!(url.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g));
+    validateUrl(url :string) : boolean {
+        const pattern = /^(https?:\/\/)?((([a-zA-Z\d]([a-zA-Z\d-]*[a-zA-Z\d])*)\.)+[a-zA-Z]{2,})(:\d+)?(\/[-a-zA-Z\d%_.~+()]*)*(\?[;&a-zA-Z\d%_.~+=-]*)?(#[-a-zA-Z\d_]*)?$/;
+        return pattern.test(url);
     }
 
 }
