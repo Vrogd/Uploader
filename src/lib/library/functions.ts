@@ -164,8 +164,17 @@ export const functions = {
     validateUrl(url :string) : boolean {
         const pattern = /^(https?:\/\/)?((([a-zA-Z\d]([a-zA-Z\d-]*[a-zA-Z\d])*)\.)+[a-zA-Z]{2,})(:\d+)?(\/[-a-zA-Z\d%_.~+()]*)*(\?[;&a-zA-Z\d%_.~+=-]*)?(#[-a-zA-Z\d_]*)?$/;
         return pattern.test(url);
-    }
+    },
+    /**
+     * @description validate if correct type of file is upload / external otherwise throw error
+     * @param {typeFile} file
+     * @return {Promise} void
+     */
+    validateCorrectUploadType(file: typeFile, activeTab : Tabs) : Promise<void> {
+        return new Promise((resolve: any, reject: any) => {
 
+        })
+    }
 }
 
 /**

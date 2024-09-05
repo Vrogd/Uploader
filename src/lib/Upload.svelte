@@ -70,16 +70,16 @@
                                             </span>
                                             <span class="actions">
                                                 {#if upload.hasCrop(file) && file.completed && !upload.isCompact()}
-                                                    <button data-upload-crop on:click="{() => upload.crop(file)}">
+                                                    <button class="spin" data-upload-crop on:click="{() => upload.crop(file)}">
                                                         <i class="fa-solid fa-crop"></i>
                                                     </button>
                                                 {/if}
                                                 {#if file.completed }
-                                                    <button data-upload-download on:click="{() => upload.download(file)}">
+                                                    <button class="spin" data-upload-download on:click="{() => upload.download(file)}">
                                                         <i class="fa-solid fa-cloud-arrow-down"></i>
                                                     </button>
                                                 {/if}
-                                                <button data-upload-delete on:click="{() => upload.delete(file)}">
+                                                <button class="spin" data-upload-delete on:click="{() => upload.delete(file)}">
                                                     <i class="fa-solid fa-trash"></i>
                                                 </button>
                                             </span>
@@ -87,9 +87,11 @@
                                                 <span data-upload-percentage class="percentage">{file.progress} %</span>
                                             {/if}
                                        </div>
-                                       <div class="progress">
-                                            <span class="bar" style="width: {file.progress}%"></span>
-                                       </div>
+                                       {#if !(file.external)}
+                                           <div class="progress">
+                                                <span class="bar" style="width: {file.progress}%"></span>
+                                           </div>
+                                       {/if}
                                        {#if file.isPreviewAble && !upload.isCompact()}
                                             <div class="preview" use:renderPreview={file}>
                                                 <div class="wrapper"></div>

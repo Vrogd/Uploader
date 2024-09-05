@@ -70,6 +70,7 @@ export class Upload {
                 const string = element.value;
                 if (string && string.length > 5 && functions.validateUrl(string)){
                     upload(this, functions.new(string, this.tabActive));
+                    this.external = false;
                 }
             }
         }
@@ -105,6 +106,7 @@ export class Upload {
     public switch = (key : Tabs) : void => {
         if (this.tabActive !== key) {
             this.tabActive = key;
+            this.external = false;
             this.files.callback?.(this.files.list.filter((file: typeFile) => file.type === this.tabActive));
         }
     }
@@ -157,7 +159,7 @@ export class Upload {
      * @return boolean
      */
     public hasCrop = (file : typeFile) : boolean => {
-        return (this.options.enableImage && file.type === 'image');
+        return (this.options.enableImage && file.type === 'image' && !file.external);
     }
     /**
      * @description check if crop can be shown

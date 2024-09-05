@@ -153,8 +153,6 @@
     z-index: 3;
     bottom: 10%;
     right: 2%;
-    transition: all;
-    transition-delay: 200ms;
     button {
       opacity: .85;
       padding: #{$componentBarHeight} #{$componentBarHeight};
