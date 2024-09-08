@@ -27,7 +27,10 @@ export class Upload {
         enableImage: true,
         enableVideo : true,
         enableOther : true,
-        enableBackend: true
+        enableBackend: true,
+        imageExtensions: [],
+        videoExtensions: [],
+        otherExtensions: []
     }
     constructor(object: unknown | undefined) {
        this.setSettings(object)
@@ -41,9 +44,12 @@ export class Upload {
         if (options.wrapper) this.dom(options.wrapper);
         if (options.blobList) this.windowBlobList = options.blobList;
         if (typeof options.backend === 'boolean') this.options.enableBackend = options.backend;
-        if (typeof options.image === 'boolean') this.options.enableImage = options.enableImage;
-        if (typeof options.video === 'boolean') this.options.enableVideo = options.enableVideo;
-        if (typeof options.other === 'boolean') this.options.enableOther = options.enableOther;
+        if (typeof options.enableImage === 'boolean') this.options.enableImage = options.enableImage;
+        if (typeof options.enableVideo === 'boolean') this.options.enableVideo = options.enableVideo;
+        if (typeof options.enableOther === 'boolean') this.options.enableOther = options.enableOther;
+        this.options.imageExtensions = Array.isArray(options.imageExtensions) ? options.imageExtensions : constants.imageDefaultExtensions;
+        this.options.videoExtensions = Array.isArray(options.videoExtensions) ? options.videoExtensions : constants.videoDefaultExtensions;
+        if (Array.isArray(options.otherExtensions)) this.options.otherExtensions = options.otherExtensions;
     }
     /**
      * @description on change event file list

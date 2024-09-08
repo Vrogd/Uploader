@@ -168,11 +168,25 @@ export const functions = {
     /**
      * @description validate if correct type of file is upload / external otherwise throw error
      * @param {typeFile} file
+     * @param {Tabs} activeTab
+     * @param {Upload} parent main class
      * @return {Promise} void
      */
-    validateCorrectUploadType(file: typeFile, activeTab : Tabs) : Promise<void> {
-        return new Promise((resolve: any, reject: any) => {
+    validateCorrectUploadType(file: typeFile, activeTab : Tabs, parent : Upload) : Promise<void> {
+        return new Promise((resolve, reject) => {
+            let extension;
+            if (file.file instanceof File){
+                extension = file.file.name.split('.').pop()
+            } else if (file.url){
+                extension = file.url.split('.').pop()
+            }
 
+            if (extension){
+
+            }
+
+            console.log(file.file)
+            console.log(file, activeTab, parent, 'validate');
         })
     }
 }

@@ -13,7 +13,7 @@ import {constants} from "./constants";
 export function upload(parent : Upload, file : typeFile) : void {
     parent.files.update(file);
     if (file && file.file instanceof File){
-        functions.validateCorrectUploadType(file, parent.tabActive).then(() => {
+        functions.validateCorrectUploadType(file, parent.tabActive, parent).then(() => {
 
         });
         uploadFile(parent, file);
