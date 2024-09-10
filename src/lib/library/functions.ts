@@ -38,7 +38,7 @@ export const functions = {
         }
     },
     /**
-     * @description create new instance
+     * @description read file from upload
      * @param {typeFile} file file object
      * @param {Upload} parent parent class
      * @return void
@@ -49,12 +49,12 @@ export const functions = {
             file.name = file.file.name;
             if (file.file.type.includes('image') && !file.isPreviewAble){
                 functions.fileReader(file, parent).then(() => {
-                    filesList.update(file);
+                    parent.files.update(file);
                 }).catch((err : Error) => {
                     console.error(constants.prefixError + ' failed to set preview', err);
                 })
             } else {
-                filesList.update(file);
+                parent.files.update(file);
             }
         }
     },
@@ -66,7 +66,7 @@ export const functions = {
      */
     fileReader(file : typeFile, parent: Upload|undefined) : Promise<void> {
         return new Promise((resolve: any) => {
-            if (file.file && file.file instanceof File){
+            if ((file.file && file.file instanceof File && parent)){
                 const canvas = document.createElement('canvas');
                 const blob = <Blob>parent.blob(file.file.name, file.file.lastModified);
                 if (blob){
@@ -108,7 +108,7 @@ export const functions = {
                         const image = new Image();
                         image.src = e.target.result;
                         renderPreview(file, image, canvas).then(() => {
-                            filesList.update(file);
+                            parent.files.update(file);
                         })
                     };
                 };
@@ -172,7 +172,7 @@ export const functions = {
      * @param {Upload} parent main class
      * @return {Promise} void
      */
-    validateCorrectUploadType(file: typeFile, activeTab : Tabs, parent : Upload) : Promise<void> {
+    validateCorrectUploadType(file: typeFile, activeTab : Tabs, parent : Upload) : Promise<typeFile> {
         return new Promise((resolve, reject) => {
             let extension;
             if (file.file instanceof File){
@@ -180,13 +180,26 @@ export const functions = {
             } else if (file.url){
                 extension = file.url.split('.').pop()
             }
-
             if (extension){
+                const isImage = <boolean> (parent.options.imageExtensions.indexOf(extension) > -1);
+                const isVideo = <boolean> (parent.options.videoExtensions.indexOf(extension) > -1);
+                const isOther  = <boolean> ((Object.keys(parent.options.otherExtensions).length) ? parent.options.otherExtensions.indexOf(extension) : true);
+                const activeImage = <boolean> ((activeTab === 'image') && isImage && parent.options.enableImage);
+                const activeImageCorrection = <boolean> (!(activeTab === 'image') && isImage && parent.options.enableImage);
+                const activeVideo = <boolean> (activeTab === 'video' && isVideo &&  parent.options.enableVideo);
+                const activeVideoCorrection = <boolean> (!(activeTab === 'video') && isVideo && parent.options.enableVideo);
+                const activeOther = <boolean> (activeTab === 'other' && isOther && parent.options.enableOther);
+                const activeOtherCorrection = <boolean> (!(activeTab === 'other') && isOther && parent.options.enableOther);
 
+                if (activeImageCorrection) file.type = 'image';
+                else if (activeVideoCorrection) file.type = 'video';
+                else if (activeOtherCorrection) file.type = 'other';
+
+                if (activeImage || activeImageCorrection || activeVideo || activeVideoCorrection || activeOther || activeOtherCorrection){
+                    resolve(file);
+                }
             }
-
-            console.log(file.file)
-            console.log(file, activeTab, parent, 'validate');
+            reject();
         })
     }
 }

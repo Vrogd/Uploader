@@ -6,6 +6,7 @@ import type {typeFile} from "../../types/file";
 import {customEvent, functions} from "./functions"
 import {constants} from "./constants";
 import type {fileBlob} from "../../types/fileBlob";
+import type {adjustOptions} from "../../types/adjustOptions";
 
 /**
  * @description upload class
@@ -22,7 +23,7 @@ export class Upload {
     public tabActive : Tabs = 'image';
     public windowBlobList : string = 'UploadBlobs';
     public external : boolean = false; // when clicked open external
-    public options : any  = {
+    public options : adjustOptions  = {
         enableExternal : true,
         enableImage: true,
         enableVideo : true,

@@ -11,15 +11,13 @@ import {constants} from "./constants";
  * @return void
  */
 export function upload(parent : Upload, file : typeFile) : void {
-    parent.files.update(file);
-    if (file && file.file instanceof File){
-        functions.validateCorrectUploadType(file, parent.tabActive, parent).then(() => {
-
-        });
-        uploadFile(parent, file);
-    } else {
-        uploadExternal(parent, file);
-    }
+    functions.validateCorrectUploadType(file, parent.tabActive, parent).then((file : typeFile) => {
+        parent.files.update(file);
+        if (file && file.file instanceof File) uploadFile(parent, file);
+        else uploadExternal(parent, file);
+    }).catch((err) => {
+        console.log(err, 'failed to upload')
+    });
 }
 
 /**

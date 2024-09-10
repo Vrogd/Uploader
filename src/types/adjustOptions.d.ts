@@ -3,5 +3,8 @@ export type adjustOptions =  {
     enableImage: boolean,
     enableVideo : boolean,
     enableOther : boolean,
-    enableBackend: boolean
+    enableBackend: boolean,
+    imageExtensions: string[],
+    videoExtensions: string[],
+    otherExtensions: string[]
 }

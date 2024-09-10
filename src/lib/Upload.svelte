@@ -10,7 +10,9 @@
     export let crop : boolean = constants.defaultCropEnabled;
 
     // create class
-    let upload = new library.upload(<typeOptions>{crop: crop});
+    let upload = new library.upload(<typeOptions>{
+        crop: crop
+    });
     let updater = 0;
     const dispatch = createEventDispatcher();
 
