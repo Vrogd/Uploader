@@ -214,22 +214,20 @@ export const functions = {
 function renderPreview(file: typeFile, image: HTMLImageElement, canvas: HTMLCanvasElement) : Promise<unknown> {
     return new Promise(((resolve: unknown) => {
         image.addEventListener("load", function() {
-            setTimeout(() => {
-                const clientWidth = file.previewElement?.clientWidth;
-                const clientHeight = constants.previewHeight * parseFloat(getComputedStyle(document.documentElement).fontSize);
-                if (clientHeight && clientWidth) {
-                    const size : canvasSize = calculateCanvasSize(clientWidth, clientHeight, image.width, image.height);
-                    canvas.width = size.width;
-                    canvas.height = size.height;
-                    canvas.setAttribute('data-width', String(size.width));
-                    canvas.setAttribute('data-height', String(size.height))
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(image, size.left, size.top, size.width, size.height);
-                } else {
-                    console.error(constants.prefixError + ' dom missing width / height');
-                }
-                resolve();
-            }, 0)
+            const clientWidth = file.previewElement?.clientWidth;
+            const clientHeight = constants.previewHeight * parseFloat(getComputedStyle(document.documentElement).fontSize);
+            if (clientHeight && clientWidth) {
+                const size : canvasSize = calculateCanvasSize(clientWidth, clientHeight, image.width, image.height);
+                canvas.width = size.width;
+                canvas.height = size.height;
+                canvas.setAttribute('data-width', String(size.width));
+                canvas.setAttribute('data-height', String(size.height))
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(image, size.left, size.top, size.width, size.height);
+            } else {
+                console.error(constants.prefixError + ' dom missing width / height');
+            }
+            resolve();
         }, false);
         image.addEventListener("error", function() {
             console.error(constants.prefixError + ' failed to load image');
