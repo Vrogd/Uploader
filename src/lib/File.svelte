@@ -40,8 +40,8 @@
                  <i class="fa-solid fa-trash"></i>
             </button>
         </span>
-        {#if !upload.isCompact()}
-            <span data-upload-percentage class="percentage">{file.progress} %</span>
+        {#if !upload.isCompact() && !file.failed}
+            <span data-upload-percentage class="percentage"></span>
         {/if}
     </div>
     {#if !(file.external)}

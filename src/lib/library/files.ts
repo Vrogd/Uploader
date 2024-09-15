@@ -23,6 +23,7 @@ export const filesList = {
         if (find && find as typeFile){
             const index : number = this.list.indexOf(find);
             if (index > -1){
+                if (item.failed) item.completed = false;
                 this.list[index] = item;
                 if (typeof this.callback === 'function') this.callback(this.list.filter((file: typeFile) => file.type === tabActive));
             }
