@@ -31,7 +31,7 @@ function uploadFile(parent : Upload, file : typeFile) : void {
     formData.append("file", file.file);
     const ajax = new XMLHttpRequest();
     if (ajax.upload){
-        functions.updateFileData(file, parent);
+        parent.files.update(file);
         ajax.upload.addEventListener("progress", (e : ProgressEvent<XMLHttpRequestEventTarget>) => {
             uploadProgressHandler(file, e, parent);
         }, false);
@@ -50,6 +50,7 @@ function uploadFile(parent : Upload, file : typeFile) : void {
             uploadLoadEndHandler(file, parent)
         });
         ajax.addEventListener("load", () => {
+            functions.updateFileData(file, parent);
             if (ajax.status === 404) {
                 // Handle 404 error
                 console.error('File not found (404)');
@@ -110,7 +111,7 @@ function uploadProgressHandler(file : typeFile, e : ProgressEvent, parent: Uploa
     if (file.progress === 100 && !constants.enableBackend){
         file.completed = true;
     }
-    functions.updateFileData(file, parent);
+    parent.files.update(file);
 }
 
 /**

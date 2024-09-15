@@ -15,20 +15,21 @@ export const filesList = {
      * @return void
      */
     update: function (item : typeFile) : void {
-        if (item.hasOwnProperty('id') && typeof item.id === 'string'){
-            const find = this.list.find((file : typeFile) => {
-                if (item.id === file.id) return file;
-            })
-            if (find && find as typeFile){
-                const index : number = this.list.indexOf(find);
-                if (index > -1){
-                    this.list[index] = item;
-                    if (typeof this.callback === 'function') this.callback(this.list.filter((file: typeFile) => file.type === item.type));
-                }
+        const find = this.list.find((file : typeFile) => {
+            if (item.hasOwnProperty('id') && typeof item.id === 'string' && item.id === file.id) return file;
+        })
+        if (find && find as typeFile){
+            const index : number = this.list.indexOf(find);
+            if (index > -1){
+                this.list[index] = item;
+                if (typeof this.callback === 'function') this.callback(this.list.filter((file: typeFile) => file.type === item.type));
             }
         } else {
-            item.id = generateId(30);
+            if (!item.id){
+                item.id = generateId(30);
+            }
             this.list.push(item);
+            if (typeof this.callback === 'function') this.callback(this.list.filter((file: typeFile) => file.type === item.type));
         }
     },
     delete: function (item : typeFile) : void {

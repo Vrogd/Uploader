@@ -1,6 +1,6 @@
 import {constants} from "./constants";
 import {filesList} from "./files";
-import {formatFileSize} from "./events";
+import {formatFileSize, generateId} from "./events";
 import type {typeFile} from "../../types/file";
 import type {canvasSize} from "../../types/size";
 import type {Tabs} from "../../types/tabs";
@@ -24,7 +24,8 @@ export const functions = {
             'preview': null,
             'name': null,
             'size': null,
-            'type' : tab
+            'type' : tab,
+            'id' : generateId(30),
         }
         if (file instanceof File) {
             return <typeFile> Object.assign({
@@ -107,6 +108,7 @@ export const functions = {
                         file.url = e.target?.result;
                         const image = new Image();
                         image.src = e.target.result;
+                        parent.files.update(file);
                         renderPreview(file, image, canvas).then(() => {
                             parent.files.update(file);
                         })
@@ -140,7 +142,7 @@ export const functions = {
             const image = new Image();
             image.src = url;
             renderPreview(file, image, canvas).then(()=>{
-                filesList.update(file);
+                parent.files.update(file);
             })
             resolve();
         })
