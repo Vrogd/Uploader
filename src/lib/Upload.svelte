@@ -1,10 +1,11 @@
 <script lang="ts">
-    import {onMount, createEventDispatcher} from 'svelte';
+    import {onMount, createEventDispatcher, tick} from 'svelte';
     import type {typeFile} from "../types/file";
     import {library} from "./index";
     import {constants} from "./library/constants";
     import type {typeOptions} from "../types/options";
     import File from "./File.svelte";
+    import {functions} from "./library/functions";
 
     // options
     export let component = null;
@@ -19,13 +20,15 @@
 
     // callback
     upload.files.callback = function (list: typeFile[]) {
+        console.log(list)
         fileList = list;
         updater++;
     }
 
     // init
     let fileList;
-    onMount(() => {
+    onMount(async () => {
+        await tick();
         upload.dom(component);
         let timeout : any[] = [];
         component.addEventListener(constants.uploadEvent, function (e : CustomEvent){
@@ -42,9 +45,9 @@
         component.addEventListener(constants.cropEvent, function (e: CustomEvent){
             dispatch(constants.cropEvent, e.detail);
         })
-        // loaded dom event
+        // loaded dom event // load preview if clicked on tab
         component.addEventListener(constants.domLoadEvent, function (e : CustomEvent){
-            console.log(e, 'load event')
+            functions.updateFileData(e.detail, upload);
         })
     });
 </script>
@@ -68,7 +71,7 @@
                  {#if fileList && Object.keys(fileList).length}
                       {#each fileList as file}
                            {#if 'id' in file && file.id}
-                               <File bind:file={file} bind:upload={upload}/>
+                               <File bind:file={file} bind:upload={upload} bind:component={component}/>
                            {/if}
                       {/each}
                  {/if}

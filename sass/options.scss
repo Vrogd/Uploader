@@ -14,6 +14,8 @@ $componentPreviewClass: #{$componentName} + "-preview";
 // items
 $componentItem: #{$componentName} + '-item';
 $componentItemImage: #{$componentName} + '-item-image';
+$componentItemError: #{$componentName} + '-item-error';
+
 //colors
 $componentMainColor: #202a44 !default;
 $componentSecondaryColor: #1d1d2a !default;

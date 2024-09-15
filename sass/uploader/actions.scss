@@ -121,3 +121,13 @@
     }
   }
 }
+
+// error class
+#{'.' +  #{$componentItemError}}{
+  .progress {
+    .bar {
+      background: var(--text-error) !important;
+    }
+  }
+}
+

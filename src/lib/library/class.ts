@@ -3,7 +3,7 @@ import {upload} from "./events";
 import type {typeOptions} from "../../types/options";
 import type {Tabs} from "../../types/tabs";
 import type {typeFile} from "../../types/file";
-import {customEvent, functions} from "./functions"
+import {cleanUrl, customEvent, functions} from "./functions"
 import {constants} from "./constants";
 import type {fileBlob} from "../../types/fileBlob";
 import type {adjustOptions} from "../../types/adjustOptions";
@@ -76,7 +76,7 @@ export class Upload {
             if (element instanceof HTMLInputElement){
                 const string = element.value;
                 if (string && string.length > 5 && functions.validateUrl(string)){
-                    upload(this, functions.new(string, this.tabActive));
+                    upload(this, functions.new(cleanUrl(string), this.tabActive));
                     this.external = false;
                 }
             }

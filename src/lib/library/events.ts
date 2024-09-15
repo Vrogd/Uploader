@@ -12,11 +12,10 @@ import {constants} from "./constants";
  */
 export function upload(parent : Upload, file : typeFile) : void {
     functions.validateCorrectUploadType(file, parent.tabActive, parent).then((file : typeFile) => {
-        parent.files.update(file);
         if (file && file.file instanceof File) uploadFile(parent, file);
         else uploadExternal(parent, file);
     }).catch((err) => {
-        console.log(err, 'failed to upload')
+        console.error(constants.prefixError + ' failed to validate upload', err)
     });
 }
 
@@ -31,17 +30,18 @@ function uploadFile(parent : Upload, file : typeFile) : void {
     formData.append("file", file.file);
     const ajax = new XMLHttpRequest();
     if (ajax.upload){
-        parent.files.update(file);
+        parent.files.update(file, parent.tabActive);
+        functions.updateFileData(file, parent);
         ajax.upload.addEventListener("progress", (e : ProgressEvent<XMLHttpRequestEventTarget>) => {
             uploadProgressHandler(file, e, parent);
         }, false);
         ajax.upload.addEventListener("error", (e) => {
-            console.log(e)
+            file.failed = true;
             uploadErrorhandler(e);
         }, false);
         ajax.upload.addEventListener("abort", (e) => {
             uploadAbortHandler(e);
-            console.log(e)
+            file.failed = true;
         }, false);
         ajax.upload.addEventListener("timeout", (e) => {
             console.log(e, 'timeout')
@@ -51,17 +51,11 @@ function uploadFile(parent : Upload, file : typeFile) : void {
         });
         ajax.addEventListener("load", () => {
             functions.updateFileData(file, parent);
-            if (ajax.status === 404) {
-                // Handle 404 error
-                console.error('File not found (404)');
-                // You can call a specific handler or perform any other action here
-            } else if (ajax.status >= 200 && ajax.status < 300) {
-                // Success, handle the response
-                console.log('File uploaded successfully');
-            } else {
-                // Handle other HTTP errors
-                console.error(`Error: ${ajax.status}`);
+            if (ajax.status >= 400 && ajax.status < 600) {
+                if (constants.enableBackend) file.failed = true;
+                console.error(constants.prefixError +  ' File upload failed (' + ajax.status + ')');
             }
+            parent.files.update(file, parent.tabActive);
         });
         ajax.open("POST", "/file");
         ajax.send(formData as XMLHttpRequestBodyInit);
@@ -75,27 +69,32 @@ function uploadFile(parent : Upload, file : typeFile) : void {
  * @return void
  */
 function uploadExternal(parent : Upload, file : typeFile) : void {
-    parent.files.update(file);
     fetch(file.url).then(response => {
         const contentType : string = response.headers.get('Content-Type');
+        file.name = file.url;
         if (file.type === 'image' && contentType && contentType.startsWith('image/')){
             response.blob().then(blobResponse => {
                 file.size = formatFileSize(blobResponse.size, 2)
                 file.progress = 100;
                 file.completed = true;
-                file.name = file.url;
                 const canvas = document.createElement('canvas');
                 functions.loadCache(file, parent, canvas, blobResponse).then(() =>{
                     console.log('test')
                 }).catch((err : Error) => {
                     console.error(constants.prefixError + ' failed to load preview from cache.', err);
                 });
-                parent.files.update(file);
+                parent.files.update(file, parent.tabActive);
                 console.log(response, blobResponse)
             })
         } else {
             console.log('error', response)
         }
+    }).catch((error) => {
+        console.log(error)
+        file.failed = true;
+        parent.files.update(file, parent.tabActive);
+
+        console.error(error)
     });
 }
 
@@ -111,7 +110,7 @@ function uploadProgressHandler(file : typeFile, e : ProgressEvent, parent: Uploa
     if (file.progress === 100 && !constants.enableBackend){
         file.completed = true;
     }
-    parent.files.update(file);
+    parent.files.update(file, parent.tabActive);
 }
 
 /**

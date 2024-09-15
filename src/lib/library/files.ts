@@ -1,6 +1,7 @@
 import type {typeFileList} from "../../types/fileList";
 import {generateId} from "./events";
 import type {typeFile} from "../../types/file";
+import type {Tabs} from "../../types/tabs";
 
 /**
  * @description data object
@@ -12,9 +13,10 @@ export const filesList = {
     /**
      * @description add
      * @param {typeFile} item
+     * @param {Tabs} tabActive active tab
      * @return void
      */
-    update: function (item : typeFile) : void {
+    update: function (item : typeFile, tabActive : Tabs) : void {
         const find = this.list.find((file : typeFile) => {
             if (item.hasOwnProperty('id') && typeof item.id === 'string' && item.id === file.id) return file;
         })
@@ -22,14 +24,14 @@ export const filesList = {
             const index : number = this.list.indexOf(find);
             if (index > -1){
                 this.list[index] = item;
-                if (typeof this.callback === 'function') this.callback(this.list.filter((file: typeFile) => file.type === item.type));
+                if (typeof this.callback === 'function') this.callback(this.list.filter((file: typeFile) => file.type === tabActive));
             }
         } else {
             if (!item.id){
                 item.id = generateId(30);
             }
             this.list.push(item);
-            if (typeof this.callback === 'function') this.callback(this.list.filter((file: typeFile) => file.type === item.type));
+            if (typeof this.callback === 'function') this.callback(this.list.filter((file: typeFile) => file.type === tabActive));
         }
     },
     delete: function (item : typeFile) : void {

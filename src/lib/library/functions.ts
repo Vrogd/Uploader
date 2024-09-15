@@ -45,17 +45,18 @@ export const functions = {
      * @return void
      */
     updateFileData(file: typeFile, parent: Upload) : void {
+        const correctTab : boolean = parent.tabActive === file.type;
         if (file.file instanceof File){
             file.size = formatFileSize(file.file.size, 2);
             file.name = file.file.name;
-            if (file.file.type.includes('image') && !file.isPreviewAble){
+            if (file.file.type.includes('image') && !file.isPreviewAble && !file.preview && correctTab){
                 functions.fileReader(file, parent).then(() => {
-                    parent.files.update(file);
+                    parent.files.update(file, parent.tabActive);
                 }).catch((err : Error) => {
                     console.error(constants.prefixError + ' failed to set preview', err);
                 })
             } else {
-                parent.files.update(file);
+                parent.files.update(file, parent.tabActive);
             }
         }
     },
@@ -108,9 +109,10 @@ export const functions = {
                         file.url = e.target?.result;
                         const image = new Image();
                         image.src = e.target.result;
-                        parent.files.update(file);
                         renderPreview(file, image, canvas).then(() => {
-                            parent.files.update(file);
+                            parent.files.update(file, parent.tabActive);
+                        }).catch(() => {
+                            console.error(constants.prefixError + ' failed to load preview');
                         })
                     };
                 };
@@ -142,7 +144,7 @@ export const functions = {
             const image = new Image();
             image.src = url;
             renderPreview(file, image, canvas).then(()=>{
-                parent.files.update(file);
+                parent.files.update(file, parent.tabActive);
             })
             resolve();
         })
@@ -164,7 +166,7 @@ export const functions = {
      * @return {boolean}
      */
     validateUrl(url :string) : boolean {
-        const pattern = /^(https?:\/\/)?((([a-zA-Z\d]([a-zA-Z\d-]*[a-zA-Z\d])*)\.)+[a-zA-Z]{2,})(:\d+)?(\/[-a-zA-Z\d%_.~+()]*)*(\?[;&a-zA-Z\d%_.~+=-]*)?(#[-a-zA-Z\d_]*)?$/;
+        const pattern = /^(https?:\/\/)?((([a-zA-Z\d]([a-zA-Z\d-]*[a-zA-Z\d])*)\.)+[a-zA-Z]{2,})(:\d+)?(\/[-a-zA-Z\d%_.~+()/:=]*)*(\?[;&a-zA-Z\d%_.~+=-]*)?(#[-a-zA-Z\d_]*)?$/;
         return pattern.test(url);
     },
     /**
@@ -178,9 +180,9 @@ export const functions = {
         return new Promise((resolve, reject) => {
             let extension;
             if (file.file instanceof File){
-                extension = file.file.name.split('.').pop()
+                extension = file.file.name.split('.').pop();
             } else if (file.url){
-                extension = file.url.split('.').pop()
+                extension = file.url.split('.').pop();
             }
             if (extension){
                 const isImage = <boolean> (parent.options.imageExtensions.indexOf(extension) > -1);
@@ -193,9 +195,9 @@ export const functions = {
                 const activeOther = <boolean> (activeTab === 'other' && isOther && parent.options.enableOther);
                 const activeOtherCorrection = <boolean> (!(activeTab === 'other') && isOther && parent.options.enableOther);
 
-                if (activeImageCorrection) file.type = 'image';
-                else if (activeVideoCorrection) file.type = 'video';
-                else if (activeOtherCorrection) file.type = 'other';
+                if ((activeImageCorrection || activeImage) && isImage) file.type = 'image';
+                else if ((activeVideoCorrection || activeVideo) && isVideo) file.type = 'video';
+                else if ((activeOtherCorrection || activeOther) && isOther) file.type = 'other';
 
                 if (activeImage || activeImageCorrection || activeVideo || activeVideoCorrection || activeOther || activeOtherCorrection){
                     resolve(file);
@@ -273,6 +275,19 @@ function calculateCanvasSize(domWidth: number, domHeight: number, width: number,
  */
 export function customEvent(key: string, detail: any) : CustomEvent{
     return new CustomEvent(key, {detail: detail});
+}
+
+/**
+ * @description clean up url
+ * @param {string} url string params clean up after ?
+ * @return string should be clear url
+ */
+export function cleanUrl(url : string){
+    const index = url.indexOf('?');
+    if (index !== -1) {
+        return url.substring(0, index);
+    }
+    return url;
 }
 
 export default functions;
