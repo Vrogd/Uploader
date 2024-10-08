@@ -69,7 +69,8 @@ function uploadFile(parent : Upload, file : typeFile) : void {
  * @return void
  */
 function uploadExternal(parent : Upload, file : typeFile) : void {
-    fetch(file.url).then(response => {
+    fetch(new URL(file.url)).then(response => {
+        console.log(response)
         const contentType : string = response.headers.get('Content-Type');
         file.name = file.url;
         if (file.type === 'image' && contentType && contentType.startsWith('image/')){
