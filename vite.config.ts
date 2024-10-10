@@ -2,6 +2,7 @@ import { defineConfig } from 'vite';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { resolve } from 'path';
 import { writeFileSync, mkdirSync } from 'fs';
+import { exec } from 'child_process';
 import * as sass from 'sass'
 
 const svelteConfig = defineConfig({
@@ -20,6 +21,23 @@ const svelteConfig = defineConfig({
 
 				// Write the compiled CSS to the output file
 				writeFileSync(resolve(__dirname, 'static/output.css'), result.css);
+			}
+		},
+		{
+			name: 'npm link',
+			apply: 'serve',
+			buildEnd() {
+				exec('cd dist npm link', (err, stdout, stderr) => {
+					if (err) {
+						console.error(`Error running npm link: ${err.message}`);
+						return;
+					}
+					if (stderr) {
+						console.error(`npm link stderr: ${stderr}`);
+						return;
+					}
+					console.log(`npm link stdout: ${stdout}`);
+				});
 			}
 		}
 	],

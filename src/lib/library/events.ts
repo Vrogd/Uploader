@@ -13,7 +13,7 @@ import {constants} from "./constants";
 export function upload(parent : Upload, file : typeFile) : void {
     functions.validateCorrectUploadType(file, parent.tabActive, parent).then((file : typeFile) => {
         if (file && file.file instanceof File) uploadFile(parent, file);
-        else uploadExternal(parent, file);
+        else  uploadExternal(parent, file);
     }).catch((err) => {
         console.error(constants.prefixError + ' failed to validate upload', err)
     });

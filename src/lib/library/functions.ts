@@ -1,5 +1,4 @@
 import {constants} from "./constants";
-import {filesList} from "./files";
 import {formatFileSize, generateId} from "./events";
 import type {typeFile} from "../../types/file";
 import type {canvasSize} from "../../types/size";
@@ -168,6 +167,33 @@ export const functions = {
     validateUrl(url :string) : boolean {
         const pattern = /^(https?:\/\/)?((([a-zA-Z\d]([a-zA-Z\d-]*[a-zA-Z\d])*)\.)+[a-zA-Z]{2,})(:\d+)?(\/[-a-zA-Z\d%_.~+()/:=]*)*(\?[;&a-zA-Z\d%_.~+=-]*)?(#[-a-zA-Z\d_]*)?$/;
         return pattern.test(url);
+    },
+    /**
+     * @description check if url is on same domain as current
+     * @param {string|null} url
+     * @return boolean
+     */
+    isSameDomain(url: string|null = null) : boolean {
+        if (typeof url !== 'string') return false
+        const parsedUrl = new URL(url);
+        const currentOrigin = window.location.origin;
+        return (
+            parsedUrl.origin === currentOrigin ||
+            parsedUrl.hostname === 'localhost'
+        );
+    },
+    /**
+     * @description check if url is youtube
+     * @param {string|null} url
+     * @return boolean
+     */
+    isYouTubeURl(url : string| null) : boolean {
+        const parsedUrl = new URL(url);
+        return (
+            parsedUrl.hostname === 'www.youtube.com' ||
+            parsedUrl.hostname === 'youtube.com' ||
+            parsedUrl.hostname === 'youtu.be'
+        );
     },
     /**
      * @description validate if correct type of file is upload / external otherwise throw error

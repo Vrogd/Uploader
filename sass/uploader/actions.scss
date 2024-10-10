@@ -1,7 +1,8 @@
+@use "sass:color";
 #{'.' +  #{$componentWrapperClass}}{
   --main-color: #{$componentMainColor};
-  --main-color-high: #{darken($componentMainColor, 7)};
-  --main-color-low: #{lighten($componentMainColor, 7)};
+  --main-color-high: #{color.adjust($componentMainColor, $lightness: -7%)};
+  --main-color-low: #{color.adjust($componentMainColor, $lightness: 7%)};
   --second-color: #{$componentSecondaryColor};
   --high-color: #{$componentHighlightColor};
   --text-color: white;
