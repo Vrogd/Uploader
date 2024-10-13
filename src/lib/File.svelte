@@ -41,7 +41,7 @@
             </button>
         </span>
         {#if !upload.isCompact() && !file.failed}
-            <span data-upload-percentage class="percentage"></span>
+            <span data-upload-percentage class="percentage">{file.progress} %</span>
         {/if}
     </div>
     {#if !(file.external)}

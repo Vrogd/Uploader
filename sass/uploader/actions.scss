@@ -80,7 +80,8 @@
   text-decoration: none;
   user-select: none;
   svg{
-    max-width: 2rem;
+    line-height: 2rem;
+    max-height: 2rem;
     vertical-align: middle;
     fill: var(--text-color);
     transition: opacity, 0.3s, ease-in-out;
@@ -108,7 +109,7 @@
 }
 
 .actions{
-  display: inline-flex;
+  display: none;
   font-size: .95rem;
   button{
     border:none;
@@ -121,6 +122,7 @@
       background: var(--main-color-high) !important;
     }
   }
+
 }
 
 // error class

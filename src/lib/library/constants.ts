@@ -1,5 +1,5 @@
 export const constants = {
-    enableBackend : <boolean> true,
+    enableBackend : <boolean> false,
     booleanSettings : <string[]> [],
     previewExtensions : <string[]> ['png', 'jpg', 'jpeg', 'webp'],
     previewVideoExtensions : <string[]>  ['mp4'],

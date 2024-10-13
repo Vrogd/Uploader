@@ -44,7 +44,11 @@ export class Upload {
     private setSettings = (options : unknown | undefined) : void => {
         if (options.wrapper) this.dom(options.wrapper);
         if (options.blobList) this.windowBlobList = options.blobList;
-        if (typeof options.backend === 'boolean') this.options.enableBackend = options.backend;
+        if (typeof options.backend === 'boolean') {
+            this.options.enableBackend = options.backend
+        } else {
+            this.options.enableBackend = constants.enableBackend;
+        }
         if (typeof options.enableImage === 'boolean') this.options.enableImage = options.enableImage;
         if (typeof options.enableVideo === 'boolean') this.options.enableVideo = options.enableVideo;
         if (typeof options.enableOther === 'boolean') this.options.enableOther = options.enableOther;

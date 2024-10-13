@@ -88,8 +88,16 @@
   }
 
   &:not(#{'.' +  #{$componentItemImage}}) {
+    &:hover .actions {
+      display: flex !important;
+      background: var(--main-color-high) !important;
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      top: 0;
+      min-width: 10rem;
+    }
     .actions {
-      width: 100%;
       button {
         border-left: 1px solid var(--text-color);
         width: 50%;
