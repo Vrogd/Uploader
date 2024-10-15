@@ -87,7 +87,7 @@
                 </div>
             {/if}
         {/key}
-        <div class="uploader-actions" style="display: flex">
+        <div class="uploader-actions">
             <div class="uploader-submit" role="button" tabindex="0"
                  on:click="{() => {upload.eventUpload()}}"
                  on:keydown="{() => {upload.eventUpload()}}"

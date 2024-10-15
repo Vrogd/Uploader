@@ -141,6 +141,7 @@ export class Upload {
      * @return void
      */
     public download = (file : typeFile) : void => {
+        console.log(file)
         try {
             if (file.url){
                 const link = document.createElement("a");
@@ -148,6 +149,7 @@ export class Upload {
                 link.href = file.url;
                 document.body.appendChild(link);
                 link.click();
+                console.log(link)
                 document.body.removeChild(link);
                 this.component.dispatchEvent(customEvent(constants.downloadEvent, file));
             }
@@ -217,7 +219,7 @@ export class Upload {
      * @return {boolean}
      */
     public isCompact = () : boolean => {
-        return this.tabActive === 'other';
+        return this.tabActive === 'other' && this.options.enableExternal;
     }
     /**
      * @description toggle external window

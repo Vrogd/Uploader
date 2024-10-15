@@ -23,7 +23,7 @@
 }
 // uploader -tabs
 #{'.' +  #{$componentTabsClass}}{
-  border-bottom: 1px solid var(--text-color);
+  border-bottom: 2px solid var(--high-color);
   overflow: hidden;
   display: inline-flex;
   justify-content: center;
@@ -50,16 +50,17 @@
 // main class
 #{'.' +  #{$componentSubmitActions}}{
   display: flex;
-  &:not(.#{$componentSubmitClassExternal}){
-    width: 100%;
+  padding: 0 0.2rem;
+  & :not(.#{$componentSubmitClassExternal}){
+    width: auto;
   }
   // pick files
   #{'.' +  #{$componentSubmitClass}}{
-    width: 90%;
+    width: 100%;
   }
   // external
   #{'.' +  #{$componentSubmitClassExternal}}{
-    width: 10%;
+    width: 15%;
     svg {
       margin: auto !important;
     }
@@ -70,7 +71,6 @@
 #{'.' +  #{$componentSubmitClass}}, #{'.' +  #{$componentSubmitClassExternal}}{
   background-color: var(--main-color);
   padding: 0.5rem 1rem;
-  border-radius: .3rem;
   margin: .2rem 0;
   display: flex;
   justify-content: center;
@@ -89,6 +89,17 @@
   }
   &:active, &:focus-within, &:hover{
     background-color: var(--main-color-high);
+  }
+}
+
+#{'.' +  #{$componentSubmitActions}}:has(#{'.' +  #{$componentSubmitClass}}):has(#{'.' +  #{$componentSubmitClassExternal}}) {
+  #{'.' +  #{$componentSubmitClass}}, #{'.' +  #{$componentSubmitClassExternal}} {
+    &:first-of-type{
+      border-radius: .3rem 0 0 .3rem !important;
+    }
+    &:last-of-type{
+      border-radius: 0 .3rem .3rem 0 !important;
+    }
   }
 }
 

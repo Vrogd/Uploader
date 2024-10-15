@@ -31,7 +31,7 @@
                        <i class="fa-solid fa-crop"></i>
                  </button>
             {/if}
-            {#if file.completed && !file.failed }
+            {#if file.completed && !file.failed && file.url }
                  <button class="spin" data-upload-download on:click="{() => upload.download(file)}">
                        <i class="fa-solid fa-cloud-arrow-down"></i>
                  </button>
