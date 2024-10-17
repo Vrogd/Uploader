@@ -81,8 +81,8 @@
             {#if upload.isExternal()}
                 <div class="uploader-external">
                     <div class="row">
-                        <label class="form-label" for="external-input-link">link : </label>
-                        <input class="form-field" id="external-input-link" type="text" placeholder="http(s)://">
+                        <label for="external-input-link">link : </label>
+                        <input id="external-input-link" type="text" placeholder="http(s)://">
                     </div>
                 </div>
             {/if}
