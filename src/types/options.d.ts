@@ -7,6 +7,6 @@ export type typeOptions =  {
     videoExtensions ?: string[],
     crop ?:boolean
     blobList?: string
-    backend: boolean,
-    options : adjustOptions
+    backend?: boolean,
+    options? : adjustOptions
 }

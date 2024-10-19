@@ -10,7 +10,6 @@ export const constants = {
     prefixError: <string> '[Upload]',
     previewBorderSpace: <number> 2,
     previewHeight: <number> 7, // height of preview
-    previewSizeLimit: <number> 50,
     uploadEvent: <string>'customUpload',
     deleteEvent: <string>'customDelete',
     downloadEvent: <string>'customDownload',

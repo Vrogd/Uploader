@@ -9,18 +9,14 @@
 
     // options
     export let component = null;
-    export let crop : boolean = constants.defaultCropEnabled;
-
+    export let options : typeOptions = {};
     // create class
-    let upload = new library.upload(<typeOptions>{
-        crop: crop
-    });
+    let upload = new library.upload(options);
     let updater = 0;
     const dispatch = createEventDispatcher();
 
     // callback
     upload.files.callback = function (list: typeFile[]) {
-        console.log(list)
         fileList = list;
         updater++;
     }
