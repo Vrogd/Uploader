@@ -1,6 +1,8 @@
-@import "options";
-#{'.' +  #{$componentName}}{
-  @import "uploader/actions";
-  @import "uploader/preview";
-  @import "uploader/animations";
+@use "sass:meta";
+@use "options" as properties;
+
+#{'.' +  #{properties.$componentName}}{
+  @include meta.load-css("uploader/actions");
+  @include meta.load-css("uploader/preview");
+  @include meta.load-css("uploader/animations");
 }

@@ -1,18 +1,20 @@
 @use "sass:color";
-#{'.' +  #{$componentWrapperClass}}{
-  --main-color: #{$componentMainColor};
-  --main-color-high: #{color.adjust($componentMainColor, $lightness: -7%)};
-  --main-color-low: #{color.adjust($componentMainColor, $lightness: 7%)};
-  --second-color: #{$componentSecondaryColor};
-  --high-color: #{$componentHighlightColor};
-  --text-color: white;
-  --text-error: #{$componentErrorColor};
+@use "./../options" as properties;
 
-  font-family: #{$componentFontFamily};
+#{'.' +  #{properties.$componentWrapperClass}}{
+  --main-color: #{properties.$componentMainColor};
+  --main-color-high: #{color.adjust(properties.$componentMainColor, $lightness: -7%)};
+  --main-color-low: #{color.adjust(properties.$componentMainColor, $lightness: 7%)};
+  --second-color: #{properties.$componentSecondaryColor};
+  --high-color: #{properties.$componentHighlightColor};
+  --text-color: white;
+  --text-error: #{properties.$componentErrorColor};
+
+  font-family: #{properties.$componentFontFamily};
   text-align: center;
   background-color: var(--main-color);
-  min-width: #{$componentMinWidth};
-  min-height: #{$componentMinHeight};
+  min-width: #{properties.$componentMinWidth};
+  min-height: #{properties.$componentMinHeight};
   border-radius: 8px;
   margin: auto;
   overflow: hidden;
@@ -22,7 +24,7 @@
   }
 }
 // uploader -tabs
-#{'.' +  #{$componentTabsClass}}{
+#{'.' +  #{properties.$componentTabsClass}}{
   border-bottom: 1px solid var(--high-color);
   overflow: hidden;
   display: inline-flex;
@@ -36,7 +38,7 @@
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
-  #{'.' +  #{$componentTab}}{
+  #{'.' +  #{properties.$componentTab}}{
     display: flex;
     flex: 1 1;
     cursor: pointer;
@@ -48,18 +50,18 @@
 }
 
 // main class
-#{'.' +  #{$componentSubmitActions}}{
+#{'.' +  #{properties.$componentSubmitActions}}{
   display: flex;
   padding: 0 0.2rem;
-  & :not(.#{$componentSubmitClassExternal}){
+  & :not(.#{properties.$componentSubmitClassExternal}){
     width: auto;
   }
   // pick files
-  #{'.' +  #{$componentSubmitClass}}{
+  #{'.' +  #{properties.$componentSubmitClass}}{
     width: 100%;
   }
   // external
-  #{'.' +  #{$componentSubmitClassExternal}}{
+  #{'.' +  #{properties.$componentSubmitClassExternal}}{
     width: 15%;
     svg {
       margin: auto !important;
@@ -68,7 +70,7 @@
 }
 
 // submit class
-#{'.' +  #{$componentSubmitClass}}, #{'.' +  #{$componentSubmitClassExternal}}{
+#{'.' +  #{properties.$componentSubmitClass}}, #{'.' +  #{properties.$componentSubmitClassExternal}}{
   background-color: var(--main-color);
   padding: 0.5rem 1rem;
   margin: .2rem 0;
@@ -92,8 +94,8 @@
   }
 }
 
-#{'.' +  #{$componentSubmitActions}}:has(#{'.' +  #{$componentSubmitClass}}):has(#{'.' +  #{$componentSubmitClassExternal}}) {
-  #{'.' +  #{$componentSubmitClass}}, #{'.' +  #{$componentSubmitClassExternal}} {
+#{'.' +  #{properties.$componentSubmitActions}}:has(#{'.' +  #{properties.$componentSubmitClass}}):has(#{'.' +  #{properties.$componentSubmitClassExternal}}) {
+  #{'.' +  #{properties.$componentSubmitClass}}, #{'.' +  #{properties.$componentSubmitClassExternal}} {
     &:first-of-type{
       border-radius: .3rem 0 0 .3rem !important;
     }
@@ -103,7 +105,7 @@
   }
 }
 
-#{'.' +  #{$componentTab}}{
+#{'.' +  #{properties.$componentTab}}{
   transition: 0.3s box-shadow ease;
   max-width: 100%;
   display: flex;
@@ -137,7 +139,7 @@
 }
 
 // error class
-#{'.' +  #{$componentItemError}}{
+#{'.' +  #{properties.$componentItemError}}{
   .progress {
     .bar {
       background: var(--text-error) !important;

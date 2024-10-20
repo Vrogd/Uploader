@@ -1,6 +1,6 @@
 const buildPath = 'static';
-
 import sass from 'rollup-plugin-sass';
+
 // sass test setup not final sass
 const sassConfig = {
     input: 'sass/app.scss',
@@ -11,6 +11,8 @@ const sassConfig = {
         sass({
             output: "static/output.css",
             outputStyle: "compressed",
+            watch: true,
+            include: ['sass/*.css', 'sass/*.sass', 'sass/*.scss']
         })
     ]
 }
