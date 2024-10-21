@@ -1,5 +1,3 @@
-import Upload from './Upload.svelte';
-
 import { Upload as Class } from "./library/class";
 import { functions } from "./library/functions";
 
@@ -9,9 +7,9 @@ export const library = {
 };
 
 // types
-export type { typeFile as typeFile } from "./types/file";
-export type { Tabs as Tabs } from "./types/tabs";
-export type { typeOptions as typeOptions } from './types/options';
-export type { fileBlob as fileBlob } from './types/fileBlob';
+export type { typeFile } from "./types/file";
+export type { Tabs } from "./types/tabs";
+export type { typeOptions } from './types/options';
+export type { fileBlob } from './types/fileBlob';
 // component
-export { Upload as Upload };
+export { default as Upload } from './Upload.svelte';
