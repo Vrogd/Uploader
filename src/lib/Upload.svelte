@@ -1,9 +1,9 @@
 <script lang="ts">
     import {onMount, createEventDispatcher, tick} from 'svelte';
-    import type {typeFile} from "../types/file";
+    import type {typeFile} from "./types/file";
     import {library} from "./index";
     import {constants} from "./library/constants";
-    import type {typeOptions} from "../types/options";
+    import type {typeOptions} from "./types/options";
     import File from "./File.svelte";
     import {functions} from "./library/functions";
 

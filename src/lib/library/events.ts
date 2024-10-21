@@ -1,6 +1,6 @@
 import type {Upload} from "./class";
 import {customEvent, functions} from "./functions";
-import type {typeFile} from "../../types/file";
+import type {typeFile} from "../types/file";
 import {constants} from "./constants";
 
 /**

@@ -9,9 +9,9 @@ export const library = {
 };
 
 // types
-export type { typeFile as typeFile } from "../types/file";
-export type { Tabs as Tabs } from "../types/tabs";
-export type { typeOptions as Options } from '../types/options';
-export type { fileBlob as FileBlob } from '../types/fileBlob';
+export type { typeFile as typeFile } from "./types/file";
+export type { Tabs as Tabs } from "./types/tabs";
+export type { typeOptions as typeOptions } from './types/options';
+export type { fileBlob as fileBlob } from './types/fileBlob';
 // component
 export { Upload as Upload };

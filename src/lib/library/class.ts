@@ -1,12 +1,12 @@
 import {filesList} from "./files";
 import {upload} from "./events";
-import type {typeOptions} from "../../types/options";
-import type {Tabs} from "../../types/tabs";
-import type {typeFile} from "../../types/file";
+import type {typeOptions} from "../types/options";
+import type {Tabs} from "../types/tabs";
+import type {typeFile} from "../types/file";
 import {cleanUrl, customEvent, functions} from "./functions"
 import {constants} from "./constants";
-import type {fileBlob} from "../../types/fileBlob";
-import type {adjustOptions} from "../../types/adjustOptions";
+import type {fileBlob} from "../types/fileBlob";
+import type {adjustOptions} from "../types/adjustOptions";
 
 /**
  * @description upload class

@@ -1,8 +1,8 @@
 import {constants} from "./constants";
 import {formatFileSize, generateId} from "./events";
-import type {typeFile} from "../../types/file";
-import type {canvasSize} from "../../types/size";
-import type {Tabs} from "../../types/tabs";
+import type {typeFile} from "../types/file";
+import type {canvasSize} from "../types/size";
+import type {Tabs} from "../types/tabs";
 import {Upload} from "./class";
 
 /**

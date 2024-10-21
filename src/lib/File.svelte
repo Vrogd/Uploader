@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type {typeFile} from "../types/file";
+    import type {typeFile} from "./types/file";
     import {library} from "./index";
     import {constants} from "./library/constants";
     import {onMount, tick} from "svelte";
