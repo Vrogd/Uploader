@@ -1,5 +1,5 @@
 import type {typeFileList} from "../types/fileList";
-import {generateId} from "./events";
+import {generateId} from "./functions";
 import type {typeFile} from "../types/file";
 import type {Tabs} from "../types/tabs";
 

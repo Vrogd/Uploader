@@ -1,9 +1,8 @@
-import {constants} from "./constants";
-import {formatFileSize, generateId} from "./events";
 import type {typeFile} from "../types/file";
 import type {canvasSize} from "../types/size";
 import type {Tabs} from "../types/tabs";
 import {Upload} from "./class";
+import {library} from "../index";
 
 /**
  * @description update and create of files
@@ -52,7 +51,7 @@ export const functions = {
                 functions.fileReader(file, parent).then(() => {
                     parent.files.update(file, parent.tabActive);
                 }).catch((err : Error) => {
-                    console.error(constants.prefixError + ' failed to set preview', err);
+                    console.error(library.constants.prefixError + ' failed to set preview', err);
                 })
             } else {
                 parent.files.update(file, parent.tabActive);
@@ -72,11 +71,11 @@ export const functions = {
                 const blob = <Blob>parent.blob(file.file.name, file.file.lastModified);
                 if (blob){
                     functions.loadCache(file, parent, canvas, blob).then(() => resolve()).catch((err : Error) => {
-                        console.error(constants.prefixError + ' failed to load preview from cache.', err);
+                        console.error(library.constants.prefixError + ' failed to load preview from cache.', err);
                     });
                 } else {
                     functions.loadPreview(file, parent, canvas).then(() => resolve()).catch((err : Error) => {
-                        console.error(constants.prefixError + ' failed to load preview.', err);
+                        console.error(library.constants.prefixError + ' failed to load preview.', err);
                     });
                 }
             }
@@ -111,15 +110,15 @@ export const functions = {
                         renderPreview(file, image, canvas).then(() => {
                             parent.files.update(file, parent.tabActive);
                         }).catch(() => {
-                            console.error(constants.prefixError + ' failed to load preview');
+                            console.error(library.constants.prefixError + ' failed to load preview');
                         })
                     };
                 };
                 request.onerror = function () {
-                    console.error(constants.prefixError + ' error failed to load file');
+                    console.error(library.constants.prefixError + ' error failed to load file');
                 }
                 request.onabort = function () {
-                    console.error(constants.prefixError + ' abort file load');
+                    console.error(library.constants.prefixError + ' abort file load');
                 }
                 request.send();
             }
@@ -196,6 +195,15 @@ export const functions = {
         );
     },
     /**
+     * @description generate custom event
+     * @param {string} key string value
+     * @param {any} detail data
+     * @return {CustomEvent} CustomEvent
+     */
+     customEvent(key: string, detail: any) : CustomEvent{
+        return new CustomEvent(key, {detail: detail});
+     },
+    /**
      * @description validate if correct type of file is upload / external otherwise throw error
      * @param {typeFile} file
      * @param {Tabs} activeTab
@@ -245,7 +253,7 @@ function renderPreview(file: typeFile, image: HTMLImageElement, canvas: HTMLCanv
     return new Promise(((resolve: unknown) => {
         image.addEventListener("load", function() {
             const clientWidth = file.previewElement?.clientWidth;
-            const clientHeight = constants.previewHeight * parseFloat(getComputedStyle(document.documentElement).fontSize);
+            const clientHeight = library.constants.previewHeight * parseFloat(getComputedStyle(document.documentElement).fontSize);
             if (clientHeight && clientWidth) {
                 const size : canvasSize = calculateCanvasSize(clientWidth, clientHeight, image.width, image.height);
                 canvas.width = size.width;
@@ -255,12 +263,12 @@ function renderPreview(file: typeFile, image: HTMLImageElement, canvas: HTMLCanv
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(image, size.left, size.top, size.width, size.height);
             } else {
-                console.error(constants.prefixError + ' dom missing width / height');
+                console.error(library.constants.prefixError + ' dom missing width / height');
             }
             resolve();
         }, false);
         image.addEventListener("error", function() {
-            console.error(constants.prefixError + ' failed to load image');
+            console.error(library.constants.prefixError + ' failed to load image');
             resolve();
         }, false)
     }))
@@ -278,7 +286,7 @@ function calculateCanvasSize(domWidth: number, domHeight: number, width: number,
     let newWidth, newHeight, newTop, newLeft;
     newWidth = Math.ceil(domWidth);
     newHeight = Math.ceil(newWidth * (height/ width));
-    if (newHeight < (domHeight * (100 - constants.previewBorderSpace) / 100)){
+    if (newHeight < (domHeight * (100 - library.constants.previewBorderSpace) / 100)){
         newHeight = Math.ceil(domHeight);
         newWidth = Math.ceil(newHeight * (width / height));
     }
@@ -294,13 +302,22 @@ function calculateCanvasSize(domWidth: number, domHeight: number, width: number,
 }
 
 /**
- * @description generate custom event
- * @param {string} key string value
- * @param {any} detail data
- * @return {CustomEvent} CustomEvent
+ * @description decimal to hex string
+ * @param {number} dec number
+ * @return {string}
  */
-export function customEvent(key: string, detail: any) : CustomEvent{
-    return new CustomEvent(key, {detail: detail});
+function dec2hex(dec : number) : string {
+    return dec.toString(16).padStart(2, "0");
+}
+/**
+ * @description generate new string id
+ * @param {number} len total of number
+ * @return {string}
+ */
+export function generateId(len : number) : string {
+    const arr = new Uint8Array((len || 40) / 2);
+    window.crypto.getRandomValues(arr);
+    return Array.from(arr, dec2hex).join('');
 }
 
 /**
@@ -314,6 +331,19 @@ export function cleanUrl(url : string){
         return url.substring(0, index);
     }
     return url;
+}
+
+/**
+ * @description format file size
+ * @param {number} bytes
+ * @param {number} decimalPoint
+ * @return {string}
+ */
+export function formatFileSize(bytes : number, decimalPoint : number = 2){
+    if(bytes == 0) return '0 Bytes';
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
+    const i = Math.floor(Math.log(bytes) / Math.log(1024));
+    return parseFloat((bytes / Math.pow(1024, i)).toFixed(decimalPoint)) + ' ' + sizes[i];
 }
 
 export default functions;

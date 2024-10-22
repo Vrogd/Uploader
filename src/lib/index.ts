@@ -1,9 +1,15 @@
 import { Upload as Class } from "./library/class";
 import { functions } from "./library/functions";
+import {constants} from "./library/constants";
 
+/**
+ * @description one object for all useful / required data
+ * @const library
+ */
 export const library = {
-   'upload': Class,
+   'upload': <Class>Class,
    'functions': functions,
+   'constants': constants
 };
 
 // types

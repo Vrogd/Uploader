@@ -13,7 +13,7 @@
     onMount(async () => {
         await tick();
         file.previewElement = previewElement;
-        component.dispatchEvent(new CustomEvent(constants.domLoadEvent, {
+        component.dispatchEvent(library.functions.customEvent(constants.domLoadEvent, {
             detail: file
         }));
     });

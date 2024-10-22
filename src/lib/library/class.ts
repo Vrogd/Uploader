@@ -3,10 +3,10 @@ import {upload} from "./events";
 import type {typeOptions} from "../types/options";
 import type {Tabs} from "../types/tabs";
 import type {typeFile} from "../types/file";
-import {cleanUrl, customEvent, functions} from "./functions"
-import {constants} from "./constants";
+import {cleanUrl, functions} from "./functions"
 import type {fileBlob} from "../types/fileBlob";
 import type {adjustOptions} from "../types/adjustOptions";
+import {library} from "../index";
 
 /**
  * @description upload class
@@ -27,14 +27,16 @@ export class Upload {
         enableExternal : true,
         enableImage: true,
         enableVideo : true,
+        enableCrop: false,
         enableOther : true,
         enableBackend: true,
         imageExtensions: [],
         videoExtensions: [],
         otherExtensions: []
     }
-    constructor(object: unknown | undefined) {
-       this.setSettings(object)
+    constructor(object: unknown | undefined, fallback : boolean = false) {
+       this.setSettings(object);
+       this.fallback = fallback;
     }
     /**
      * @description set settings
@@ -47,13 +49,14 @@ export class Upload {
         if (typeof options.backend === 'boolean') {
             this.options.enableBackend = options.backend
         } else {
-            this.options.enableBackend = constants.enableBackend;
+            this.options.enableBackend = library.constants.enableBackend;
         }
         if (typeof options.enableImage === 'boolean') this.options.enableImage = options.enableImage;
         if (typeof options.enableVideo === 'boolean') this.options.enableVideo = options.enableVideo;
         if (typeof options.enableOther === 'boolean') this.options.enableOther = options.enableOther;
-        this.options.imageExtensions = Array.isArray(options.imageExtensions) ? options.imageExtensions : constants.imageDefaultExtensions;
-        this.options.videoExtensions = Array.isArray(options.videoExtensions) ? options.videoExtensions : constants.videoDefaultExtensions;
+        if (typeof options.enableCrop === 'boolean') this.options.enableCrop = options.enableCrop;
+        this.options.imageExtensions = Array.isArray(options.imageExtensions) ? options.imageExtensions : library.constants.imageDefaultExtensions;
+        this.options.videoExtensions = Array.isArray(options.videoExtensions) ? options.videoExtensions : library.constants.videoDefaultExtensions;
         if (Array.isArray(options.otherExtensions)) this.options.otherExtensions = options.otherExtensions;
     }
     /**
@@ -149,12 +152,11 @@ export class Upload {
                 link.href = file.url;
                 document.body.appendChild(link);
                 link.click();
-                console.log(link)
                 document.body.removeChild(link);
-                this.component.dispatchEvent(customEvent(constants.downloadEvent, file));
+                this.component.dispatchEvent(library.functions.customEvent(library.constants.downloadEvent, file));
             }
         } catch (e){
-            console.error(constants.prefixError + ' failed to download file image');
+            console.error(library.constants.prefixError + ' failed to download file image');
         }
     }
     /**
@@ -164,7 +166,7 @@ export class Upload {
      */
     public delete = (file : typeFile) : void => {
         this.files.delete(file);
-        this.component.dispatchEvent(customEvent(constants.deleteEvent, file));
+        this.component.dispatchEvent(library.functions.customEvent(library.constants.deleteEvent, file));
     }
     /**
      * @description check if crop can be shown
@@ -172,7 +174,7 @@ export class Upload {
      * @return boolean
      */
     public hasCrop = (file : typeFile) : boolean => {
-        return (this.options.enableImage && file.type === 'image' && !file.external);
+        return (this.options.enableImage && file.type === 'image' && !file.external && this.options.enableCrop);
     }
     /**
      * @description check if crop can be shown
@@ -180,7 +182,7 @@ export class Upload {
      * @return void
      */
     public crop = (file: typeFile) : void => {
-        this.component.dispatchEvent(customEvent(constants.cropEvent, file));
+        this.component.dispatchEvent(library.functions.customEvent(library.constants.cropEvent, file));
     }
     /**
      * @description save / get blob to window list / based on change date
