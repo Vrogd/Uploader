@@ -24,8 +24,7 @@ export const filesList: typeFileList = {
             const index : number = this.list.indexOf(find);
             if (index > -1){
                 if (item.failed) item.completed = false;
-                console.log({'list' : this.list, 'df': item})
-                this.list[index] = item;
+                this.list[index] = {...this.list[index], ...item};
                 if (typeof this.callback === 'function') this.callback(this.list.filter((file: typeFile) => file.type === tabActive));
             }
         } else {

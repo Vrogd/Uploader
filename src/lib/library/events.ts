@@ -53,12 +53,14 @@ function uploadFile(parent : Upload, file : typeFile) : void {
             uploadLoadEndHandler(file, parent)
         });
         ajax.addEventListener("load", () => {
-            if (ajax.status >= 400 && ajax.status < 600 && parent.options.enableBackend) {
-                file.failed = true;
-                console.error(library.constants.prefixError +  ' File upload failed (' + ajax.status + ')');
+            const current = <typeFile|null>parent.files.find(<string>file.id)
+            if (current){
+                if (ajax.status >= 400 && ajax.status < 600 && parent.options.enableBackend) {
+                    current.failed = true;
+                    console.error(library.constants.prefixError +  ' File upload failed (' + ajax.status + ')');
+                }
+                parent.files.update(current, parent.tabActive);
             }
-            console.dir(2)
-            parent.files.update(file, parent.tabActive);
         });
         ajax.open("POST", "/file");
         ajax.send(formData as XMLHttpRequestBodyInit);
@@ -87,7 +89,6 @@ function uploadExternal(parent : Upload, file : typeFile) : void {
                     }).catch((err : Error) => {
                         console.error(library.constants.prefixError + ' failed to load preview from cache.', err);
                     });
-                    console.dir(3)
                     parent.files.update(file, parent.tabActive);
                     console.log(response, blobResponse)
                 })
@@ -96,7 +97,6 @@ function uploadExternal(parent : Upload, file : typeFile) : void {
             }
         }).catch((error) => {
             file.failed = true;
-            console.dir(4)
             parent.files.update(file, parent.tabActive);
             console.error(error)
         });

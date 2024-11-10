@@ -45,11 +45,10 @@ const svelteConfig = defineConfig({
 		cssCodeSplit: true,
 		rollupOptions: {
 			output: {
-				manualChunks(id) {
+				manualChunks(id) : string | void {
 					if (id.includes('src/styles/')) {
 						return 'styles';
 					}
-					return id;
 				},
 			},
 		},

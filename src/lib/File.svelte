@@ -12,7 +12,7 @@
     let previewElement : HTMLElement|null = null;
 
     let {
-        file,
+        file = <typeFile>$bindable(),
         upload,
         component,
     } : Props = $props();
@@ -27,9 +27,6 @@
             console.error(library.constants.prefixError + ' failed to check preview dom');
         }
     });
-    $effect(() => {
-       $inspect('update', file.preview, upload.isCompact(), file.isPreviewAble)
-    })
 </script>
 
 <div class="uploader-item" class:uploader-item-image="{file.preview !== null && !upload.isCompact()}" class:uploader-item-error="{file.failed}" bind:this={previewElement}>

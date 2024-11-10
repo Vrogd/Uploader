@@ -23,6 +23,7 @@ export class Upload {
     public windowBlobList : string = 'UploadBlobs';
     public external : boolean = false; // when clicked open external
     public options : adjustOptions  = {
+
         enableExternal : true,
         enableImage: true,
         enableVideo : true,

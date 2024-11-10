@@ -43,21 +43,21 @@ export const functions: any = {
      * @return void
      */
     updateFileData(file: typeFile, parent: Upload) : void {
-        console.dir(file)
-        const correctTab : boolean = parent.tabActive === file.type;
-        if (file.file instanceof File){
-            file.size = formatFileSize(file.file.size, 2);
-            file.name = file.file.name;
-            if (file.file.type.includes('image') && !file.isPreviewAble && !file.preview && correctTab){
-                functions.fileReader(file, parent).then(() => {
-                    console.dir(7)
-                    parent.files.update(file, parent.tabActive);
-                }).catch((err : Error) => {
-                    console.error(library.constants.prefixError + ' failed to set preview', err);
-                })
-            } else {
-                console.dir(8)
-                parent.files.update(file, parent.tabActive);
+        const current = <typeFile|null> parent.files.find(<string>file.id);
+        if (current){
+            const correctTab : boolean = parent.tabActive === current.type;
+            if (current.file instanceof File){
+                current.size = formatFileSize(current.file.size, 2);
+                current.name = current.file.name;
+                parent.files.update(current, parent.tabActive);
+                if (current.file.type.includes('image') && !current.isPreviewAble && !current.preview && correctTab){
+                    functions.fileReader(current, parent).catch((err : Error) => {
+                        console.error(library.constants.prefixError + ' failed to set preview', err);
+                    })
+                } else {
+                    console.dir(8)
+                    parent.files.update(current, parent.tabActive);
+                }
             }
         }
     },
@@ -91,32 +91,33 @@ export const functions: any = {
      * @param {HTMLCanvasElement} canvas html canvas
      * @return {Promise<void>}
      */
-    loadPreview(file: typeFile, parent: Upload|undefined, canvas: HTMLCanvasElement) : Promise<void>{
+    loadPreview(file: typeFile, parent: Upload, canvas: HTMLCanvasElement) : Promise<void>{
         return new Promise((resolve: any) => {
-            if (file.file && file.file instanceof File && parent && file.previewElement) {
+            const current = <typeFile|null> parent.files.find(<string>file.id);
+            if (current && current.file instanceof File) {
                 const request = new XMLHttpRequest();
-                request.open('GET', URL.createObjectURL(file.file), true);
+                request.open('GET', URL.createObjectURL(current.file), true);
                 request.responseType = 'blob';
                 request.onload = function () {
                     const reader = new FileReader();
                     reader.readAsDataURL(request.response);
                     reader.onload = function (e: any) {
-                        if (file.file instanceof File) {
+                        const currentLoaded = <typeFile|null> parent.files.find(<string>file.id);
+                        if (currentLoaded && currentLoaded.file instanceof File) {
                             const blob = request.response;
-                            if (blob instanceof Blob) parent.blob(file.file.name, file.file.lastModified, blob);
+                            if (blob instanceof Blob) parent.blob(currentLoaded.file.name, currentLoaded.file.lastModified, blob);
+                            currentLoaded.url = e.target?.result;
+                            const image = new Image();
+                            image.src = e.target.result;
+                            currentLoaded.isPreviewAble = true
+                            currentLoaded.preview = canvas;
+                            parent.files.update(currentLoaded, parent.tabActive);
+                            renderPreview(currentLoaded, image, canvas).then(() => {
+                                parent.files.update(currentLoaded, parent.tabActive);
+                            }).catch(() => {
+                                console.error(library.constants.prefixError + ' failed to load preview');
+                            })
                         }
-                        file.url = e.target?.result;
-                        const image = new Image();
-                        image.src = e.target.result;
-                        renderPreview(file, image, canvas).then(() => {
-                            file.isPreviewAble = true
-                            file.preview = canvas;
-                            console.log(file, 'after', parent.files)
-                            console.dir(9)
-                            parent.files.update(file, parent.tabActive);
-                        }).catch(() => {
-                            console.error(library.constants.prefixError + ' failed to load preview');
-                        })
                     };
                 };
                 request.onerror = function () {
@@ -147,10 +148,7 @@ export const functions: any = {
             const image = new Image();
             image.src = url;
             renderPreview(file, image, canvas).then(()=>{
-                if (parent) {
-                    console.dir(10)
-                    parent.files.update(file, parent.tabActive);
-                }
+                if (parent) parent.files.update(file, parent.tabActive);
             })
             resolve();
         })

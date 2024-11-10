@@ -45,8 +45,7 @@
             } as EventListener)
             // loaded dom event // load preview if clicked on tab
             component.addEventListener(constants.domLoadEvent, function (e : CustomEvent){
-                console.log({...e.detail}, 'reset')
-                library.functions.updateFileData({...e.detail}, upload);
+                upload.files.update({...e.detail}, upload.tabActive);
             } as EventListener)
         }
 
@@ -70,8 +69,8 @@
             </div>
             <div class="uploader-preview">
                  {#if fileList && Object.keys(fileList).length}
-                      {#each fileList as file}
-                          <File file={file} upload={upload} component={component}/>
+                      {#each fileList as file, key}
+                          <File bind:file={fileList[key]} upload={upload} component={component}/>
                       {/each}
                  {/if}
             </div>
