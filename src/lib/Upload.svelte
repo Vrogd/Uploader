@@ -70,7 +70,7 @@
             <div class="uploader-preview">
                  {#if fileList && Object.keys(fileList).length}
                       {#each fileList as file, key}
-                          <File bind:file={fileList[key]} upload={upload} component={component}/>
+                          <File file={fileList[key]} upload={upload} component={component}/>
                       {/each}
                  {/if}
             </div>

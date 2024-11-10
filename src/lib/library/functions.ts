@@ -348,11 +348,36 @@ export function cleanUrl(url : string){
  * @param {number} decimalPoint
  * @return {string}
  */
-export function formatFileSize(bytes : number, decimalPoint : number = 2){
+export function formatFileSize(bytes : number, decimalPoint : number = 2): string{
     if(bytes == 0) return '0 Bytes';
     const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
     const i = Math.floor(Math.log(bytes) / Math.log(1024));
     return parseFloat((bytes / Math.pow(1024, i)).toFixed(decimalPoint)) + ' ' + sizes[i];
+}
+
+/**
+ * @description deep merge
+ * @param {any} target
+ * @param {any[]} sources
+ * @return {Object}
+ */
+export function deepMerge(target : any, ...sources:any[]) : any {
+    if (!sources.length) return target;
+    const source = sources.shift();
+    if (typeof target === 'object' && typeof source === 'object') {
+        for (const key in source) {
+            if (source.hasOwnProperty(key)) {
+                if (typeof source[key] === 'object' && source[key] !== null) {
+                    if (!target[key]) target[key] = {};
+                    deepMerge(target[key], source[key]);
+                } else {
+                    target[key] = source[key];
+                }
+            }
+        }
+    }
+
+    return deepMerge(target, ...sources);
 }
 
 export default functions;

@@ -32,7 +32,6 @@ function uploadFile(parent : Upload, file : typeFile) : void {
     }
     const ajax = new XMLHttpRequest();
     if (ajax.upload){
-        console.dir(1)
         parent.files.update(file, parent.tabActive);
         library.functions.updateFileData(file, parent);
         ajax.upload.addEventListener("progress", (e : ProgressEvent<XMLHttpRequestEventTarget>) => {
@@ -62,7 +61,7 @@ function uploadFile(parent : Upload, file : typeFile) : void {
                 parent.files.update(current, parent.tabActive);
             }
         });
-        ajax.open("POST", "/file");
+        //ajax.open("POST", "/file");
         ajax.send(formData as XMLHttpRequestBodyInit);
     }
 }
@@ -142,6 +141,7 @@ function uploadProgressHandler(file : typeFile, e : ProgressEvent, parent: Uploa
         if (current.progress === 100 && !parent.options.enableBackend){
             current.completed = true;
         }
+        console.log(current.progress)
         parent.files.update(current, parent.tabActive);
     }
 }

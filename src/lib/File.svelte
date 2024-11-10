@@ -12,7 +12,7 @@
     let previewElement : HTMLElement|null = null;
 
     let {
-        file = <typeFile>$bindable(),
+        file,
         upload,
         component,
     } : Props = $props();
