@@ -136,12 +136,14 @@ function prefetchExternal(parent : Upload, file : typeFile) : Promise<unknown>{
  * @return void
  */
 function uploadProgressHandler(file : typeFile, e : ProgressEvent, parent: Upload) : void {
-    file.progress = Math.round((e.loaded / e.total) * 100);
-    if (file.progress === 100 && !parent.options.enableBackend){
-        file.completed = true;
+    const current =  <typeFile|null> parent.files.find(<string>file.id);
+    if (current){
+        current.progress = Math.round((e.loaded / e.total) * 100);
+        if (current.progress === 100 && !parent.options.enableBackend){
+            current.completed = true;
+        }
+        parent.files.update(current, parent.tabActive);
     }
-    console.dir(6)
-    parent.files.update(file, parent.tabActive);
 }
 
 /**

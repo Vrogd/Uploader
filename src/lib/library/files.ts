@@ -11,8 +11,8 @@ export const filesList: typeFileList = {
     list: <typeFile[]>[],
     callback: <((files : typeFile[]) => void)| null> null,
     /**
-     * @description add
-     * @param {typeFile} item
+     * @description add data / item
+     * @param {typeFile} item current item
      * @param {Tabs} tabActive active tab
      * @return void
      */
@@ -36,6 +36,21 @@ export const filesList: typeFileList = {
             if (typeof this.callback === 'function') this.callback(this.list.filter((file: typeFile) => file.type === tabActive));
         }
     },
+    /**
+     * @description find object before every update
+     * @param {string} id id of file
+     * @return {typeFile|null}
+     */
+    find: function (id : string): typeFile | null {
+        return <typeFile | null> this.list.find((file: typeFile) => {
+            return id === file.id;
+        });
+    },
+    /**
+     * @description delete file from list
+     * @param {typeFile} item
+     * @return {void}
+     */
     delete: function (item : typeFile) : void {
         this.list = this.list.filter((file: typeFile) => file.id !== item.id);
         if (typeof this.callback === 'function') this.callback(this.list);
