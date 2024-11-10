@@ -1,13 +1,13 @@
-import type {typeFileList} from "../types/fileList";
 import {generateId} from "./functions";
-import type {typeFile} from "../types/file";
-import type {Tabs} from "../types/tabs";
+import type {typeFile} from "$lib";
+import type {Tabs} from "$lib";
+import type {typeFileList} from "$lib/types/fileList";
 
 /**
  * @description data object
  * @type {typeFileList} hold data of files
  */
-export const filesList = {
+export const filesList: typeFileList = {
     list: <typeFile[]>[],
     callback: <((files : typeFile[]) => void)| null> null,
     /**
@@ -17,13 +17,14 @@ export const filesList = {
      * @return void
      */
     update: function (item : typeFile, tabActive : Tabs) : void {
-        const find = this.list.find((file : typeFile) => {
-            if (item.hasOwnProperty('id') && typeof item.id === 'string' && item.id === file.id) return file;
-        })
+        const find = this.list.find((file: typeFile) => {
+            return item.hasOwnProperty('id') && typeof item.id === 'string' && item.id === file.id;
+        });
         if (find && find as typeFile){
             const index : number = this.list.indexOf(find);
             if (index > -1){
                 if (item.failed) item.completed = false;
+                console.log({'list' : this.list, 'df': item})
                 this.list[index] = item;
                 if (typeof this.callback === 'function') this.callback(this.list.filter((file: typeFile) => file.type === tabActive));
             }
@@ -36,7 +37,7 @@ export const filesList = {
         }
     },
     delete: function (item : typeFile) : void {
-        this.list = this.list.filter((file: typeFile) => file.id !== item.id)
-        this.callback(this.list);
+        this.list = this.list.filter((file: typeFile) => file.id !== item.id);
+        if (typeof this.callback === 'function') this.callback(this.list);
     }
 }

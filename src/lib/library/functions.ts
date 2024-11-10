@@ -1,22 +1,22 @@
-import type {typeFile} from "../types/file";
+import type {typeFile} from "$lib";
 import type {canvasSize} from "../types/size";
-import type {Tabs} from "../types/tabs";
+import type {Tabs} from "$lib";
 import {Upload} from "./class";
-import {library} from "../index";
+import {library} from "$lib";
 
 /**
  * @description update and create of files
  * @type {object} objectInstance
  */
-export const functions = {
+export const functions: any = {
     /**
      * @description create new instance
      * @param {File} file file upload or drag
      * @param {Tabs} tab active tab
      * @return {typeFile} new file object
      */
-    new : function (file: File | string, tab: Tabs) {
-        const main = {
+    new : function (file: File | string, tab: Tabs): typeFile {
+        const main = <object> {
             'progress': 0,
             'isPreviewAble' : false,
             'preview': null,
@@ -26,14 +26,14 @@ export const functions = {
             'id' : generateId(30),
         }
         if (file instanceof File) {
-            return <typeFile> Object.assign({
+            return <typeFile>Object.assign({
                 'file': file,
             }, main);
         } else {
-            return <typeFile> Object.assign({
+            return $state(<typeFile>Object.assign({
                 'url': file,
-                'external' : true
-            }, main);
+                'external': true
+            }, main));
         }
     },
     /**
@@ -43,17 +43,20 @@ export const functions = {
      * @return void
      */
     updateFileData(file: typeFile, parent: Upload) : void {
+        console.dir(file)
         const correctTab : boolean = parent.tabActive === file.type;
         if (file.file instanceof File){
             file.size = formatFileSize(file.file.size, 2);
             file.name = file.file.name;
             if (file.file.type.includes('image') && !file.isPreviewAble && !file.preview && correctTab){
                 functions.fileReader(file, parent).then(() => {
+                    console.dir(7)
                     parent.files.update(file, parent.tabActive);
                 }).catch((err : Error) => {
                     console.error(library.constants.prefixError + ' failed to set preview', err);
                 })
             } else {
+                console.dir(8)
                 parent.files.update(file, parent.tabActive);
             }
         }
@@ -67,7 +70,7 @@ export const functions = {
     fileReader(file : typeFile, parent: Upload|undefined) : Promise<void> {
         return new Promise((resolve: any) => {
             if ((file.file && file.file instanceof File && parent)){
-                const canvas = document.createElement('canvas');
+                const canvas : HTMLCanvasElement = document.createElement('canvas');
                 const blob = <Blob>parent.blob(file.file.name, file.file.lastModified);
                 if (blob){
                     functions.loadCache(file, parent, canvas, blob).then(() => resolve()).catch((err : Error) => {
@@ -90,7 +93,7 @@ export const functions = {
      */
     loadPreview(file: typeFile, parent: Upload|undefined, canvas: HTMLCanvasElement) : Promise<void>{
         return new Promise((resolve: any) => {
-            if (file.file && file.file instanceof File) {
+            if (file.file && file.file instanceof File && parent && file.previewElement) {
                 const request = new XMLHttpRequest();
                 request.open('GET', URL.createObjectURL(file.file), true);
                 request.responseType = 'blob';
@@ -102,12 +105,14 @@ export const functions = {
                             const blob = request.response;
                             if (blob instanceof Blob) parent.blob(file.file.name, file.file.lastModified, blob);
                         }
-                        file.isPreviewAble = true
-                        file.preview = canvas;
                         file.url = e.target?.result;
                         const image = new Image();
                         image.src = e.target.result;
                         renderPreview(file, image, canvas).then(() => {
+                            file.isPreviewAble = true
+                            file.preview = canvas;
+                            console.log(file, 'after', parent.files)
+                            console.dir(9)
                             parent.files.update(file, parent.tabActive);
                         }).catch(() => {
                             console.error(library.constants.prefixError + ' failed to load preview');
@@ -142,7 +147,10 @@ export const functions = {
             const image = new Image();
             image.src = url;
             renderPreview(file, image, canvas).then(()=>{
-                parent.files.update(file, parent.tabActive);
+                if (parent) {
+                    console.dir(10)
+                    parent.files.update(file, parent.tabActive);
+                }
             })
             resolve();
         })
@@ -187,7 +195,7 @@ export const functions = {
      * @return boolean
      */
     isYouTubeURl(url : string| null) : boolean {
-        const parsedUrl = new URL(url);
+        const parsedUrl = new URL(url ? url : '');
         return (
             parsedUrl.hostname === 'www.youtube.com' ||
             parsedUrl.hostname === 'youtube.com' ||
@@ -250,10 +258,11 @@ export const functions = {
  * @return {Promise<unknown>}
  */
 function renderPreview(file: typeFile, image: HTMLImageElement, canvas: HTMLCanvasElement) : Promise<unknown> {
-    return new Promise(((resolve: unknown) => {
+    return new Promise(((resolve: any) => {
         image.addEventListener("load", function() {
             const clientWidth = file.previewElement?.clientWidth;
             const clientHeight = library.constants.previewHeight * parseFloat(getComputedStyle(document.documentElement).fontSize);
+            console.dir({'width' : clientWidth, 'height' : clientHeight});
             if (clientHeight && clientWidth) {
                 const size : canvasSize = calculateCanvasSize(clientWidth, clientHeight, image.width, image.height);
                 canvas.width = size.width;
@@ -261,7 +270,9 @@ function renderPreview(file: typeFile, image: HTMLImageElement, canvas: HTMLCanv
                 canvas.setAttribute('data-width', String(size.width));
                 canvas.setAttribute('data-height', String(size.height))
                 const ctx = canvas.getContext('2d');
-                ctx.drawImage(image, size.left, size.top, size.width, size.height);
+                if (ctx) {
+                    ctx.drawImage(image, size.left, size.top, size.width, size.height);
+                }
             } else {
                 console.error(library.constants.prefixError + ' dom missing width / height');
             }

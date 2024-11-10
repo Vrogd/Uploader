@@ -1,12 +1,11 @@
 import {filesList} from "./files";
 import {upload} from "./events";
-import type {typeOptions} from "../types/options";
-import type {Tabs} from "../types/tabs";
-import type {typeFile} from "../types/file";
+import type {Tabs} from "$lib";
+import type {typeFile} from "$lib";
 import {cleanUrl, functions} from "./functions"
-import type {fileBlob} from "../types/fileBlob";
+import type {fileBlob} from "$lib";
 import type {adjustOptions} from "../types/adjustOptions";
-import {library} from "../index";
+import {library} from "$lib";
 
 /**
  * @description upload class
@@ -43,7 +42,7 @@ export class Upload {
      * @param {typeOptions} options all options
      * @return void
      */
-    private setSettings = (options : unknown | undefined) : void => {
+    private setSettings = (options : any | undefined) : void => {
         if (options.wrapper) this.dom(options.wrapper);
         if (options.blobList) this.windowBlobList = options.blobList;
         if (typeof options.backend === 'boolean') {
@@ -78,7 +77,7 @@ export class Upload {
     public eventUpload = () : void => {
         if (!this.isExternal()){
             if (this.input instanceof HTMLInputElement) this.input.click();
-        } else {
+        } else if(this.component){
             const element = this.component.querySelector('.uploader-external input');
             if (element instanceof HTMLInputElement){
                 const string = element.value;
@@ -144,16 +143,15 @@ export class Upload {
      * @return void
      */
     public download = (file : typeFile) : void => {
-        console.log(file)
         try {
             if (file.url){
-                const link = document.createElement("a");
-                link.download = file.name;
+                const link: HTMLAnchorElement = document.createElement("a");
+                if (typeof file.name === "string") link.download = file.name;
                 link.href = file.url;
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
-                this.component.dispatchEvent(library.functions.customEvent(library.constants.downloadEvent, file));
+                if (this.component) this.component.dispatchEvent(library.functions.customEvent(library.constants.downloadEvent, file));
             }
         } catch (e){
             console.error(library.constants.prefixError + ' failed to download file image');
@@ -165,8 +163,8 @@ export class Upload {
      * @return void
      */
     public delete = (file : typeFile) : void => {
-        this.files.delete(file);
-        this.component.dispatchEvent(library.functions.customEvent(library.constants.deleteEvent, file));
+        if (this.files.delete) this.files.delete(file);
+        if(this.component) this.component.dispatchEvent(library.functions.customEvent(library.constants.deleteEvent, file));
     }
     /**
      * @description check if crop can be shown
@@ -182,7 +180,7 @@ export class Upload {
      * @return void
      */
     public crop = (file: typeFile) : void => {
-        this.component.dispatchEvent(library.functions.customEvent(library.constants.cropEvent, file));
+        if (this.component) this.component.dispatchEvent(library.functions.customEvent(library.constants.cropEvent, file));
     }
     /**
      * @description save / get blob to window list / based on change date
@@ -192,8 +190,10 @@ export class Upload {
      * @return {Blob|void}
      */
     public blob = (url: string, modified : number, blob : Blob|null = null) : Blob | void => {
-        if (!Array.isArray(window[this.windowBlobList])){
-            window[this.windowBlobList] = [];
+        const blobListKey = this.windowBlobList as keyof typeof window;
+
+        if (!Array.isArray(window[blobListKey])){
+            (window[blobListKey] as any[]) = [];
         }
         if (blob instanceof Blob){
             const newObject: fileBlob = {
@@ -201,9 +201,9 @@ export class Upload {
                 'blob' : blob,
                 'modified' : modified
             }
-            window[this.windowBlobList].push(newObject);
-        } else if (Object.keys(window[this.windowBlobList]).length){
-            const hasObject = (window[this.windowBlobList].find((item) => {
+            window[blobListKey].push(newObject);
+        } else if (Object.keys(window[blobListKey]).length){
+            const hasObject = (window[blobListKey].find((item : any) => {
                 if (item.url === url && item.modified === modified) return item;
             }));
             if (hasObject) return hasObject.blob;
@@ -229,7 +229,7 @@ export class Upload {
      */
     public toggleExternal = () : void => {
         this.external = !(this.external)
-        this.files.callback(this.files.list.filter((file: typeFile) => file.type === this.tabActive));
+        if(this.files && typeof this.files.callback === 'function') this.files.callback(this.files.list.filter((file: typeFile) => file.type === this.tabActive));
     }
 }
 

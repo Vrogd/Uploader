@@ -49,10 +49,18 @@ const svelteConfig = defineConfig({
 					if (id.includes('src/styles/')) {
 						return 'styles';
 					}
+					return id;
 				},
 			},
 		},
 	},
+	css: {
+		preprocessorOptions: {
+			scss: {
+				silenceDeprecations: ["legacy-js-api"],
+			},
+		},
+	}
 });
 
 export default svelteConfig

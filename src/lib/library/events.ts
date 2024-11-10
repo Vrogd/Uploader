@@ -1,8 +1,7 @@
 import type {Upload} from "./class";
 import {formatFileSize} from "./functions";
-import type {typeFile} from "../types/file";
-import {constants} from "./constants";
-import {library} from "../index";
+import type {typeFile} from "$lib";
+import {library} from "$lib";
 
 /**
  * @description file upload function
@@ -15,7 +14,7 @@ export function upload(parent : Upload, file : typeFile) : void {
     library.functions.validateCorrectUploadType(file, parent.tabActive, parent).then((file : typeFile) => {
         if (file && file.file instanceof File) uploadFile(parent, file);
         else uploadExternal(parent, file);
-    }).catch((err) => {
+    }).catch((err : any) => {
         console.error(library.constants.prefixError + ' failed to validate upload', err)
     });
 }
@@ -28,34 +27,37 @@ export function upload(parent : Upload, file : typeFile) : void {
  */
 function uploadFile(parent : Upload, file : typeFile) : void {
     const formData = new FormData();
-    formData.append("file", file.file);
+    if (file.file){
+        formData.append("file", file.file);
+    }
     const ajax = new XMLHttpRequest();
     if (ajax.upload){
+        console.dir(1)
         parent.files.update(file, parent.tabActive);
         library.functions.updateFileData(file, parent);
         ajax.upload.addEventListener("progress", (e : ProgressEvent<XMLHttpRequestEventTarget>) => {
             uploadProgressHandler(file, e, parent);
         }, false);
-        ajax.upload.addEventListener("error", (e) => {
+        ajax.upload.addEventListener("error", (e :ProgressEvent<XMLHttpRequestEventTarget>) => {
             file.failed = true;
             uploadErrorhandler(e);
         }, false);
-        ajax.upload.addEventListener("abort", (e) => {
+        ajax.upload.addEventListener("abort", (e:ProgressEvent<XMLHttpRequestEventTarget>) => {
             uploadAbortHandler(e);
             file.failed = true;
         }, false);
-        ajax.upload.addEventListener("timeout", (e) => {
+        ajax.upload.addEventListener("timeout", (e:ProgressEvent<XMLHttpRequestEventTarget>) => {
             console.log(e, 'timeout')
         }, false);
         ajax.upload.addEventListener("loadend", () => {
             uploadLoadEndHandler(file, parent)
         });
         ajax.addEventListener("load", () => {
-            library.functions.updateFileData(file, parent);
             if (ajax.status >= 400 && ajax.status < 600 && parent.options.enableBackend) {
                 file.failed = true;
                 console.error(library.constants.prefixError +  ' File upload failed (' + ajax.status + ')');
             }
+            console.dir(2)
             parent.files.update(file, parent.tabActive);
         });
         ajax.open("POST", "/file");
@@ -71,10 +73,9 @@ function uploadFile(parent : Upload, file : typeFile) : void {
  */
 function uploadExternal(parent : Upload, file : typeFile) : void {
     prefetchExternal(parent, file).then(() => {
-        fetch(new URL(file.url)).then(response => {
-            console.log(response)
-            const contentType : string = response.headers.get('Content-Type');
-            file.name = file.url;
+        fetch(new URL(<string>file.url)).then(response => {
+            const contentType : string = <string>response.headers.get('Content-Type');
+            file.name = <string>file.url;
             if (file.type === 'image' && contentType && contentType.startsWith('image/')){
                 response.blob().then(blobResponse => {
                     file.size = formatFileSize(blobResponse.size, 2)
@@ -86,6 +87,7 @@ function uploadExternal(parent : Upload, file : typeFile) : void {
                     }).catch((err : Error) => {
                         console.error(library.constants.prefixError + ' failed to load preview from cache.', err);
                     });
+                    console.dir(3)
                     parent.files.update(file, parent.tabActive);
                     console.log(response, blobResponse)
                 })
@@ -94,6 +96,7 @@ function uploadExternal(parent : Upload, file : typeFile) : void {
             }
         }).catch((error) => {
             file.failed = true;
+            console.dir(4)
             parent.files.update(file, parent.tabActive);
             console.error(error)
         });
@@ -109,8 +112,8 @@ function uploadExternal(parent : Upload, file : typeFile) : void {
  * @return <Promise>
  */
 function prefetchExternal(parent : Upload, file : typeFile) : Promise<unknown>{
-    return new Promise((resolve : unknown, reject : unknown) => {
-        fetch(new URL(file.url), {
+    return new Promise((resolve : any, reject : any) => {
+        fetch(new URL(<string>file.url), {
             method: 'OPTIONS',
             headers: {
                 'Access-Control-Allow-Origin' : '*',
@@ -137,6 +140,7 @@ function uploadProgressHandler(file : typeFile, e : ProgressEvent, parent: Uploa
     if (file.progress === 100 && !parent.options.enableBackend){
         file.completed = true;
     }
+    console.dir(6)
     parent.files.update(file, parent.tabActive);
 }
 
@@ -166,5 +170,5 @@ function uploadAbortHandler(e : Event): void {
  */
 function uploadLoadEndHandler(file : typeFile, parent : Upload): void {
     file.completed = true;
-    if (parent) parent.component.dispatchEvent(library.functions.customEvent(library.constants.uploadEvent, file));
+    if (parent.component) parent.component.dispatchEvent(library.functions.customEvent(library.constants.uploadEvent, file));
 }

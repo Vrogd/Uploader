@@ -16,3 +16,5 @@ export const constants = {
     cropEvent: <string>'customCrop',
     domLoadEvent: <string> 'customDomLoad'
 } as const
+
+export default constants;

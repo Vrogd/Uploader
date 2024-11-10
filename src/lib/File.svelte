@@ -2,24 +2,37 @@
     import type {typeFile} from "./types/file";
     import {library} from "./index";
     import {constants} from "./library/constants";
-    import {onMount, tick} from "svelte";
+    import {onMount} from "svelte";
 
-    export let file : typeFile
-    export let upload;
-    export let component;
-    export let previewElement
-    const renderPreview = (node, file) => library.functions.previewEvent(file, node);
+    interface Props {
+        file: typeFile;
+        upload: any;
+        component: any;
+    }
+    let previewElement : HTMLElement|null = null;
 
-    onMount(async () => {
-        await tick();
-        file.previewElement = previewElement;
-        component.dispatchEvent(library.functions.customEvent(constants.domLoadEvent, {
-            detail: file
-        }));
+    let {
+        file,
+        upload,
+        component,
+    } : Props = $props();
+
+    const renderPreview = (node : HTMLElement, file : typeFile) => library.functions.previewEvent(file, node);
+
+    onMount(() => {
+        if (previewElement instanceof HTMLElement) {
+            file.previewElement = previewElement;
+            component.dispatchEvent(library.functions.customEvent(constants.domLoadEvent, file));
+        } else  {
+            console.error(library.constants.prefixError + ' failed to check preview dom');
+        }
     });
+    $effect(() => {
+       $inspect('update', file.preview, upload.isCompact(), file.isPreviewAble)
+    })
 </script>
 
-<div class="uploader-item" class:uploader-item-image="{file.preview != null && !upload.isCompact()}" class:uploader-item-error="{file.failed}" bind:this={previewElement}>
+<div class="uploader-item" class:uploader-item-image="{file.preview !== null && !upload.isCompact()}" class:uploader-item-error="{file.failed}" bind:this={previewElement}>
     <div class="info">
         <span class="text">
              <span data-upload-name>{file.name}</span>
@@ -27,16 +40,16 @@
         </span>
         <span class="actions">
             {#if upload.hasCrop(file) && file.completed && !file.failed  && !upload.isCompact()}
-                 <button class="spin" data-upload-crop on:click="{() => upload.crop(file)}">
+                 <button class="spin" aria-label="crop" data-upload-crop onclick={() => upload.crop(file)}>
                        <i class="fa-solid fa-crop"></i>
                  </button>
             {/if}
             {#if file.completed && !file.failed && file.url }
-                 <button class="spin" data-upload-download on:click="{() => upload.download(file)}">
+                 <button class="spin" aria-label="download" data-upload-download onclick={() => upload.download(file)}>
                        <i class="fa-solid fa-cloud-arrow-down"></i>
                  </button>
             {/if}
-            <button class="spin" data-upload-delete on:click="{() => upload.delete(file)}">
+            <button class="spin" aria-label="delete" data-upload-delete onclick={() => upload.delete(file)}>
                  <i class="fa-solid fa-trash"></i>
             </button>
         </span>
