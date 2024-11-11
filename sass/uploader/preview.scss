@@ -40,7 +40,6 @@
     height: #{properties.$componentBarHeight};
     bottom: 0;
     margin-top: auto;
-    border-top: 1px solid var(--text-color);
     background-color: var(--main-color);
 
     .bar {
@@ -48,7 +47,7 @@
       height: #{properties.$componentBarHeight};
       width: 30%;
       transition: .4s width ease-out;
-      background: var(--high-color);
+      background: var(--text-color);
     }
   }
   .info {
@@ -163,7 +162,7 @@
 #{'.' +  #{properties.$componentItemImage}}{
   &:hover .actions{
     display: block !important;
-    transition-delay:.1s;
+    transition-delay:.3s;
   }
   .actions {
     display: none;
@@ -172,6 +171,7 @@
     bottom: 10%;
     right: 2%;
     transition: 0s all;
+    transition-delay:.3s;
     button {
       opacity: .85;
       padding: #{properties.$componentBarHeight} #{properties.$componentBarHeight};
@@ -181,6 +181,7 @@
       height: 2.6rem !important;
       background: var(--main-color);
       outline: 1px solid var(--text-color);
+      transition: 0s all;
       &:hover, &:focus, &:focus-within, &:focus-visible {
         opacity: 1;
       }

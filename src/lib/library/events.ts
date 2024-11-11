@@ -52,16 +52,15 @@ function uploadFile(parent : Upload, file : typeFile) : void {
             uploadLoadEndHandler(file, parent)
         });
         ajax.addEventListener("load", () => {
-            const current = <typeFile|null>parent.files.find(<string>file.id)
-            if (current){
-                if (ajax.status >= 400 && ajax.status < 600 && parent.options.enableBackend) {
-                    current.failed = true;
-                    console.error(library.constants.prefixError +  ' File upload failed (' + ajax.status + ')');
-                }
-                parent.files.update(current, parent.tabActive);
+            if (ajax.status >= 400 && ajax.status < 600 && parent.options.enableBackend) {
+                parent.files.update({
+                    'id' : file.id,
+                    'failed' : true
+                } as typeFile, parent.tabActive);
+                console.error(library.constants.prefixError +  ' File upload failed (' + ajax.status + ')');
             }
         });
-        //ajax.open("POST", "/file");
+        ajax.open("POST", "/file");
         ajax.send(formData as XMLHttpRequestBodyInit);
     }
 }
@@ -88,16 +87,17 @@ function uploadExternal(parent : Upload, file : typeFile) : void {
                     }).catch((err : Error) => {
                         console.error(library.constants.prefixError + ' failed to load preview from cache.', err);
                     });
-                    parent.files.update(file, parent.tabActive);
                     console.log(response, blobResponse)
                 })
             } else {
                 console.log('error', response)
             }
-        }).catch((error) => {
+        }).catch(() => {
             file.failed = true;
-            parent.files.update(file, parent.tabActive);
-            console.error(error)
+            parent.files.update({
+                'id' : file.id,
+                'failed' : true
+            } as typeFile, parent.tabActive);
         });
     }).catch((error) => {
         console.error(library.constants.prefixError + ' Url is not available : ', error);
@@ -135,15 +135,11 @@ function prefetchExternal(parent : Upload, file : typeFile) : Promise<unknown>{
  * @return void
  */
 function uploadProgressHandler(file : typeFile, e : ProgressEvent, parent: Upload) : void {
-    const current =  <typeFile|null> parent.files.find(<string>file.id);
-    if (current){
-        current.progress = Math.round((e.loaded / e.total) * 100);
-        if (current.progress === 100 && !parent.options.enableBackend){
-            current.completed = true;
-        }
-        console.log(current.progress)
-        parent.files.update(current, parent.tabActive);
-    }
+    parent.files.update({
+        'id' : file.id,
+        'progress' : Math.round((e.loaded / e.total) * 100) as Number,
+        'completed': (file.progress === 100 && !parent.options.enableBackend),
+    } as typeFile, parent.tabActive);
 }
 
 /**

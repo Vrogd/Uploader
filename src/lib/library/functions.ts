@@ -30,10 +30,10 @@ export const functions: any = {
                 'file': file,
             }, main);
         } else {
-            return $state(<typeFile>Object.assign({
+            return <typeFile>Object.assign({
                 'url': file,
                 'external': true
-            }, main));
+            }, main);
         }
     },
     /**
@@ -43,21 +43,17 @@ export const functions: any = {
      * @return void
      */
     updateFileData(file: typeFile, parent: Upload) : void {
-        const current = <typeFile|null> parent.files.find(<string>file.id);
-        if (current){
-            const correctTab : boolean = parent.tabActive === current.type;
-            if (current.file instanceof File){
-                current.size = formatFileSize(current.file.size, 2);
-                current.name = current.file.name;
-                parent.files.update(current, parent.tabActive);
-                if (current.file.type.includes('image') && !current.isPreviewAble && !current.preview && correctTab){
-                    functions.fileReader(current, parent).catch((err : Error) => {
-                        console.error(library.constants.prefixError + ' failed to set preview', err);
-                    })
-                } else {
-                    console.dir(8)
-                    parent.files.update(current, parent.tabActive);
-                }
+        const correctTab : boolean = parent.tabActive === file.type;
+        if (file.file instanceof File){
+            parent.files.update({
+                'id' : file.id,
+                'size' : formatFileSize(file.file.size, 2),
+                'name' : file.file.name
+            } as typeFile, parent.tabActive);
+            if (file.file.type.includes('image') && !file.isPreviewAble && !file.preview && correctTab){
+                functions.fileReader(file, parent).catch((err : Error) => {
+                    console.error(library.constants.prefixError + ' failed to set preview', err);
+                })
             }
         }
     },
@@ -93,31 +89,27 @@ export const functions: any = {
      */
     loadPreview(file: typeFile, parent: Upload, canvas: HTMLCanvasElement) : Promise<void>{
         return new Promise((resolve: any) => {
-            const current = <typeFile|null> parent.files.find(<string>file.id);
-            if (current && current.file instanceof File) {
+            if (file.file instanceof File) {
                 const request = new XMLHttpRequest();
-                request.open('GET', URL.createObjectURL(current.file), true);
+                request.open('GET', URL.createObjectURL(file.file), true);
                 request.responseType = 'blob';
                 request.onload = function () {
                     const reader = new FileReader();
                     reader.readAsDataURL(request.response);
                     reader.onload = function (e: any) {
-                        const currentLoaded = <typeFile|null> parent.files.find(<string>file.id);
-                        if (currentLoaded && currentLoaded.file instanceof File) {
-                            const blob = request.response;
-                            if (blob instanceof Blob) parent.blob(currentLoaded.file.name, currentLoaded.file.lastModified, blob);
-                            currentLoaded.url = e.target?.result;
-                            const image = new Image();
-                            image.src = e.target.result;
-                            currentLoaded.isPreviewAble = true
-                            currentLoaded.preview = canvas;
-                            parent.files.update(currentLoaded, parent.tabActive);
-                            renderPreview(currentLoaded, image, canvas).then(() => {
-                                parent.files.update(currentLoaded, parent.tabActive);
-                            }).catch(() => {
-                                console.error(library.constants.prefixError + ' failed to load preview');
-                            })
-                        }
+                        const blob = request.response;
+                        if (blob instanceof Blob && file.file instanceof File) parent.blob(file.file.name, file.file.lastModified, blob);
+                        const image = new Image();
+                        image.src = e.target.result;
+                        parent.files.update({
+                            'id' : file.id,
+                            'url' : e.target?.result,
+                            'isPreviewAble': true,
+                            'preview': canvas
+                        } as typeFile, parent.tabActive);
+                        renderPreview(file, image, canvas).catch(() => {
+                            console.error(library.constants.prefixError + ' failed to load preview');
+                        })
                     };
                 };
                 request.onerror = function () {
@@ -139,16 +131,23 @@ export const functions: any = {
      * @param {Blob} blob blob stored in js
      * @return {Promise<void>}
      */
-    loadCache(file: typeFile, parent: Upload|undefined, canvas: HTMLCanvasElement, blob: Blob) : Promise<unknown> {
+    loadCache(file: typeFile, parent: Upload, canvas: HTMLCanvasElement, blob: Blob) : Promise<unknown> {
         return new Promise((resolve : any) => {
             const url :string =  URL.createObjectURL(blob)
-            file.isPreviewAble = true
-            file.preview = canvas;
-            file.url = url;
             const image = new Image();
             image.src = url;
             renderPreview(file, image, canvas).then(()=>{
-                if (parent) parent.files.update(file, parent.tabActive);
+                parent.files.update({
+                    'id' : file.id,
+                    'preview' : canvas,
+                    'isPreviewAble': true,
+                    'url': url
+                } as typeFile, parent.tabActive);
+            }).catch(() => {
+                parent.files.update({
+                    'id' : file.id,
+                    'url': url
+                } as typeFile, parent.tabActive);
             })
             resolve();
         })
@@ -354,30 +353,4 @@ export function formatFileSize(bytes : number, decimalPoint : number = 2): strin
     const i = Math.floor(Math.log(bytes) / Math.log(1024));
     return parseFloat((bytes / Math.pow(1024, i)).toFixed(decimalPoint)) + ' ' + sizes[i];
 }
-
-/**
- * @description deep merge
- * @param {any} target
- * @param {any[]} sources
- * @return {Object}
- */
-export function deepMerge(target : any, ...sources:any[]) : any {
-    if (!sources.length) return target;
-    const source = sources.shift();
-    if (typeof target === 'object' && typeof source === 'object') {
-        for (const key in source) {
-            if (source.hasOwnProperty(key)) {
-                if (typeof source[key] === 'object' && source[key] !== null) {
-                    if (!target[key]) target[key] = {};
-                    deepMerge(target[key], source[key]);
-                } else {
-                    target[key] = source[key];
-                }
-            }
-        }
-    }
-
-    return deepMerge(target, ...sources);
-}
-
 export default functions;

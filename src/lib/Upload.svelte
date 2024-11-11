@@ -45,7 +45,7 @@
             } as EventListener)
             // loaded dom event // load preview if clicked on tab
             component.addEventListener(constants.domLoadEvent, function (e : CustomEvent){
-                upload.files.update({...e.detail}, upload.tabActive);
+                upload.files.update(e.detail, upload.tabActive);
             } as EventListener)
         }
 

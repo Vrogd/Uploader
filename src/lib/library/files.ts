@@ -1,7 +1,6 @@
-import type {typeFile} from "$lib";
-import type {Tabs} from "$lib";
+import type {Tabs, typeFile} from "$lib";
 import type {typeFileList} from "$lib/types/fileList";
-import {deepMerge, generateId} from "$lib/library/functions";
+import {generateId} from "$lib/library/functions";
 
 /**
  * @description data object
@@ -18,18 +17,19 @@ export const filesList: typeFileList = {
      */
     update: function (item : typeFile, tabActive : Tabs) : void {
         const find = this.list.find((file: typeFile) => {
-            return item.hasOwnProperty('id') && typeof item.id === 'string' && item.id === file.id;
+            return item.hasOwnProperty('id') && item.id === file.id;
         });
         if (find && find as typeFile){
             const index : number = this.list.indexOf(find);
             if (index > -1){
                 if (item.failed) item.completed = false;
-                this.list[index] = deepMerge(this.list[index], item);
+                this.list[index] = merge(this.list[index], item);
+                console.dir({'test' :this.list[index]})
                 if (typeof this.callback === 'function') this.callback(this.list.filter((file: typeFile) => file.type === tabActive));
             }
         } else {
             if (!item.id){
-                item.id = generateId(30);
+                item.id = generateId(40);
             }
             this.list.push(item);
             if (typeof this.callback === 'function') this.callback(this.list.filter((file: typeFile) => file.type === tabActive));
@@ -41,7 +41,7 @@ export const filesList: typeFileList = {
      * @return {typeFile|null}
      */
     find: function (id : string): typeFile | null {
-        return <typeFile | null> this.list.find((file: typeFile) => {
+        return <typeFile | null>this.list.find((file: typeFile) => {
             return id === file.id;
         });
     },
@@ -54,4 +54,16 @@ export const filesList: typeFileList = {
         this.list = this.list.filter((file: typeFile) => file.id !== item.id);
         if (typeof this.callback === 'function') this.callback(this.list);
     }
+}
+
+/**
+ * overwrite first with second object
+ * @param {typeFile} obj1
+ * @param {typeFile} obj2
+ */
+function merge(obj1 : any, obj2 : any) {
+    for (let key in obj2) {
+        obj1[key] = obj2[key];
+    }
+    return obj1;
 }

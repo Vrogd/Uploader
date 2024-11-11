@@ -21,12 +21,17 @@
 
     onMount(() => {
         if (previewElement instanceof HTMLElement) {
-            file.previewElement = previewElement;
-            component.dispatchEvent(library.functions.customEvent(constants.domLoadEvent, file));
+            component.dispatchEvent(library.functions.customEvent(constants.domLoadEvent, {
+                id: file.id,
+                previewElement: previewElement,
+            }));
         } else  {
             console.error(library.constants.prefixError + ' failed to check preview dom');
         }
     });
+    $effect(() => {
+       $inspect('update', file.preview, upload.isCompact(), file.isPreviewAble)
+    })
 </script>
 
 <div class="uploader-item" class:uploader-item-image="{file.preview !== null && !upload.isCompact()}" class:uploader-item-error="{file.failed}" bind:this={previewElement}>
