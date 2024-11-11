@@ -6,7 +6,7 @@ export type typeFile = {
     file? : File | Blob | string,
     progress?: Number | null,
     completed? : boolean | null
-    failed: boolean
+    failed?: boolean
     isPreviewAble?: boolean
     preview?: null | HTMLCanvasElement,
     previewElement ?: null | HTMLElement

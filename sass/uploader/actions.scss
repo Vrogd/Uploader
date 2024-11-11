@@ -10,7 +10,8 @@
   --text-color: white;
   --text-error: #{properties.$componentErrorColor};
 
-  font-family: #{properties.$componentFontFamily};
+  box-shadow: 0 0 1px 1px var(--main-color-high);
+  font-family: "Calibri Light", sans-serif;
   text-align: center;
   background-color: var(--main-color);
   min-width: #{properties.$componentMinWidth};
@@ -130,6 +131,7 @@
     background: none;
     color: var(--text-color);
     padding: 0.3rem 0.7rem;
+    font-family: inherit;
     &:active, &:hover{
       cursor: pointer;
       background: var(--main-color-high) !important;

@@ -22,9 +22,9 @@ export const filesList: typeFileList = {
         if (find && find as typeFile){
             const index : number = this.list.indexOf(find);
             if (index > -1){
-                if (item.failed) item.completed = false;
+                if (typeof item.failed === 'boolean' && !item.failed) item.completed = false
+                if (item.completed) item.failed = false;
                 this.list[index] = merge(this.list[index], item);
-                console.dir({'test' :this.list[index]})
                 if (typeof this.callback === 'function') this.callback(this.list.filter((file: typeFile) => file.type === tabActive));
             }
         } else {

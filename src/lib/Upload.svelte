@@ -69,8 +69,8 @@
             </div>
             <div class="uploader-preview">
                  {#if fileList && Object.keys(fileList).length}
-                      {#each fileList as file, key}
-                          <File file={fileList[key]} upload={upload} component={component}/>
+                      {#each fileList as file}
+                          <File file={file} upload={upload} component={component}/>
                       {/each}
                  {/if}
             </div>
