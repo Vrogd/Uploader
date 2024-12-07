@@ -8,7 +8,7 @@ import {generateId} from "$lib/library/functions";
  */
 export const filesList: typeFileList = {
     list: <typeFile[]>[],
-    callback: <((files : typeFile[]) => void)| null> null,
+    callback: <((files : typeFile[]) =>  typeFile[])| null> null,
     /**
      * @description add data / item
      * @param {typeFile} item current item
@@ -25,14 +25,14 @@ export const filesList: typeFileList = {
                 if (typeof item.failed === 'boolean' && !item.failed) item.completed = false
                 if (item.completed) item.failed = false;
                 this.list[index] = merge(this.list[index], item);
-                if (typeof this.callback === 'function') this.callback(this.list.filter((file: typeFile) => file.type === tabActive));
+                this.queue(this.list.filter((file: typeFile) => file.type === tabActive));
             }
         } else {
             if (!item.id){
                 item.id = generateId(40);
             }
             this.list.push(item);
-            if (typeof this.callback === 'function') this.callback(this.list.filter((file: typeFile) => file.type === tabActive));
+            this.queue(this.list.filter((file: typeFile) => file.type === tabActive));
         }
     },
     /**
@@ -51,8 +51,16 @@ export const filesList: typeFileList = {
      * @return {void}
      */
     delete: function (item : typeFile) : void {
-        this.list = this.list.filter((file: typeFile) => file.id !== item.id);
-        if (typeof this.callback === 'function') this.callback(this.list);
+        this.queue(this.list.filter((file: typeFile) => file.id !== item.id));
+    },
+    timeout: null,
+    /**
+     * @description use callback to update list
+     * @param {typeFile[]} files
+     * @return void
+     */
+    queue: function (files : typeFile[]) : void {
+        if (typeof this.callback === 'function') this.callback(files);
     }
 }
 

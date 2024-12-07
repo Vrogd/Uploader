@@ -26,29 +26,25 @@
 		"!dist/**/*.test.*",
 		"!dist/**/*.spec.*"
 	],
-	"peerDependencies": {
-		"svelte": "^4.2.18"
+	"peerDependencies" : {
+		"svelte": "^5.8.1"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^3.3.1",
-		"@sveltejs/kit": "^2.8.0",
+		"@sveltejs/kit": "^2.9.0",
 		"@sveltejs/package": "^2.3.7",
-		"@sveltejs/vite-plugin-svelte": "^4.0.0",
-		"@types/node": "^22.9.0",
-		"publint": "^0.2.11",
+		"@sveltejs/vite-plugin-svelte": "^5.0.1",
+		"publint": "^0.2.12",
 		"rollup-plugin-sass": "^1.14.0",
-		"sass": "^1.80.6",
-		"svelte": "^5.1.13",
-		"svelte-check": "^4.0.6",
+		"sass": "^1.82.0",
+		"svelte-check": "^4.1.1",
 		"tslib": "^2.8.1",
-		"typescript": "^5.6.3",
-		"vite": "^5.4.10"
+		"typescript": "^5.7.2",
+		"vite": "^6.0.3",
+		"@sveltejs/adapter-static": "^3.0.6",
+		"svelte-preprocess": "^6.0.3"
 	},
 	"main": "./dist/index.js",
 	"types": "./dist/index.d.ts",
-	"type": "module",
-	"dependencies": {
-		"@sveltejs/adapter-static": "^3.0.5",
-		"svelte-preprocess": "^6.0.3"
-	}
+	"type": "module"
 }

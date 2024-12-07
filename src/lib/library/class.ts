@@ -33,7 +33,10 @@ export class Upload {
         videoExtensions: [],
         otherExtensions: []
     }
-    constructor(object: unknown | undefined, fallback : boolean = false) {
+    constructor(object: unknown | undefined,  files : typeFile[] = [], fallback : boolean = false) {
+        if (files && Object.keys(files).length) {
+            this.files.list = files;
+        }
        this.setSettings(object);
        this.fallback = fallback;
     }
@@ -120,16 +123,17 @@ export class Upload {
         if (this.tabActive !== key) {
             this.tabActive = key;
             this.external = false;
-            this.files.callback?.(this.files.list.filter((file: typeFile) => file.type === this.tabActive));
+            this.files.queue(this.files.list.filter((file: typeFile) => file.type === this.tabActive));
         }
     }
     /**
      * @description add event listeners
+     * @info function is set on mount if triggered multiple times retrigger list
      * @param {HTMLElement | Element} wrapper dom element
      * @return void
      */
     public dom = (wrapper? : HTMLElement | Element) : void  => {
-        if (wrapper && wrapper instanceof HTMLElement){
+        if (wrapper && wrapper instanceof HTMLElement && !this.component){
             this.component = wrapper;
             this.input = wrapper.querySelector('input[type="file"]');
             if (this.input instanceof HTMLElement){
@@ -229,7 +233,7 @@ export class Upload {
      */
     public toggleExternal = () : void => {
         this.external = !(this.external)
-        if(this.files && typeof this.files.callback === 'function') this.files.callback(this.files.list.filter((file: typeFile) => file.type === this.tabActive));
+        if(this.files) this.files.queue(this.files.list.filter((file: typeFile) => file.type === this.tabActive));
     }
 }
 

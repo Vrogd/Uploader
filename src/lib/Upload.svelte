@@ -1,24 +1,24 @@
 <script lang="ts">
-    import {onMount, tick} from 'svelte';
+    import {onDestroy, onMount, tick} from 'svelte';
     import type {typeFile} from "./types/file";
     import {library} from "./index";
     import constants from "./library/constants";
     import File from "./File.svelte";
 
-    let { component = $bindable(null), options = {}, ...other} = $props();
-
+    let { component = $bindable(null), options = {}, files = [], ...other} = $props();
     // custom events
     const uploadHandler = other[constants.uploadEvent] ? other[constants.uploadEvent] as EventListener : null;
     const deleteHandler = other[constants.deleteEvent] ? other[constants.deleteEvent] as EventListener : null;
     const cropHandler = other[constants.cropEvent] ? other[constants.cropEvent] as EventListener : null;
 
     // create class
-    let upload = $state(new library.upload(options));
+    let upload = $state(new library.upload(options, files));
     let updater = $state(0);
 
     // callback
     upload.files.callback = function (list: typeFile[]) {
-        fileList = [...list];
+        fileList = list;
+        console.log('list file list')
         updater++;
     }
 
@@ -28,6 +28,7 @@
         await tick();
         if (component instanceof HTMLElement) {
             upload.dom(component);
+            fileList = files;
             let timeout : any[] = [];
             component.addEventListener(constants.uploadEvent, function (e : CustomEvent){
                 clearTimeout(timeout[e.detail.id]);
@@ -48,8 +49,11 @@
                 upload.files.update(e.detail, upload.tabActive);
             } as EventListener)
         }
-
     });
+
+    onDestroy(() => {
+        fileList = [];
+    })
 </script>
 <div class="uploader" bind:this={component}>
     <div class="uploader-wrapper">
@@ -68,11 +72,13 @@
                 {/key}
             </div>
             <div class="uploader-preview">
-                 {#if fileList && Object.keys(fileList).length}
-                      {#each fileList as file}
-                          <File file={file} upload={upload} component={component}/>
-                      {/each}
-                 {/if}
+                {#if fileList && Object.keys(fileList).length}
+                    {#each fileList as file}
+                        {#key file.id}
+                            <File file={file} upload={upload} component={component}/>
+                        {/key}
+                    {/each}
+                {/if}
             </div>
         {/if}
         {#key updater}
