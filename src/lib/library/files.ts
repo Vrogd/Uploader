@@ -47,16 +47,17 @@ export const filesList: typeFileList = {
     },
     /**
      * @description delete file from list
-     * @param {typeFile} item
+     * @param {typeFile} item current file to remove
      * @return {void}
      */
     delete: function (item : typeFile) : void {
-        this.queue(this.list.filter((file: typeFile) => file.id !== item.id));
+        this.list = this.list.filter((file: typeFile) => file.id !== item.id);
+        this.queue(this.list);
     },
     timeout: null,
     /**
      * @description use callback to update list
-     * @param {typeFile[]} files
+     * @param {typeFile[]} files new list of files
      * @return void
      */
     queue: function (files : typeFile[]) : void {

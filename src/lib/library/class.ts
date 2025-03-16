@@ -33,12 +33,17 @@ export class Upload {
         videoExtensions: [],
         otherExtensions: []
     }
-    constructor(object: unknown | undefined,  files : typeFile[] = [], fallback : boolean = false) {
-        if (files && Object.keys(files).length) {
-            this.files.list = files;
-        }
-       this.setSettings(object);
-       this.fallback = fallback;
+    constructor(object: unknown | undefined, fallback : boolean = false) {
+        this.setSettings(object);
+        this.fallback = fallback;
+    }
+    /**
+     * @description set files
+     * @param {typeFile[]} files new files
+     * @return void
+     */
+    public setFiles(files : typeFile[]) : void {
+        this.files.list = files;
     }
     /**
      * @description set settings
@@ -60,6 +65,7 @@ export class Upload {
         this.options.imageExtensions = Array.isArray(options.imageExtensions) ? options.imageExtensions : library.constants.imageDefaultExtensions;
         this.options.videoExtensions = Array.isArray(options.videoExtensions) ? options.videoExtensions : library.constants.videoDefaultExtensions;
         if (Array.isArray(options.otherExtensions)) this.options.otherExtensions = options.otherExtensions;
+        if (typeof options.maxFiles === 'number') this.maxAmountOfFiles = options.maxFiles;
     }
     /**
      * @description on change event file list
@@ -167,7 +173,8 @@ export class Upload {
      * @return void
      */
     public delete = (file : typeFile) : void => {
-        if (this.files.delete) this.files.delete(file);
+        console.log(typeof this.files.delete === 'function')
+        if (typeof this.files.delete === 'function') this.files.delete(file);
         if(this.component) this.component.dispatchEvent(library.functions.customEvent(library.constants.deleteEvent, file));
     }
     /**

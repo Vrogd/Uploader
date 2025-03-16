@@ -12,13 +12,14 @@
     const cropHandler = other[constants.cropEvent] ? other[constants.cropEvent] as EventListener : null;
 
     // create class
-    let upload = $state(new library.upload(options, files));
+    let upload = new library.upload(options);
+    upload.setFiles(files);
     let updater = $state(0);
 
     // callback
     upload.files.callback = function (list: typeFile[]) {
         fileList = list;
-        console.log('list file list')
+        console.log('list file list', list)
         updater++;
     }
 
@@ -74,9 +75,7 @@
             <div class="uploader-preview">
                 {#if fileList && Object.keys(fileList).length}
                     {#each fileList as file}
-                        {#key file.id}
-                            <File file={file} upload={upload} component={component}/>
-                        {/key}
+                        <File file={file} upload={upload} component={component}/>
                     {/each}
                 {/if}
             </div>
