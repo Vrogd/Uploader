@@ -65,6 +65,8 @@
   #{'.' +  #{properties.$componentSubmitClassExternal}}{
     width: 15%;
     svg {
+      line-height: 1.6rem;
+      max-height: 1.6rem;
       margin: auto !important;
     }
   }

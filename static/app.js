@@ -1,3 +1,3 @@
-var app = "";
+const app = "";
 
 export { app as default };
