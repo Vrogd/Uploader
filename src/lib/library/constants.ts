@@ -14,7 +14,9 @@ export const constants = {
     deleteEvent: <string>'customDelete',
     downloadEvent: <string>'customDownload',
     cropEvent: <string>'customCrop',
-    domLoadEvent: <string> 'customDomLoad'
+    domLoadEvent: <string> 'customDomLoad',
+    previewText: <string>'previewText',
+    basePreviewText: <string>'Click to Upload or drag & drop'
 } as const
 
 export default constants;

@@ -103,7 +103,7 @@ export class Upload {
      * @return void
      */
     public eventDrop = (e : DragEvent) : void => {
-        if (!this.isExternal){
+        if (!this.isExternal()){
             if (e.dataTransfer && "files" in e.dataTransfer) {
                 const files = e.dataTransfer.files;
                 for (const file of files){
@@ -143,8 +143,19 @@ export class Upload {
             this.component = wrapper;
             this.input = wrapper.querySelector('input[type="file"]');
             if (this.input instanceof HTMLElement){
-                this.input.addEventListener('change', (e : Event) => this.eventChange(e));
+                this.input.addEventListener('change', (e : Event) : void => this.eventChange(e));
             }
+            const controller = new AbortController();
+            const { signal } = controller;
+
+            const preventDefault: (e:Event) => void  = (e: Event) => {
+                e.preventDefault();
+                e.stopPropagation();
+            };
+
+            // Attach listeners with AbortController signal
+            window.addEventListener('dragover', preventDefault, { signal });
+            window.addEventListener('drop', preventDefault, { signal });
         }
     }
     /**
@@ -152,7 +163,7 @@ export class Upload {
      * @param {typeFile} file file object
      * @return void
      */
-    public download = (file : typeFile) : void => {
+    public download : (file : typeFile) => void = (file : typeFile) : void => {
         try {
             if (file.url){
                 const link: HTMLAnchorElement = document.createElement("a");
@@ -172,8 +183,7 @@ export class Upload {
      * @param {typeFile} file file object
      * @return void
      */
-    public delete = (file : typeFile) : void => {
-        console.log(typeof this.files.delete === 'function')
+    public delete : (file : typeFile) => void = (file : typeFile) : void => {
         if (typeof this.files.delete === 'function') this.files.delete(file);
         if(this.component) this.component.dispatchEvent(library.functions.customEvent(library.constants.deleteEvent, file));
     }
@@ -182,15 +192,23 @@ export class Upload {
      * @param {typeFile} file file object
      * @return boolean
      */
-    public hasCrop = (file : typeFile) : boolean => {
+    public hasCrop : (file : typeFile) => boolean = (file : typeFile) : boolean => {
         return (this.options.enableImage && file.type === 'image' && !file.external && this.options.enableCrop);
     }
+    /**
+     * @description check if it needs to show on top
+     * @return boolean
+     */
+    public showButtons :() => boolean = () : boolean => {
+        return [this.options.enableImage, this.options.enableVideo,this.options.enableOther].filter(Boolean).length > 1;
+    }
+
     /**
      * @description check if crop can be shown
      * @param {typeFile} file file object
      * @return void
      */
-    public crop = (file: typeFile) : void => {
+    public crop : (file : typeFile) => void = (file: typeFile) : void => {
         if (this.component) this.component.dispatchEvent(library.functions.customEvent(library.constants.cropEvent, file));
     }
     /**

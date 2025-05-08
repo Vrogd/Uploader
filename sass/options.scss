@@ -11,6 +11,8 @@ $componentSubmitClass: #{$componentName} + "-submit";
 $componentSubmitClassExternal: #{$componentName} + "-submit-external";
 
 $componentPreviewClass: #{$componentName} + "-preview";
+$componentPreviewTextClass: #{$componentName} + "-preview-text";
+
 // items
 $componentItem: #{$componentName} + '-item';
 $componentItemImage: #{$componentName} + '-item-image';

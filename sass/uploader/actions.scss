@@ -52,6 +52,7 @@
 
 // main class
 #{'.' +  #{properties.$componentSubmitActions}}{
+  border-top: .15rem solid var(--main-color-high);
   display: flex;
   padding: 0 0.2rem;
   & :not(.#{properties.$componentSubmitClassExternal}){

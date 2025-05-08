@@ -12,6 +12,15 @@
   display: flex;
   color: var(--text-color);
 }
+
+// text preview for text
+#{'.' +  #{properties.$componentPreviewTextClass}}{
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+}
+
 // preview item
 #{'.' +  #{properties.$componentItem}}{
   min-height: 2rem;

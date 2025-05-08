@@ -11,6 +11,8 @@
     const deleteHandler = other[constants.deleteEvent] ? other[constants.deleteEvent] as EventListener : null;
     const cropHandler = other[constants.cropEvent] ? other[constants.cropEvent] as EventListener : null;
 
+    const uploadText = other[constants.previewText] ? other[constants.previewText] as string : constants.basePreviewText;
+
     // create class
     let upload = new library.upload(options);
     upload.setFiles(files);
@@ -19,7 +21,6 @@
     // callback
     upload.files.callback = function (list: typeFile[]) {
         fileList = list;
-        console.log('list file list', list)
         updater++;
     }
 
@@ -59,24 +60,30 @@
 <div class="uploader" bind:this={component}>
     <div class="uploader-wrapper">
         {#if upload}
-            <div class="uploader-tabs">
-                {#key updater}
-                    {#if upload.options.enableImage}
-                        <button type="button" class="uploader-tab-image tab" class:show={upload.tabActive === 'image'} onclick={() => upload.switch('image')}>Image</button>
-                    {/if}
-                    {#if upload.options.enableVideo}
-                        <button type="button" class="uploader-tab-video tab" class:show={upload.tabActive === 'video'} onclick={() => upload.switch('video')}>Video</button>
-                    {/if}
-                    {#if upload.options.enableOther}
-                        <button type="button" class="uploader-tab-other tab" class:show={upload.tabActive === 'other'} onclick={() => upload.switch('other')}>Other</button>
-                    {/if}
-                {/key}
-            </div>
-            <div class="uploader-preview">
+            {#if upload.showButtons()}
+                <div class="uploader-tabs">
+                    {#key updater}
+                        {#if upload.options.enableImage}
+                            <button type="button" class="uploader-tab-image tab" class:show={upload.tabActive === 'image'} onclick={() => upload.switch('image')}>Image</button>
+                        {/if}
+                        {#if upload.options.enableVideo}
+                            <button type="button" class="uploader-tab-video tab" class:show={upload.tabActive === 'video'} onclick={() => upload.switch('video')}>Video</button>
+                        {/if}
+                        {#if upload.options.enableOther}
+                            <button type="button" class="uploader-tab-other tab" class:show={upload.tabActive === 'other'} onclick={() => upload.switch('other')}>Other</button>
+                        {/if}
+                    {/key}
+                </div>
+            {/if}
+            <div class="uploader-preview" role="button" tabindex="0" ondrop={(e) => {upload.eventDrop(e)}}>
                 {#if fileList && Object.keys(fileList).length}
                     {#each fileList as file}
                         <File file={file} upload={upload} component={component}/>
                     {/each}
+                {:else}
+                    <div class="uploader-preview-text">
+                        { uploadText }
+                    </div>
                 {/if}
             </div>
         {/if}
