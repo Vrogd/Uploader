@@ -26,7 +26,7 @@
 }
 // uploader -tabs
 #{'.' +  #{properties.$componentTabsClass}}{
-  border-bottom: 1px solid var(--high-color);
+  border-bottom: .12rem solid var(--main-color-high);
   overflow: hidden;
   display: inline-flex;
   justify-content: center;
