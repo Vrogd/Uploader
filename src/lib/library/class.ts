@@ -197,7 +197,7 @@ export class Upload {
     }
     /**
      * @description check if it needs to show on top
-     * @return boolean
+     * @return {boolean} show or not
      */
     public showButtons :() => boolean = () : boolean => {
         return [this.options.enableImage, this.options.enableVideo,this.options.enableOther].filter(Boolean).length > 1;
@@ -214,13 +214,12 @@ export class Upload {
     /**
      * @description save / get blob to window list / based on change date
      * @param {string} url current file url / name
+     * @param {string|Number} id id
      * @param {Blob} blob blob element
-     * @param {number} modified date of file creation on people pc
      * @return {Blob|void}
      */
-    public blob = (url: string, modified : number, blob : Blob|null = null) : Blob | void => {
+    public blob = (url: string, id : string|number, blob : Blob|null = null) : Blob | null => {
         const blobListKey = this.windowBlobList as keyof typeof window;
-
         if (!Array.isArray(window[blobListKey])){
             (window[blobListKey] as any[]) = [];
         }
@@ -228,15 +227,16 @@ export class Upload {
             const newObject: fileBlob = {
                 'url' : url,
                 'blob' : blob,
-                'modified' : modified
+                'id' : id
             }
             window[blobListKey].push(newObject);
         } else if (Object.keys(window[blobListKey]).length){
             const hasObject = (window[blobListKey].find((item : any) => {
-                if (item.url === url && item.modified === modified) return item;
+                if (item.url === url) return item;
             }));
             if (hasObject) return hasObject.blob;
         }
+        return null;
     }
     /**
      * @description decide when to show external input

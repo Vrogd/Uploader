@@ -2,7 +2,7 @@
     import type {typeFile} from "./types/file";
     import {library} from "./index";
     import {constants} from "./library/constants";
-    import {onMount} from "svelte";
+    import {onMount, tick} from "svelte";
 
     interface Props {
         file: typeFile;
@@ -19,9 +19,10 @@
         component,
     } : Props = $props();
 
-    const renderPreview = (node : HTMLElement, file : typeFile) => library.functions.previewEvent(file, node);
+    const renderPreview = (node : HTMLElement, file : typeFile) => library.functions.previewEvent($state.snapshot(file), node, upload);
 
-    onMount(() => {
+    onMount(async () => {
+        await tick();
         if (previewElement instanceof HTMLElement) {
             component.dispatchEvent(library.functions.customEvent(constants.domLoadEvent, {
                 id: file.id,
@@ -33,9 +34,13 @@
     });
 </script>
 
-<div class="uploader-item" class:uploader-item-image="{file.preview !== null && !upload.isCompact()}" class:uploader-item-error="{file.failed}" bind:this={previewElement} transition:fade={{
-	delay: 40,
-	duration: 200,
+<div class="uploader-item"
+     class:uploader-item-image="{file.preview !== null && !upload.isCompact()}"
+     class:uploader-item-error="{file.failed}"
+     bind:this={previewElement}
+     transition:fade={{
+	    delay: 40,
+	    duration: 200,
 }}>
     <div class="info">
         <span class="text">

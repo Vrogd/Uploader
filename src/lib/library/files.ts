@@ -1,6 +1,7 @@
-import type {Tabs, typeFile} from "$lib";
+import {library, type typeFile} from "$lib";
 import type {typeFileList} from "$lib/types/fileList";
-import {generateId} from "$lib/library/functions";
+import functions, {generateId} from "$lib/library/functions";
+import type Upload from "./class";
 
 /**
  * @description data object
@@ -12,10 +13,10 @@ export const filesList: typeFileList = {
     /**
      * @description add data / item
      * @param {typeFile} item current item
-     * @param {Tabs} tabActive active tab
+     * @param {Upload} parent
      * @return void
      */
-    update: function (item : typeFile, tabActive : Tabs) : void {
+    update: function (item : typeFile, parent: Upload) : void {
         const find = this.list.find((file: typeFile) => {
             return item.hasOwnProperty('id') && item.id === file.id;
         });
@@ -25,14 +26,20 @@ export const filesList: typeFileList = {
                 if (typeof item.failed === 'boolean' && !item.failed) item.completed = false
                 if (item.completed) item.failed = false;
                 this.list[index] = merge(this.list[index], item);
-                this.queue(this.list.filter((file: typeFile) => file.type === tabActive));
+                const newObject = this.list[index] as typeFile;
+                if (newObject && newObject.isPreviewAble && newObject.previewElement && !newObject.preview){
+                    functions.fileReader(item, parent).catch((err : Error) => {
+                        console.error(library.constants.prefixError + ' failed to render preview', err);
+                    })
+                }
+                this.queue(this.list.filter((file: typeFile) => file.type === parent.tabActive));
             }
         } else {
             if (!item.id){
                 item.id = generateId(40);
             }
             this.list.push(item);
-            this.queue(this.list.filter((file: typeFile) => file.type === tabActive));
+            this.queue(this.list.filter((file: typeFile) => file.type === parent.tabActive));
         }
     },
     /**

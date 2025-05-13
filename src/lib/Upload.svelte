@@ -15,7 +15,6 @@
 
     // create class
     let upload = new library.upload(options);
-    upload.setFiles(files);
     let updater = $state(0);
 
     // callback
@@ -23,6 +22,8 @@
         fileList = list;
         updater++;
     }
+
+    upload.setFiles(files);
 
     // init
     let fileList = <typeFile[]> $state();
@@ -48,7 +49,7 @@
             } as EventListener)
             // loaded dom event // load preview if clicked on tab
             component.addEventListener(constants.domLoadEvent, function (e : CustomEvent){
-                upload.files.update(e.detail, upload.tabActive);
+                upload.files.update(e.detail, upload);
             } as EventListener)
         }
     });

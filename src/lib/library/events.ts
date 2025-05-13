@@ -32,7 +32,7 @@ function uploadFile(parent : Upload, file : typeFile) : void {
     }
     const ajax = new XMLHttpRequest();
     if (ajax.upload){
-        parent.files.update(file, parent.tabActive);
+        parent.files.update(file, parent);
         library.functions.updateFileData(file, parent);
         ajax.upload.addEventListener("progress", (e : ProgressEvent<XMLHttpRequestEventTarget>) => {
             uploadProgressHandler(file, e, parent);
@@ -56,7 +56,7 @@ function uploadFile(parent : Upload, file : typeFile) : void {
                 parent.files.update({
                     'id' : file.id,
                     'failed' : true
-                } as typeFile, parent.tabActive);
+                } as typeFile, parent);
                 console.error(library.constants.prefixError +  ' File upload failed (' + ajax.status + ')');
             }
         });
@@ -97,7 +97,7 @@ function uploadExternal(parent : Upload, file : typeFile) : void {
             parent.files.update({
                 'id' : file.id,
                 'failed' : true
-            } as typeFile, parent.tabActive);
+            } as typeFile, parent);
         });
     }).catch((error) => {
         console.error(library.constants.prefixError + ' Url is not available : ', error);
@@ -140,7 +140,7 @@ function uploadProgressHandler(file : typeFile, e : ProgressEvent, parent: Uploa
         'id' : file.id,
         'progress' : progress,
         'completed': (progress === 100),
-    } as typeFile, parent.tabActive);
+    } as typeFile, parent);
 }
 
 /**
