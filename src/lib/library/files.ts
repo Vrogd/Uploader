@@ -26,6 +26,7 @@ export const filesList: typeFileList = {
                 if (typeof item.failed === 'boolean' && !item.failed) item.completed = false
                 if (item.completed) item.failed = false;
                 this.list[index] = merge(this.list[index], item);
+                console.log(item)
                 this.queue(this.list.filter((file: typeFile) => file.type === parent.tabActive));
                 return this.list[index] as typeFile;
             }
@@ -44,8 +45,7 @@ export const filesList: typeFileList = {
             const wrapper = item.previewElement.querySelector('.preview .wrapper');
             if (wrapper instanceof HTMLDivElement){
                 if (wrapper.firstChild !== item.preview) {
-                    while (wrapper.firstChild) wrapper.removeChild(wrapper.firstChild);
-                    wrapper.appendChild(item.preview);
+                    wrapper.replaceChildren(item.preview)
                 }
             }
         }

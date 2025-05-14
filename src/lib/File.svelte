@@ -19,7 +19,7 @@
         component,
     } : Props = $props();
 
-    const renderPreview = (node : HTMLElement, file : typeFile) => library.functions.previewEvent($state.snapshot(file), node, upload);
+    const renderPreview = (node : HTMLElement, file : typeFile) => library.functions.previewEvent($state.snapshot(file), upload);
 
     onMount(async () => {
         await tick();

@@ -60,19 +60,13 @@ export const functions: any = {
     /**
      * @description render dom element if available
      * @param {typeFile} file current file
-     * @param {HTMLElement} node dom element
      * @param {Upload} parent
      * @return void
      */
-    previewEvent(file: typeFile, node: HTMLElement, parent: Upload): void {
-        if(file.preview instanceof HTMLCanvasElement){
-            node.appendChild(file.preview)
-        }
-        if(file.url){
-            functions.fileReader(file, parent).catch((err : Error) => {
-                console.error(library.constants.prefixError + ' failed to set preview', err);
-            })
-        }
+    previewEvent(file: typeFile, parent: Upload): void {
+        functions.fileReader(file, parent).catch((err : Error) => {
+            console.error(library.constants.prefixError + ' failed to set preview', err);
+        })
     },
     /**
      * @description read file / get preview
