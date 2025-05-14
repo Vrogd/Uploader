@@ -58,6 +58,23 @@ export const functions: any = {
         }
     },
     /**
+     * @description render dom element if available
+     * @param {typeFile} file current file
+     * @param {HTMLElement} node dom element
+     * @param {Upload} parent
+     * @return void
+     */
+    previewEvent(file: typeFile, node: HTMLElement, parent: Upload): void {
+        if(file.preview instanceof HTMLCanvasElement){
+            node.appendChild(file.preview)
+        }
+        if(file.url){
+            functions.fileReader(file, parent).catch((err : Error) => {
+                console.error(library.constants.prefixError + ' failed to set preview', err);
+            })
+        }
+    },
+    /**
      * @description read file / get preview
      * @param {typeFile} file file object
      * @param {Upload} parent parent class
@@ -67,18 +84,17 @@ export const functions: any = {
         return new Promise((resolve: any) => {
             const startCheck = !!((file.file && file.file instanceof File && parent)) as boolean;
             const repeatCheck = !!(file.url && parent) as boolean;
-            console.log(startCheck, repeatCheck)
             if (startCheck || repeatCheck) {
                 const canvas : HTMLCanvasElement = document.createElement('canvas');
                 const blob : Blob|null = parent.blob(<string>((file.file instanceof File) ? file.file.name : file.name), file.id);
-                console.dir(blob)
-                if (blob){
+                if (blob instanceof Blob){
                     functions.loadCache(file, parent, canvas, blob).then(() => resolve()).catch((err : Error) => {
                         console.error(library.constants.prefixError + ' failed to load preview from cache.', err);
                     });
                 } else {
                     functions.loadPreview(file, parent, canvas).then(() => resolve()).catch((err : Error) => {
                         console.error(library.constants.prefixError + ' failed to load preview.', err);
+                        resolve();
                     });
                 }
             }
@@ -108,15 +124,20 @@ export const functions: any = {
                         }
                         const image = new Image();
                         image.src = e.target.result;
-                        parent.files.update({
+                        const updatedFile : typeFile|null = parent.files.update({
                             'id' : file.id,
                             'url' : e.target?.result,
                             'isPreviewAble': true,
                             'preview': canvas
                         } as typeFile, parent);
-                        renderPreview(file, image, canvas).catch(() => {
-                            console.error(library.constants.prefixError + ' failed to load preview');
-                        })
+                        if (updatedFile) {
+                            renderPreview(updatedFile, image, canvas).then(() => {
+                                parent.files.load(file);
+                            }).catch(() => {
+                                console.error(library.constants.prefixError + ' failed to load preview');
+                            })
+                        }
+                        resolve();
                     };
                 };
                 request.onerror = function () {
@@ -143,39 +164,20 @@ export const functions: any = {
             const url :string =  URL.createObjectURL(blob)
             const image = new Image();
             image.src = url;
-            renderPreview(file, image, canvas).then(()=>{
-                parent.files.update({
-                    'id' : file.id,
-                    'preview' : canvas,
-                    'isPreviewAble': true,
-                    'url': url
-                } as typeFile, parent);
-            }).catch(() => {
-                parent.files.update({
-                    'id' : file.id,
-                    'url': url
-                } as typeFile, parent);
-            })
-            resolve();
-        })
-    },
-    /**
-     * @description render dom element if available
-     * @param {typeFile} file current file
-     * @param {HTMLElement} node dom element
-     * @param {Upload} parent
-     * @return void
-     */
-    previewEvent(file: typeFile, node: HTMLElement, parent: Upload): void {
-        if(file.preview instanceof HTMLCanvasElement){
-            node.appendChild(file.preview)
-        } else if(file.url){
-            parent.files.update({
+            const updatedFile : typeFile|null = parent.files.update({
                 'id' : file.id,
-                'completed' : false,
+                'preview' : canvas,
                 'isPreviewAble': true,
-            }, parent);
-        }
+            } as typeFile, parent)
+            if (updatedFile) {
+                renderPreview(updatedFile, image, canvas).then(()=> {
+                    parent.files.load(updatedFile)
+                    resolve();
+                }).catch(() => {
+                    resolve();
+                })
+            }
+        })
     },
     /**
      * @description validate url
@@ -271,23 +273,24 @@ export const functions: any = {
 function renderPreview(file: typeFile, image: HTMLImageElement, canvas: HTMLCanvasElement) : Promise<unknown> {
     return new Promise(((resolve: any) => {
         image.addEventListener("load", function() {
-            const clientWidth = file.previewElement?.clientWidth;
-            const clientHeight = library.constants.previewHeight * parseFloat(getComputedStyle(document.documentElement).fontSize);
-            if (clientHeight && clientWidth) {
-                const size : canvasSize = calculateCanvasSize(clientWidth, clientHeight, image.width, image.height);
-                canvas.width = size.width;
-                canvas.height = size.height;
-                canvas.setAttribute('data-width', String(size.width));
-                canvas.setAttribute('data-height', String(size.height))
-                const ctx = canvas.getContext('2d');
-                if (ctx) {
-                    ctx.drawImage(image, size.left, size.top, size.width, size.height);
+            setTimeout(() => {
+                console.log(image)
+                const clientWidth = file.previewElement?.clientWidth;
+                const clientHeight = library.constants.previewHeight * parseFloat(getComputedStyle(document.documentElement).fontSize);
+                if (clientHeight && clientWidth) {
+                    const size : canvasSize = calculateCanvasSize(clientWidth, clientHeight, image.width, image.height);
+                    canvas.width = size.width;
+                    canvas.height = size.height;
+                    canvas.setAttribute('data-width', String(size.width));
+                    canvas.setAttribute('data-height', String(size.height))
+                    const ctx : CanvasRenderingContext2D | null = canvas.getContext('2d');
+                    if (ctx) ctx.drawImage(image, size.left, size.top, size.width, size.height);
+                } else {
+                    console.dir(file.previewElement, clientHeight)
+                    console.error(library.constants.prefixError + ' dom missing width / height');
                 }
-            } else {
-                console.dir(file.previewElement, clientHeight)
-                console.error(library.constants.prefixError + ' dom missing width / height');
-            }
-            resolve();
+                resolve();
+            }, 0)
         }, false);
         image.addEventListener("error", function() {
             console.error(library.constants.prefixError + ' failed to load image');

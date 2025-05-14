@@ -81,13 +81,10 @@ function uploadExternal(parent : Upload, file : typeFile) : void {
                     file.size = formatFileSize(blobResponse.size, 2)
                     file.progress = 100;
                     file.completed = true;
-                    const canvas = document.createElement('canvas');
-                    library.functions.loadCache(file, parent, canvas, blobResponse).then(() =>{
-                        console.log('test')
-                    }).catch((err : Error) => {
+                    const canvas : HTMLCanvasElement = document.createElement('canvas');
+                    library.functions.loadCache(file, parent, canvas, blobResponse).catch((err : Error) => {
                         console.error(library.constants.prefixError + ' failed to load preview from cache.', err);
                     });
-                    console.log(response, blobResponse)
                 })
             } else {
                 console.log('error', response)

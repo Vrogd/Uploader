@@ -1,6 +1,6 @@
-import {library, type typeFile} from "$lib";
+import {type typeFile} from "$lib";
 import type {typeFileList} from "$lib/types/fileList";
-import functions, {generateId} from "$lib/library/functions";
+import {generateId} from "$lib/library/functions";
 import type Upload from "./class";
 
 /**
@@ -16,8 +16,8 @@ export const filesList: typeFileList = {
      * @param {Upload} parent
      * @return void
      */
-    update: function (item : typeFile, parent: Upload) : void {
-        const find = this.list.find((file: typeFile) => {
+    update: function (item : typeFile, parent: Upload) : typeFile|null {
+        const find : typeFile|undefined = this.list.find((file: typeFile) => {
             return item.hasOwnProperty('id') && item.id === file.id;
         });
         if (find && find as typeFile){
@@ -26,13 +26,8 @@ export const filesList: typeFileList = {
                 if (typeof item.failed === 'boolean' && !item.failed) item.completed = false
                 if (item.completed) item.failed = false;
                 this.list[index] = merge(this.list[index], item);
-                const newObject = this.list[index] as typeFile;
-                if (newObject && newObject.isPreviewAble && newObject.previewElement && !newObject.preview){
-                    functions.fileReader(item, parent).catch((err : Error) => {
-                        console.error(library.constants.prefixError + ' failed to render preview', err);
-                    })
-                }
                 this.queue(this.list.filter((file: typeFile) => file.type === parent.tabActive));
+                return this.list[index] as typeFile;
             }
         } else {
             if (!item.id){
@@ -40,6 +35,19 @@ export const filesList: typeFileList = {
             }
             this.list.push(item);
             this.queue(this.list.filter((file: typeFile) => file.type === parent.tabActive));
+            return item;
+        }
+        return null;
+    },
+    load: function (item : typeFile) : void {
+        if (item.preview instanceof HTMLCanvasElement && item.previewElement){
+            const wrapper = item.previewElement.querySelector('.preview .wrapper');
+            if (wrapper instanceof HTMLDivElement){
+                if (wrapper.firstChild !== item.preview) {
+                    while (wrapper.firstChild) wrapper.removeChild(wrapper.firstChild);
+                    wrapper.appendChild(item.preview);
+                }
+            }
         }
     },
     /**
