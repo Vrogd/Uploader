@@ -1,8 +1,8 @@
 import {filesList} from "./files";
-import {upload} from "./events";
+import {Events} from "./events";
 import type {Tabs} from "$lib";
 import type {typeFile} from "$lib";
-import {cleanUrl, functions} from "./functions"
+import {cleanUrl, Functions} from "./functions"
 import type {fileBlob} from "$lib";
 import type {adjustOptions} from "../types/adjustOptions";
 import {library} from "$lib";
@@ -23,6 +23,7 @@ export class Upload {
     public windowBlobList : string = 'UploadBlobs';
     public external : boolean = false; // when clicked open external
     public options : adjustOptions  = {
+        requestUrl: '/post',
         enableExternal : true,
         enableImage: true,
         enableVideo : true,
@@ -51,6 +52,7 @@ export class Upload {
      * @return void
      */
     private setSettings = (options : any | undefined) : void => {
+        if (options.requestUrl) this.options.requestUrl = options.requestUrl;
         if (options.wrapper) this.dom(options.wrapper);
         if (options.blobList) this.windowBlobList = options.blobList;
         if (typeof options.backend === 'boolean') {
@@ -75,7 +77,7 @@ export class Upload {
     private eventChange = (e : Event) : void => {
         if (e.target instanceof HTMLInputElement && e.target.files instanceof FileList && Object.keys(e.target.files).length){
             for (const file of e.target.files){
-                if (file instanceof File) upload(this, functions.new(file, this.tabActive));
+                if (file instanceof File) Events.upload(this, library.functions.new(file, this.tabActive));
             }
         }
     }
@@ -90,8 +92,8 @@ export class Upload {
             const element = this.component.querySelector('.uploader-external input');
             if (element instanceof HTMLInputElement){
                 const string = element.value;
-                if (string && string.length > 5 && functions.validateUrl(string)){
-                    upload(this, functions.new(cleanUrl(string), this.tabActive));
+                if (string && string.length > 5 && library.functions.validateUrl(string)){
+                    Events.upload(this, library.functions.new(cleanUrl(string), this.tabActive));
                     this.external = false;
                 }
             }
@@ -107,7 +109,7 @@ export class Upload {
             if (e.dataTransfer && "files" in e.dataTransfer) {
                 const files = e.dataTransfer.files;
                 for (const file of files){
-                    if (file instanceof File) upload(this, functions.new(file, this.tabActive));
+                    if (file instanceof File) Events.upload(this, library.functions.new(file, this.tabActive));
                 }
             }
         }

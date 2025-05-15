@@ -4,26 +4,22 @@ import type {Tabs} from "$lib";
 import {Upload} from "./class";
 import {library} from "$lib";
 
-/**
- * @description update and create of files
- * @type {object} objectInstance
- */
-export const functions: any = {
+export class Functions {
     /**
      * @description create new instance
      * @param {File} file file upload or drag
      * @param {Tabs} tab active tab
      * @return {typeFile} new file object
      */
-    new : function (file: File | string, tab: Tabs): typeFile {
-        const main = <object> {
+    static new (file: File | string, tab: Tabs): typeFile {
+        const main = <object>{
             'progress': 0,
-            'isPreviewAble' : false,
+            'isPreviewAble': false,
             'preview': null,
             'name': null,
             'size': null,
-            'type' : tab,
-            'id' : generateId(30),
+            'type': tab,
+            'id': generateId(30),
         }
         if (file instanceof File) {
             return <typeFile>Object.assign({
@@ -35,65 +31,78 @@ export const functions: any = {
                 'external': true
             }, main);
         }
-    },
+    }
     /**
      * @description read file from upload
      * @param {typeFile} file file object
      * @param {Upload} parent parent class
      * @return void
      */
-    updateFileData(file: typeFile, parent: Upload) : void {
-        const correctTab : boolean = parent.tabActive === file.type;
+    static updateFileData(file: typeFile, parent: Upload) : void {
         if (file.file instanceof File){
+            const condImg = this.isPreviewAbleImage(file);
+            const condVideo = this.isPreviewAbleVideo(file);
             parent.files.update({
                 'id' : file.id,
                 'size' : formatFileSize(file.file.size, 2),
-                'name' : file.file.name
+                'name' : file.file.name,
+                'isPreviewAble' : condImg || condVideo,
             } as typeFile, parent);
-            if (file.file.type.includes('image') && !file.isPreviewAble && !file.preview && correctTab){
-                functions.fileReader(file, parent).catch((err : Error) => {
-                    console.error(library.constants.prefixError + ' failed to set preview', err);
-                })
-            }
         }
-    },
+    }
+    /**
+     * @description image is previewAble
+     * @param {typeFile} file current file
+     * @return {boolean}
+     */
+    static isPreviewAbleImage(file: typeFile) : boolean {
+        return file.file instanceof File && file.file.type.includes('image');
+    }
+    /**
+     * @description video is previewAble
+     * @param {typeFile} file current file
+     * @return {boolean}
+     */
+    static isPreviewAbleVideo(file: typeFile) : boolean {
+        return file.file instanceof File && (file.file.type.includes('video/mp4') || file.file.type.includes('video/webm') || file.file.type.includes('video/ogg'));
+    }
     /**
      * @description render dom element if available
      * @param {typeFile} file current file
      * @param {Upload} parent
      * @return void
      */
-    previewEvent(file: typeFile, parent: Upload): void {
-        functions.fileReader(file, parent).catch((err : Error) => {
+    static previewEvent(file: typeFile, parent: Upload): void {
+       this.fileReader(file, parent).catch((err : Error) => {
             console.error(library.constants.prefixError + ' failed to set preview', err);
         })
-    },
+    }
     /**
      * @description read file / get preview
      * @param {typeFile} file file object
      * @param {Upload} parent parent class
      * @return {Promise<void>}
      */
-    fileReader(file : typeFile, parent: Upload) : Promise<void> {
+    static fileReader(file : typeFile, parent: Upload) : Promise<void> {
         return new Promise((resolve: any) => {
             const startCheck = !!((file.file && file.file instanceof File && parent)) as boolean;
             const repeatCheck = !!(file.url && parent) as boolean;
-            if (startCheck || repeatCheck) {
+            if (startCheck || repeatCheck && file.isPreviewAble) {
                 const canvas : HTMLCanvasElement = document.createElement('canvas');
                 const blob : Blob|null = parent.blob(<string>((file.file instanceof File) ? file.file.name : file.name), file.id);
                 if (blob instanceof Blob){
-                    functions.loadCache(file, parent, canvas, blob).then(() => resolve()).catch((err : Error) => {
+                    this.loadCache(file, parent, canvas, blob).then(() => resolve()).catch((err : Error) => {
                         console.error(library.constants.prefixError + ' failed to load preview from cache.', err);
                     });
                 } else {
-                    functions.loadPreview(file, parent, canvas).then(() => resolve()).catch((err : Error) => {
+                    this.loadPreview(file, parent, canvas).then(() => resolve()).catch((err : Error) => {
                         console.error(library.constants.prefixError + ' failed to load preview.', err);
                         resolve();
                     });
                 }
             }
         })
-    },
+    }
     /**
      * @description load preview from request / not stored yet
      * @param {typeFile} file file
@@ -101,50 +110,62 @@ export const functions: any = {
      * @param {HTMLCanvasElement} canvas html canvas
      * @return {Promise<void>}
      */
-    loadPreview(file: typeFile, parent: Upload, canvas: HTMLCanvasElement) : Promise<void>{
+    static loadPreview(file: typeFile, parent: Upload, canvas: HTMLCanvasElement) : Promise<void>{
         return new Promise((resolve: any) => {
-            if (file.file instanceof File) {
-                const request = new XMLHttpRequest();
-                request.open('GET', URL.createObjectURL(file.file), true);
-                request.responseType = 'blob';
-                request.onload = function () {
-                    const reader = new FileReader();
-                    reader.readAsDataURL(request.response);
-                    reader.onload = function (e: any) {
-                        const blob = request.response;
-                        if (blob instanceof Blob){
-                            if(file.file instanceof File) parent.blob(file.file.name, file.id, blob)
-                            else if (file.name) parent.blob(file.name, file.id, blob)
-                        }
-                        const image = new Image();
-                        image.src = e.target.result;
-                        const updatedFile : typeFile|null = parent.files.update({
-                            'id' : file.id,
-                            'url' : e.target?.result,
-                            'isPreviewAble': true,
-                            'preview': canvas
-                        } as typeFile, parent);
-                        if (updatedFile) {
-                            renderPreview(updatedFile, image, canvas).then(() => {
-                                parent.files.load(file);
-                            }).catch(() => {
-                                console.error(library.constants.prefixError + ' failed to load preview');
-                            })
-                        }
-                        resolve();
+            if (file.file instanceof File){
+                console.log(library.functions.isPreviewAbleImage(file))
+                if (library.functions.isPreviewAbleVideo(file)) {
+                    renderVideoThumb(file, canvas).then(() => {
+
+                    }).catch(() => {
+                        console.error(library.constants.prefixError + ' failed to load preview');
+                    });
+                } else if(library.functions.isPreviewAbleImage(file)) {
+                    const request = new XMLHttpRequest();
+                    request.open('GET', URL.createObjectURL(file.file), true);
+                    request.responseType = 'blob';
+                    request.onload = function () {
+                        const reader = new FileReader();
+                        reader.readAsDataURL(request.response);
+                        reader.onload = function (e: any) {
+                            const blob = request.response;
+                            if (blob instanceof Blob){
+                                if(file.file instanceof File) parent.blob(file.file.name, file.id, blob)
+                                else if (file.name) parent.blob(file.name, file.id, blob)
+                            }
+                            const image = new Image();
+                            image.src = e.target.result;
+                            const updatedFile : typeFile|null = parent.files.update({
+                                'id' : file.id,
+                                'url' : e.target?.result,
+                                'isPreviewAble': true,
+                                'preview': canvas
+                            } as typeFile, parent);
+                            if (updatedFile) {
+                                renderPreview(updatedFile, image, canvas).then(() => {
+                                    parent.files.load(updatedFile);
+                                }).catch(() => {
+                                    console.error(library.constants.prefixError + ' failed to load preview');
+                                })
+                            }
+                            resolve();
+                        };
                     };
-                };
-                request.onerror = function () {
-                    console.error(library.constants.prefixError + ' error failed to load file');
+                    request.onerror = function () {
+                        console.error(library.constants.prefixError + ' error failed to load file');
+                        resolve();
+                    }
+                    request.onabort = function () {
+                        console.error(library.constants.prefixError + ' abort file load');
+                        resolve();
+                    }
+                    request.send();
                 }
-                request.onabort = function () {
-                    console.error(library.constants.prefixError + ' abort file load');
-                }
-                request.send();
+            } else {
+                resolve();
             }
-            resolve();
         });
-    },
+    }
     /**
      * @description load image from cache / blob
      * @param {typeFile} file
@@ -153,7 +174,7 @@ export const functions: any = {
      * @param {Blob} blob blob stored in js
      * @return {Promise<void>}
      */
-    loadCache(file: typeFile, parent: Upload, canvas: HTMLCanvasElement, blob: Blob) : Promise<unknown> {
+    static loadCache(file: typeFile, parent: Upload, canvas: HTMLCanvasElement, blob: Blob) : Promise<unknown> {
         return new Promise((resolve : any) => {
             const url :string =  URL.createObjectURL(blob)
             const image = new Image();
@@ -172,22 +193,22 @@ export const functions: any = {
                 })
             }
         })
-    },
+    }
     /**
      * @description validate url
      * @param {string} url url to validate
-     * @return {boolean}
+     * @return {boolean} is valid url
      */
-    validateUrl(url :string) : boolean {
+    static validateUrl(url :string) : boolean {
         const pattern = /^(https?:\/\/)?((([a-zA-Z\d]([a-zA-Z\d-]*[a-zA-Z\d])*)\.)+[a-zA-Z]{2,})(:\d+)?(\/[-a-zA-Z\d%_.~+()/:=]*)*(\?[;&a-zA-Z\d%_.~+=-]*)?(#[-a-zA-Z\d_]*)?$/;
         return pattern.test(url);
-    },
+    }
     /**
      * @description check if url is on same domain as current
-     * @param {string|null} url
+     * @param {string|null} url external url
      * @return boolean
      */
-    isSameDomain(url: string|null = null) : boolean {
+    static isSameDomain(url: string|null = null) : boolean {
         if (typeof url !== 'string') return false
         const parsedUrl = new URL(url);
         const currentOrigin = window.location.origin;
@@ -195,29 +216,29 @@ export const functions: any = {
             parsedUrl.origin === currentOrigin ||
             parsedUrl.hostname === 'localhost'
         );
-    },
+    }
     /**
      * @description check if url is youtube
      * @param {string|null} url
      * @return boolean
      */
-    isYouTubeURl(url : string| null) : boolean {
+    static isYouTubeURl(url : string| null) : boolean {
         const parsedUrl = new URL(url ? url : '');
         return (
             parsedUrl.hostname === 'www.youtube.com' ||
             parsedUrl.hostname === 'youtube.com' ||
             parsedUrl.hostname === 'youtu.be'
         );
-    },
+    }
     /**
      * @description generate custom event
      * @param {string} key string value
      * @param {any} detail data
      * @return {CustomEvent} CustomEvent
      */
-     customEvent(key: string, detail: any) : CustomEvent{
+    static customEvent(key: string, detail: any) : CustomEvent{
         return new CustomEvent(key, {detail: detail});
-     },
+    }
     /**
      * @description validate if correct type of file is upload / external otherwise throw error
      * @param {typeFile} file
@@ -225,7 +246,7 @@ export const functions: any = {
      * @param {Upload} parent main class
      * @return {Promise} void
      */
-    validateCorrectUploadType(file: typeFile, activeTab : Tabs, parent : Upload) : Promise<typeFile> {
+    static validateCorrectUploadType(file: typeFile, activeTab : Tabs, parent : Upload) : Promise<typeFile> {
         return new Promise((resolve, reject) => {
             let extension;
             if (file.file instanceof File){
@@ -255,6 +276,18 @@ export const functions: any = {
             reject();
         })
     }
+    /**
+     * @description clean up url
+     * @param {string} url string params clean up after ?
+     * @return string should be clear url
+     */
+    static cleanUrl(url : string){
+        const index = url.indexOf('?');
+        if (index !== -1) {
+            return url.substring(0, index);
+        }
+        return url;
+    }
 }
 
 /**
@@ -268,7 +301,6 @@ function renderPreview(file: typeFile, image: HTMLImageElement, canvas: HTMLCanv
     return new Promise(((resolve: any) => {
         image.addEventListener("load", function() {
             setTimeout(() => {
-                console.log(image)
                 const clientWidth = file.previewElement?.clientWidth;
                 const clientHeight = library.constants.previewHeight * parseFloat(getComputedStyle(document.documentElement).fontSize);
                 if (clientHeight && clientWidth) {
@@ -292,7 +324,21 @@ function renderPreview(file: typeFile, image: HTMLImageElement, canvas: HTMLCanv
         }, false)
     }))
 }
-
+/**
+ * @description render thumbnail of video if possible else not
+ * @param {typeFile} file active file
+ * @param {HTMLCanvasElement} canvas element to render thumbnail on
+ * @return {Promise}
+ */
+function renderVideoThumb(file : typeFile, canvas: HTMLCanvasElement) : Promise<unknown> {
+    return new Promise((resolve: any) => {
+        console.log('preview video')
+        const video = document.createElement("video");
+        //video.src = URL.createObjectURL(file);
+        video.preload = "metadata";
+        video.muted = true;
+    });
+}
 /**
  * @description calculate canvas size on resize
  * @param {number} domWidth current dom width
@@ -319,7 +365,6 @@ function calculateCanvasSize(domWidth: number, domHeight: number, width: number,
         'left': newLeft
     };
 }
-
 /**
  * @description decimal to hex string
  * @param {number} dec number
@@ -376,5 +421,3 @@ export function userAgent(pattern : RegExp) : boolean {
     }
     return false;
 }
-
-export default functions;

@@ -19,7 +19,7 @@
         component,
     } : Props = $props();
 
-    const renderPreview = (node : HTMLElement, file : typeFile) => library.functions.previewEvent($state.snapshot(file), upload);
+    const renderPreview = (node : HTMLElement, file : typeFile) => library.functions.previewEvent(file, upload);
 
     onMount(async () => {
         await tick();
@@ -40,8 +40,8 @@
      bind:this={previewElement}
      transition:fade={{
 	    delay: 40,
-	    duration: 200,
-}}>
+	    duration: 200
+	 }}>
     <div class="info">
         <span class="text">
              <span data-upload-name>{file.name}</span>

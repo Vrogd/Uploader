@@ -26,7 +26,6 @@ export const filesList: typeFileList = {
                 if (typeof item.failed === 'boolean' && !item.failed) item.completed = false
                 if (item.completed) item.failed = false;
                 this.list[index] = merge(this.list[index], item);
-                console.log(item)
                 this.queue(this.list.filter((file: typeFile) => file.type === parent.tabActive));
                 return this.list[index] as typeFile;
             }

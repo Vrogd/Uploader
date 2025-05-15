@@ -1,5 +1,5 @@
 import { Upload as Class } from "./library/class";
-import { functions } from "./library/functions";
+import {Functions} from "./library/functions";
 import { constants } from "./library/constants";
 
 /**
@@ -8,7 +8,7 @@ import { constants } from "./library/constants";
  */
 export const library = {
    'upload': Class,
-   'functions': functions,
+   'functions': Functions,
    'constants': constants
 };
 

@@ -1,4 +1,5 @@
 export type adjustOptions =  {
+    requestUrl: string
     enableExternal : boolean,
     enableImage: boolean,
     enableVideo : boolean,
