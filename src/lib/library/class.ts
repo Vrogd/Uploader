@@ -22,7 +22,7 @@ export class Upload {
     public tabActive : Tabs = 'image';
     public windowBlobList : string = 'UploadBlobs';
     public options : adjustOptions  = {
-        requestUrl: '/post',
+        requestUrl: '/file',
         enableExternal : true,
         enableImage: true,
         enableVideo : true,

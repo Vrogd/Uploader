@@ -16,7 +16,7 @@ export class Events {
             library.functions.validateCorrectUploadType(file, parent.tabActive, parent).then((file : typeFile) => {
                 if (parent.files.list.length <= parent.maxAmountOfFiles) {
                     if (file && file.file instanceof File) this.uploadFile(parent, file);
-                    else uploadExternal(parent, file);
+                    else console.error(library.constants.prefixError + ' data is missing to handle upload');
                 } else {
                     console.error(library.constants.prefixError + ' reached max limit of files');
                 }
@@ -70,7 +70,7 @@ export class Events {
                     console.error(library.constants.prefixError + ' File upload failed (' + ajax.status + ')');
                 }
             });
-            ajax.open("POST", "/file");
+            ajax.open("POST", parent.options.requestUrl);
             ajax.send(formData as XMLHttpRequestBodyInit);
         }
     }
