@@ -118,7 +118,7 @@ export class Functions {
                     renderVideoThumb(file, canvas).then(() => {
 
                     }).catch(() => {
-                        console.error(library.constants.prefixError + ' failed to load preview');
+                        console.error(library.constants.prefixError + ' failed to load preview thumbnail');
                     });
                 } else if(library.functions.isPreviewAbleImage(file)) {
                     const request = new XMLHttpRequest();
@@ -332,11 +332,7 @@ function renderPreview(file: typeFile, image: HTMLImageElement, canvas: HTMLCanv
  */
 function renderVideoThumb(file : typeFile, canvas: HTMLCanvasElement) : Promise<unknown> {
     return new Promise((resolve: any) => {
-        console.log('preview video')
-        const video = document.createElement("video");
-        //video.src = URL.createObjectURL(file);
-        video.preload = "metadata";
-        video.muted = true;
+        console.log('preview video todo')
     });
 }
 /**
