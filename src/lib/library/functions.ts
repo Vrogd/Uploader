@@ -11,7 +11,7 @@ export class Functions {
      * @param {Tabs} tab active tab
      * @return {typeFile} new file object
      */
-    static new (file: File | string, tab: Tabs): typeFile {
+    static new (file: File | string, tab: Tabs): typeFile|void {
         const main = <object>{
             'progress': 0,
             'isPreviewAble': false,
@@ -24,11 +24,6 @@ export class Functions {
         if (file instanceof File) {
             return <typeFile>Object.assign({
                 'file': file,
-            }, main);
-        } else {
-            return <typeFile>Object.assign({
-                'url': file,
-                'external': true
             }, main);
         }
     }
@@ -113,7 +108,6 @@ export class Functions {
     static loadPreview(file: typeFile, parent: Upload, canvas: HTMLCanvasElement) : Promise<void>{
         return new Promise((resolve: any) => {
             if (file.file instanceof File){
-                console.log(library.functions.isPreviewAbleImage(file))
                 if (library.functions.isPreviewAbleVideo(file)) {
                     renderVideoThumb(file, canvas).then(() => {
 
@@ -331,8 +325,30 @@ function renderPreview(file: typeFile, image: HTMLImageElement, canvas: HTMLCanv
  * @return {Promise}
  */
 function renderVideoThumb(file : typeFile, canvas: HTMLCanvasElement) : Promise<unknown> {
-    return new Promise((resolve: any) => {
-        console.log('preview video todo')
+    return new Promise((resolve: any, reject: any) => {
+        if (file.file instanceof File) {
+            const video = document.createElement("video");
+            video.src = URL.createObjectURL(file.file);
+            video.preload = "metadata";
+            video.muted = true;
+            video.playsInline = true;
+
+            video.onloadeddata = () => {
+                video.currentTime = 1;
+            };
+
+            video.onseeked = () => {
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                const ctx : CanvasRenderingContext2D|null = canvas.getContext("2d");
+                if (!ctx) return reject("No canvas context");
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                const thumbnail = canvas.toDataURL("image/png");
+                resolve(thumbnail);
+            };
+        } else {
+            reject("File element not found")
+        }
     });
 }
 /**

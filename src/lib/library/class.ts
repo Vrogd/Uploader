@@ -2,7 +2,7 @@ import {filesList} from "./files";
 import {Events} from "./events";
 import type {Tabs} from "$lib";
 import type {typeFile} from "$lib";
-import {cleanUrl, Functions} from "./functions"
+import {cleanUrl} from "./functions"
 import type {fileBlob} from "$lib";
 import type {adjustOptions} from "../types/adjustOptions";
 import {library} from "$lib";
@@ -14,14 +14,13 @@ import {library} from "$lib";
  */
 export class Upload {
     private fallback: boolean = false;
-    public maxAmountOfFiles : Number = 5;
+    public maxAmountOfFiles : number = 5;
     public component : null|HTMLElement = null;
     public input: null| HTMLElement = null;
     public files = filesList;
     public backend : boolean = false; // enable file request if not add ad callback event
     public tabActive : Tabs = 'image';
     public windowBlobList : string = 'UploadBlobs';
-    public external : boolean = false; // when clicked open external
     public options : adjustOptions  = {
         requestUrl: '/post',
         enableExternal : true,
@@ -55,11 +54,8 @@ export class Upload {
         if (options.requestUrl) this.options.requestUrl = options.requestUrl;
         if (options.wrapper) this.dom(options.wrapper);
         if (options.blobList) this.windowBlobList = options.blobList;
-        if (typeof options.backend === 'boolean') {
-            this.options.enableBackend = options.backend
-        } else {
-            this.options.enableBackend = library.constants.enableBackend;
-        }
+        if (typeof options.backend === 'boolean') this.options.enableBackend = options.backend
+        else this.options.enableBackend = library.constants.enableBackend;
         if (typeof options.enableImage === 'boolean') this.options.enableImage = options.enableImage;
         if (typeof options.enableVideo === 'boolean') this.options.enableVideo = options.enableVideo;
         if (typeof options.enableOther === 'boolean') this.options.enableOther = options.enableOther;
@@ -86,18 +82,7 @@ export class Upload {
      * @return void
      */
     public eventUpload = () : void => {
-        if (!this.isExternal()){
-            if (this.input instanceof HTMLInputElement) this.input.click();
-        } else if(this.component){
-            const element = this.component.querySelector('.uploader-external input');
-            if (element instanceof HTMLInputElement){
-                const string = element.value;
-                if (string && string.length > 5 && library.functions.validateUrl(string)){
-                    Events.upload(this, library.functions.new(cleanUrl(string), this.tabActive));
-                    this.external = false;
-                }
-            }
-        }
+        if (this.input instanceof HTMLInputElement) this.input.click();
     }
     /**
      * @description drop file inside block
@@ -105,12 +90,10 @@ export class Upload {
      * @return void
      */
     public eventDrop = (e : DragEvent) : void => {
-        if (!this.isExternal()){
-            if (e.dataTransfer && "files" in e.dataTransfer) {
-                const files = e.dataTransfer.files;
-                for (const file of files){
-                    if (file instanceof File) Events.upload(this, library.functions.new(file, this.tabActive));
-                }
+        if (e.dataTransfer && "files" in e.dataTransfer) {
+            const files = e.dataTransfer.files;
+            for (const file of files){
+                if (file instanceof File) Events.upload(this, library.functions.new(file, this.tabActive));
             }
         }
     }
@@ -130,7 +113,6 @@ export class Upload {
     public switch = (key : Tabs) : void => {
         if (this.tabActive !== key) {
             this.tabActive = key;
-            this.external = false;
             this.files.queue(this.files.list.filter((file: typeFile) => file.type === this.tabActive));
         }
     }
@@ -241,26 +223,11 @@ export class Upload {
         return null;
     }
     /**
-     * @description decide when to show external input
-     * @return void
-     */
-    public isExternal = () : boolean => {
-        return this.options.enableExternal && (this.tabActive === 'image' || this.tabActive === 'video') && this.external;
-    }
-    /**
      * @description if other tab show different dat / no preview / compact
      * @return {boolean}
      */
     public isCompact = () : boolean => {
         return this.tabActive === 'other' && this.options.enableExternal;
-    }
-    /**
-     * @description toggle external window
-     * @return void
-     */
-    public toggleExternal = () : void => {
-        this.external = !(this.external)
-        if(this.files) this.files.queue(this.files.list.filter((file: typeFile) => file.type === this.tabActive));
     }
 }
 

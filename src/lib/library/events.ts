@@ -11,67 +11,67 @@ export class Events {
      * @param {File} file file object
      * @return void
      */
-    static upload(parent : Upload, file : typeFile) : void {
-        library.functions.validateCorrectUploadType(file, parent.tabActive, parent).then((file : typeFile) => {
-            if (file && file.file instanceof File) this.uploadFile(parent, file);
-            else uploadExternal(parent, file);
-        }).catch((err : any) => {
-            console.error(library.constants.prefixError + ' failed to validate upload', err)
-        });
+    static upload(parent : Upload, file : typeFile|void) : void {
+        if (file){
+            library.functions.validateCorrectUploadType(file, parent.tabActive, parent).then((file : typeFile) => {
+                if (parent.files.list.length <= parent.maxAmountOfFiles) {
+                    if (file && file.file instanceof File) this.uploadFile(parent, file);
+                    else uploadExternal(parent, file);
+                } else {
+                    console.error(library.constants.prefixError + ' reached max limit of files');
+                }
+            }).catch((err : any) => {
+                console.error(library.constants.prefixError + ' failed to validate upload', err);
+            });
+        }
     }
     /**
      * @description upload file
      * @param {upload} parent main class
      * @param {typeFile} file main file object
-     * @param {boolean} add
      * @return void
      */
-    static uploadFile(parent : Upload, file : typeFile, add: boolean = false) : void {
-        if (add){
+    static uploadFile(parent : Upload, file : typeFile) : void {
+        const formData = new FormData();
+        if (file.file) {
+            formData.append("file", file.file);
+        }
+        const ajax = new XMLHttpRequest();
+        if (ajax.upload) {
             parent.files.update(file, parent);
             Functions.updateFileData(file, parent);
-        } else {
-            const formData = new FormData();
-            if (file.file){
-                formData.append("file", file.file);
-            }
-            const ajax = new XMLHttpRequest();
-            if (ajax.upload){
-                parent.files.update(file, parent);
-                Functions.updateFileData(file, parent);
-                ajax.upload.addEventListener("progress", (e : ProgressEvent<XMLHttpRequestEventTarget>) => {
-                    uploadProgressHandler(file, e, parent);
-                }, false);
-                ajax.upload.addEventListener("error", (e :ProgressEvent<XMLHttpRequestEventTarget>) => {
-                    file.failed = true;
-                    uploadErrorhandler(e);
-                }, false);
-                ajax.upload.addEventListener("abort", (e:ProgressEvent<XMLHttpRequestEventTarget>) => {
-                    uploadAbortHandler(e);
-                    file.failed = true;
-                }, false);
-                ajax.upload.addEventListener("timeout", (e:ProgressEvent<XMLHttpRequestEventTarget>) => {
+            ajax.upload.addEventListener("progress", (e: ProgressEvent<XMLHttpRequestEventTarget>) => {
+                uploadProgressHandler(file, e, parent);
+            }, false);
+            ajax.upload.addEventListener("error", (e: ProgressEvent<XMLHttpRequestEventTarget>) => {
+                file.failed = true;
+                uploadErrorhandler(e);
+            }, false);
+            ajax.upload.addEventListener("abort", (e: ProgressEvent<XMLHttpRequestEventTarget>) => {
+                uploadAbortHandler(e);
+                file.failed = true;
+            }, false);
+            ajax.upload.addEventListener("timeout", (e: ProgressEvent<XMLHttpRequestEventTarget>) => {
+                parent.files.update({
+                    'id': file.id,
+                    'failed': true
+                } as typeFile, parent);
+                console.error(library.constants.prefixError + ' File upload timed out (' + ajax.status + ')');
+            }, false);
+            ajax.upload.addEventListener("loadend", () => {
+                uploadLoadEndHandler(file, parent)
+            });
+            ajax.addEventListener("load", () => {
+                if (ajax.status >= 400 && ajax.status < 600 && parent.options.enableBackend) {
                     parent.files.update({
-                        'id' : file.id,
-                        'failed' : true
+                        'id': file.id,
+                        'failed': true
                     } as typeFile, parent);
-                    console.error(library.constants.prefixError +  ' File upload timed out (' + ajax.status + ')');
-                }, false);
-                ajax.upload.addEventListener("loadend", () => {
-                    uploadLoadEndHandler(file, parent)
-                });
-                ajax.addEventListener("load", () => {
-                    if (ajax.status >= 400 && ajax.status < 600 && parent.options.enableBackend) {
-                        parent.files.update({
-                            'id' : file.id,
-                            'failed' : true
-                        } as typeFile, parent);
-                        console.error(library.constants.prefixError +  ' File upload failed (' + ajax.status + ')');
-                    }
-                });
-                ajax.open("POST", "/file");
-                ajax.send(formData as XMLHttpRequestBodyInit);
-            }
+                    console.error(library.constants.prefixError + ' File upload failed (' + ajax.status + ')');
+                }
+            });
+            ajax.open("POST", "/file");
+            ajax.send(formData as XMLHttpRequestBodyInit);
         }
     }
 }
