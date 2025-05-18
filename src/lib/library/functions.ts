@@ -106,58 +106,21 @@ export class Functions {
      * @return {Promise<void>}
      */
     static loadPreview(file: typeFile, parent: Upload, canvas: HTMLCanvasElement) : Promise<void>{
-        return new Promise((resolve: any) => {
-            if (file.file instanceof File){
-                if (library.functions.isPreviewAbleVideo(file)) {
-                    videoPreviewHandler(file, parent, canvas).then((updatedFile : typeFile) : void => {
-                        parent.files.load(updatedFile);
-                    }).catch(() => {
-                        console.error(library.constants.prefixError + ' failed to load preview thumbnail');
-                    });
-                } else if(library.functions.isPreviewAbleImage(file)) {
-                    const request = new XMLHttpRequest();
-                    request.open('GET', URL.createObjectURL(file.file), true);
-                    request.responseType = 'blob';
-                    request.onload = function () {
-                        const reader = new FileReader();
-                        reader.readAsDataURL(request.response);
-                        reader.onload = function (e: any) {
-                            const blob = request.response;
-                            if (blob instanceof Blob){
-                                if(file.file instanceof File) parent.blob(file.file.name, file.id, blob)
-                                else if (file.name) parent.blob(file.name, file.id, blob)
-                            }
-                            const image = new Image();
-                            image.src = e.target.result;
-                            const updatedFile : typeFile|null = parent.files.update({
-                                'id' : file.id,
-                                'url' : e.target?.result,
-                                'isPreviewAble': true,
-                                'preview': canvas
-                            } as typeFile, parent);
-                            if (updatedFile) {
-                                renderPreview(updatedFile, image, canvas).then(() => {
-                                    parent.files.load(updatedFile);
-                                }).catch(() => {
-                                    console.error(library.constants.prefixError + ' failed to load preview');
-                                })
-                            }
-                            resolve();
-                        };
-                    };
-                    request.onerror = function () {
-                        console.error(library.constants.prefixError + ' error failed to load file');
-                        resolve();
-                    }
-                    request.onabort = function () {
-                        console.error(library.constants.prefixError + ' abort file load');
-                        resolve();
-                    }
-                    request.send();
-                }
-            } else {
-                console.log('sdfjksbdf')
-                resolve();
+        return new Promise((resolve: any, reject: any) => {
+            if (library.functions.isPreviewAbleVideo(file)) {
+                videoPreviewHandler(file, parent, canvas).then((updatedFile : typeFile) : void => {
+                    resolve(parent.files.load(updatedFile));
+                }).catch(() => {
+                    console.error(library.constants.prefixError + ' failed to load preview thumbnail');
+                    reject();
+                });
+            } else if(library.functions.isPreviewAbleImage(file)) {
+                imagePreviewHandler(file, parent, canvas).then((updatedFile : typeFile) : void => {
+                    resolve(parent.files.load(updatedFile));
+                }).catch(() => {
+                    console.error(library.constants.prefixError + ' failed to load preview');
+                    reject();
+                });
             }
         });
     }
@@ -180,7 +143,7 @@ export class Functions {
                 'isPreviewAble': true,
             } as typeFile, parent)
             if (updatedFile) {
-                renderPreview(updatedFile, image, canvas).then(()=> {
+                renderPreview(updatedFile, parent, image, canvas).then(()=> {
                     parent.files.load(updatedFile)
                     resolve();
                 }).catch(() => {
@@ -286,13 +249,68 @@ export class Functions {
 }
 
 /**
+ * @description render image possible else not
+ * @param {typeFile} file active file
+ * @param {Upload} parent
+ * @param {HTMLCanvasElement} canvas element to render thumbnail on
+ * @return {Promise}
+ */
+function imagePreviewHandler(file: typeFile, parent: Upload, canvas : HTMLCanvasElement) : Promise<typeFile>{
+    return new Promise((resolve: any, reject: any) => {
+        const request = new XMLHttpRequest();
+        request.open('GET', ((file.file instanceof File) ? URL.createObjectURL(file.file) : file.url) as string, true);
+        request.responseType = 'blob';
+        request.onload = function () {
+            const reader = new FileReader();
+            reader.readAsDataURL(request.response);
+            reader.onload = function (e: any) {
+                const blob = request.response;
+                if (blob instanceof Blob){
+                    if(file.file instanceof File) parent.blob(file.file.name, file.id, blob)
+                    else if (file.name) parent.blob(file.name, file.id, blob)
+                }
+                const image = new Image();
+                image.src = e.target.result;
+                const updatedFile : typeFile|null = parent.files.update({
+                    'id' : file.id,
+                    'url' : e.target?.result,
+                    'isPreviewAble': true,
+                    'preview': canvas
+                } as typeFile, parent);
+                if (updatedFile) {
+                    renderPreview(updatedFile, parent, image, canvas).then(() => {
+                        resolve(updatedFile);
+                    }).catch(() => {
+                        console.error(library.constants.prefixError + ' failed to load preview');
+                        reject();
+                    })
+                } else {
+                    reject();
+                }
+            };
+        };
+        request.onerror = function () {
+            console.error(library.constants.prefixError + ' error failed to load file');
+            reject();
+        }
+        request.onabort = function () {
+            console.error(library.constants.prefixError + ' abort file load');
+            reject();
+        }
+        request.send();
+    });
+}
+
+
+/**
  * @description show image in canvas
  * @param {typeFile} file current file
+ * @param {Upload} parent parent class
  * @param {HTMLImageElement} image image
  * @param {HTMLCanvasElement} canvas canvas element
  * @return {Promise<unknown>}
  */
-function renderPreview(file: typeFile, image: HTMLImageElement, canvas: HTMLCanvasElement) : Promise<unknown> {
+function renderPreview(file: typeFile,  parent: Upload, image: HTMLImageElement, canvas: HTMLCanvasElement) : Promise<unknown> {
     return new Promise(((resolve: any) => {
         image.addEventListener("load", function() {
             setTimeout(() => {
@@ -313,6 +331,10 @@ function renderPreview(file: typeFile, image: HTMLImageElement, canvas: HTMLCanv
             }, 0)
         }, false);
         image.addEventListener("error", function() {
+            parent.files.update({
+                'id' : file.id,
+                'isPreviewAble': false,
+            } as typeFile, parent);
             console.error(library.constants.prefixError + ' failed to load image');
             resolve();
         }, false)
@@ -328,31 +350,29 @@ function renderPreview(file: typeFile, image: HTMLImageElement, canvas: HTMLCanv
  */
 function videoPreviewHandler(file: typeFile, parent: Upload, canvas : HTMLCanvasElement) : Promise<typeFile> {
     return new Promise((resolve: any, reject: any) => {
-        if (file.file instanceof File) {
-            const video = document.createElement("video");
-            video.src = URL.createObjectURL(file.file);
-            video.preload = "metadata";
-            video.muted = true;
-            video.playsInline = true;
+        const video = document.createElement("video");
+        video.src = ((file.file instanceof File) ? URL.createObjectURL(file.file) : file.url) as string;
+        video.preload = "metadata";
+        video.muted = true;
+        video.playsInline = true;
 
-            const updatedFile : typeFile|null = parent.files.update({
-                'id' : file.id,
-                'url' : video.src,
-                'isPreviewAble': true,
-                'preview': canvas
-            } as typeFile, parent);
+        const updatedFile : typeFile|null = parent.files.update({
+            'id' : file.id,
+            'url' : video.src,
+            'isPreviewAble': true,
+            'preview': canvas
+        } as typeFile, parent);
 
-            if (updatedFile) {
-                renderVideoThumb(video, updatedFile, canvas).then(() => {
-                    resolve(updatedFile);
-                }).catch(() => {
-                    parent.files.update({
-                        'id' : file.id,
-                        'isPreviewAble': false,
-                    } as typeFile, parent);
-                    console.error(library.constants.prefixError + ' failed to load video preview');
-                })
-            }
+        if (updatedFile) {
+            renderVideoThumb(video, parent, updatedFile, canvas).then(() => {
+                resolve(updatedFile);
+            }).catch(() => {
+                parent.files.update({
+                    'id' : file.id,
+                    'isPreviewAble': false,
+                } as typeFile, parent);
+                console.error(library.constants.prefixError + ' failed to load video preview');
+            })
         } else {
             reject("File element not found")
         }
@@ -362,11 +382,12 @@ function videoPreviewHandler(file: typeFile, parent: Upload, canvas : HTMLCanvas
 /**
  * @description render thumbnail of video if possible else not
  * @param {HTMLVideoElement} video
+ * @param {Upload} parent main class
  * @param {typeFile} file active file
  * @param {HTMLCanvasElement} canvas element to render thumbnail on
  * @return {Promise}
  */
-function renderVideoThumb(video : HTMLVideoElement, file : typeFile, canvas: HTMLCanvasElement) : Promise<unknown> {
+function renderVideoThumb(video : HTMLVideoElement, parent: Upload, file : typeFile, canvas: HTMLCanvasElement) : Promise<unknown> {
     return new Promise((resolve: any, reject: any) => {
         video.onloadeddata = () => {
             video.currentTime = 1;
@@ -383,6 +404,12 @@ function renderVideoThumb(video : HTMLVideoElement, file : typeFile, canvas: HTM
                 const ctx : CanvasRenderingContext2D | null = canvas.getContext('2d');
                 if (ctx) ctx.drawImage(video, size.left, size.top, size.width, size.height);
                 if (!ctx) return reject("No canvas context");
+                canvas.toBlob((blob : Blob | null) => {
+                    if (blob instanceof Blob) {
+                        if(file.file instanceof File) parent.blob(file.file.name, file.id, blob)
+                        else if (file.name) parent.blob(file.name, file.id, blob)
+                    }
+                }, 'image/png');
                 resolve();
             } else {
                 console.error(library.constants.prefixError + ' dom missing width / height');

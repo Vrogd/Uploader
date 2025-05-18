@@ -2,7 +2,6 @@ import {filesList} from "./files";
 import {Events} from "./events";
 import type {Tabs} from "$lib";
 import type {typeFile} from "$lib";
-import {cleanUrl} from "./functions"
 import type {fileBlob} from "$lib";
 import type {adjustOptions} from "../types/adjustOptions";
 import {library} from "$lib";
