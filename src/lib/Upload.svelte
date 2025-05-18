@@ -78,7 +78,7 @@
             {/if}
             <div class="uploader-preview" role="button" tabindex="0" ondrop={(e) => {upload.eventDrop(e)}}>
                 {#if fileList && Object.keys(fileList).length}
-                    {#each fileList as file}
+                    {#each fileList as file (file.id)}
                         <File file={file} upload={upload} component={component}/>
                     {/each}
                 {:else}

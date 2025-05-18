@@ -11,8 +11,6 @@
     }
     let previewElement : HTMLElement|null = null;
 
-    import { fade } from 'svelte/transition';
-
     let {
         file,
         upload,
@@ -37,11 +35,7 @@
 <div class="uploader-item"
      class:uploader-item-image="{file.preview !== null && !upload.isCompact()}"
      class:uploader-item-error="{file.failed}"
-     bind:this={previewElement}
-     transition:fade={{
-	    delay: 40,
-	    duration: 200
-	 }}>
+     bind:this={previewElement}>
     <div class="info">
         <span class="text">
              <span data-upload-name>{file.name}</span>

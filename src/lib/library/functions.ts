@@ -109,8 +109,8 @@ export class Functions {
         return new Promise((resolve: any) => {
             if (file.file instanceof File){
                 if (library.functions.isPreviewAbleVideo(file)) {
-                    videoPreviewHandler(file, parent, canvas).then(() => {
-
+                    videoPreviewHandler(file, parent, canvas).then((updatedFile : typeFile) : void => {
+                        parent.files.load(updatedFile);
                     }).catch(() => {
                         console.error(library.constants.prefixError + ' failed to load preview thumbnail');
                     });
@@ -156,6 +156,7 @@ export class Functions {
                     request.send();
                 }
             } else {
+                console.log('sdfjksbdf')
                 resolve();
             }
         });
@@ -306,7 +307,6 @@ function renderPreview(file: typeFile, image: HTMLImageElement, canvas: HTMLCanv
                     const ctx : CanvasRenderingContext2D | null = canvas.getContext('2d');
                     if (ctx) ctx.drawImage(image, size.left, size.top, size.width, size.height);
                 } else {
-                    console.dir(file.previewElement, clientHeight)
                     console.error(library.constants.prefixError + ' dom missing width / height');
                 }
                 resolve();
@@ -326,7 +326,7 @@ function renderPreview(file: typeFile, image: HTMLImageElement, canvas: HTMLCanv
  * @param {HTMLCanvasElement} canvas element to render thumbnail on
  * @return {Promise}
  */
-function videoPreviewHandler(file: typeFile, parent: Upload, canvas : HTMLCanvasElement) : Promise<unknown> {
+function videoPreviewHandler(file: typeFile, parent: Upload, canvas : HTMLCanvasElement) : Promise<typeFile> {
     return new Promise((resolve: any, reject: any) => {
         if (file.file instanceof File) {
             const video = document.createElement("video");
@@ -344,11 +344,14 @@ function videoPreviewHandler(file: typeFile, parent: Upload, canvas : HTMLCanvas
 
             if (updatedFile) {
                 renderVideoThumb(video, updatedFile, canvas).then(() => {
-                    parent.files.load(updatedFile);
+                    resolve(updatedFile);
                 }).catch(() => {
+                    parent.files.update({
+                        'id' : file.id,
+                        'isPreviewAble': false,
+                    } as typeFile, parent);
                     console.error(library.constants.prefixError + ' failed to load video preview');
                 })
-                resolve();
             }
         } else {
             reject("File element not found")
@@ -369,14 +372,27 @@ function renderVideoThumb(video : HTMLVideoElement, file : typeFile, canvas: HTM
             video.currentTime = 1;
         };
         video.onseeked = () => {
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            const ctx : CanvasRenderingContext2D|null = canvas.getContext("2d");
-            if (!ctx) return reject("No canvas context");
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            const thumbnail = canvas.toDataURL("image/png");
-            resolve(thumbnail);
+            const clientWidth = file.previewElement?.clientWidth;
+            const clientHeight = library.constants.previewHeight * parseFloat(getComputedStyle(document.documentElement).fontSize);
+            if (clientHeight && clientWidth) {
+                const size : canvasSize = calculateCanvasSize(clientWidth, clientHeight, video.videoWidth, video.videoHeight);
+                canvas.width = size.width;
+                canvas.height = size.height;
+                canvas.setAttribute('data-width', String(size.width));
+                canvas.setAttribute('data-height', String(size.height))
+                const ctx : CanvasRenderingContext2D | null = canvas.getContext('2d');
+                if (ctx) ctx.drawImage(video, size.left, size.top, size.width, size.height);
+                if (!ctx) return reject("No canvas context");
+                resolve();
+            } else {
+                console.error(library.constants.prefixError + ' dom missing width / height');
+                reject();
+            }
         };
+        video.onerror = () => {
+            console.error(library.constants.prefixError + ' failed to load video');
+            reject();
+        }
     });
 }
 /**
