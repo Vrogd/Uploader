@@ -27,20 +27,20 @@
 		"!dist/**/*.spec.*"
 	],
 	"peerDependencies" : {
-		"svelte": "^5.28.2"
+		"svelte": "^5.32.0"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^5.0.0",
-		"@sveltejs/kit": "^2.20.2",
-		"@sveltejs/package": "^2.3.10",
+		"@sveltejs/kit": "^2.21.1",
+		"@sveltejs/package": "^2.3.11",
 		"@sveltejs/vite-plugin-svelte": "^5.0.3",
-		"publint": "^0.3.9",
+		"publint": "^0.3.12",
 		"rollup-plugin-sass": "^1.15.2",
-		"sass": "^1.87.0",
-		"svelte-check": "^4.1.7",
+		"sass": "^1.89.0",
+		"svelte-check": "^4.2.1",
 		"tslib": "^2.8.1",
 		"typescript": "^5.8.3",
-		"vite": "^6.2.3",
+		"vite": "^6.3.5",
 		"@sveltejs/adapter-static": "^3.0.8",
 		"svelte-preprocess": "^6.0.3"
 	},

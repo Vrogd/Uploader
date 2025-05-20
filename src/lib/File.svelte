@@ -11,8 +11,6 @@
     }
     let previewElement : HTMLElement|null = null;
 
-    import { fly } from 'svelte/transition';
-
     let {
         file,
         upload,
