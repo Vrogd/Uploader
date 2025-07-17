@@ -61,6 +61,8 @@
   // pick files
   #{'.' +  #{properties.$componentSubmitClass}}{
     width: 100%;
+    font-size: inherit;
+    border-radius: .3rem;
   }
   // external
   #{'.' +  #{properties.$componentSubmitClassExternal}}{
