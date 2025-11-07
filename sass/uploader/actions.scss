@@ -8,6 +8,7 @@
   --second-color: #{properties.$componentSecondaryColor};
   --high-color: #{properties.$componentHighlightColor};
   --text-color: white;
+  --text-color-high: white;
   --text-error: #{properties.$componentErrorColor};
 
   box-shadow: 0 0 1px 1px var(--main-color-high);

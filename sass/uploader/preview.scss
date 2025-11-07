@@ -83,7 +83,8 @@
         }
         &[data-upload-size]{
           font-weight: bold;
-          font-size: .95rem;
+          font-size: .90rem;
+          color: var(--text-color-high);
         }
       }
     }
