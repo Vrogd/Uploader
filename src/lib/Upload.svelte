@@ -4,7 +4,6 @@
     import {library} from "./index";
     import constants from "./library/constants";
     import File from "./File.svelte";
-
     let { component = $bindable(null), options = {}, files = [], ...other} = $props();
     // custom events
     const uploadHandler = other[constants.uploadEvent] ? other[constants.uploadEvent] as EventListener : null;
@@ -14,6 +13,7 @@
     const uploadText = other[constants.previewText] ? other[constants.previewText] as string : constants.basePreviewText;
 
     // create class
+    // svelte-ignore state_referenced_locally
     let upload = new library.upload(options);
     let updater = $state(0);
 
@@ -23,8 +23,6 @@
         updater++;
     }
 
-    upload.setFiles(files);
-
     // init
     let fileList = <typeFile[]> $state();
     onMount(async () => {
@@ -32,6 +30,7 @@
         if (component instanceof HTMLElement) {
             upload.dom(component);
             fileList = files;
+            upload.setFiles(files);
             let timeout : any[] = [];
             component.addEventListener(constants.uploadEvent, function (e : CustomEvent){
                 clearTimeout(timeout[e.detail.id]);
