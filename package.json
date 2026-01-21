@@ -1,6 +1,6 @@
 {
 	"name": "@vrogd/uploader",
-	"version": "0.0.4",
+	"version": "0.0.9",
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build && npm run package",
@@ -13,13 +13,18 @@
 		"dev-sass": "rollup -c -w"
 	},
 	"exports": {
-		".": "./dist/index.js",
+		".": {
+			"types": "./dist/index.d.ts",
+			"svelte": "./dist/Upload.svelte",
+			"default": "./dist/index.js"
+		},
 		"./Upload.svelte": {
 			"types": "./dist/index.d.ts",
-			"svelte": "./dist/index.js"
+			"svelte": "./dist/Upload.svelte"
 		},
 		"./output.css": "./static/output.css"
 	},
+	"svelte": "./dist/Upload.svelte",
 	"files": [
 		"dist",
 		"static/output.css",

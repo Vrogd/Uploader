@@ -4,7 +4,9 @@
     import {library} from "./index";
     import constants from "./library/constants";
     import File from "./File.svelte";
-    let { component = $bindable(null), options = {}, files = [], ...other} = $props();
+    let { options = {}, files = [], ...other} = $props();
+
+    let component : HTMLElement|undefined = $state();
     // custom events
     const uploadHandler = other[constants.uploadEvent] ? other[constants.uploadEvent] as EventListener : null;
     const deleteHandler = other[constants.deleteEvent] ? other[constants.deleteEvent] as EventListener : null;
