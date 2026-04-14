@@ -62,6 +62,7 @@ export class Events {
                 uploadLoadEndHandler(file, parent)
             });
             ajax.addEventListener("load", () => {
+                console.log('ajax', ajax)
                 if (ajax.status >= 400 && ajax.status < 600 && parent.options.enableBackend) {
                     parent.files.update({
                         'id': file.id,
@@ -71,6 +72,7 @@ export class Events {
                 }
             });
             ajax.open("POST", parent.options.requestUrl);
+            ajax.withCredentials = true;
             ajax.send(formData as XMLHttpRequestBodyInit);
         }
     }

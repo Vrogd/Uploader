@@ -1,22 +1,17 @@
 <script lang="ts">
-    import {onDestroy, onMount, tick} from 'svelte';
+    import {onDestroy, onMount, tick, untrack} from 'svelte';
     import type {typeFile} from "./types/file";
     import {library} from "./index";
     import constants from "./library/constants";
     import File from "./File.svelte";
+
     let { options = {}, files = [], ...other} = $props();
 
     let component : HTMLElement|undefined = $state();
-    // custom events
-    const uploadHandler = other[constants.uploadEvent] ? other[constants.uploadEvent] as EventListener : null;
-    const deleteHandler = other[constants.deleteEvent] ? other[constants.deleteEvent] as EventListener : null;
-    const cropHandler = other[constants.cropEvent] ? other[constants.cropEvent] as EventListener : null;
-
-    const uploadText = other[constants.previewText] ? other[constants.previewText] as string : constants.basePreviewText;
+    let uploadText = $state(constants.basePreviewText)
 
     // create class
-    // svelte-ignore state_referenced_locally
-    let upload = new library.upload(options);
+    let upload = new library.upload(untrack(() => options));
     let updater = $state(0);
 
     // callback
@@ -28,6 +23,13 @@
     // init
     let fileList = <typeFile[]> $state();
     onMount(async () => {
+        const uploadHandler = other[constants.uploadEvent] ? other[constants.uploadEvent] as EventListener : null;
+        const deleteHandler = other[constants.deleteEvent] ? other[constants.deleteEvent] as EventListener : null;
+        const cropHandler = other[constants.cropEvent] ? other[constants.cropEvent] as EventListener : null;
+
+        if (other[constants.previewText]){
+            uploadText = other[constants.previewText] as string;
+        }
         await tick();
         if (component instanceof HTMLElement) {
             upload.dom(component);
