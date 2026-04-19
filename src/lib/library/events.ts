@@ -49,7 +49,10 @@ export class Events {
             }, false);
             ajax.upload.addEventListener("abort", (e: ProgressEvent<XMLHttpRequestEventTarget>) => {
                 uploadAbortHandler(e);
-                file.failed = true;
+                parent.files.update({
+                    'id': file.id,
+                    'failed': true
+                } as typeFile, parent);
             }, false);
             ajax.upload.addEventListener("timeout", (e: ProgressEvent<XMLHttpRequestEventTarget>) => {
                 parent.files.update({
@@ -69,6 +72,12 @@ export class Events {
                         'failed': true
                     } as typeFile, parent);
                     console.error(library.constants.prefixError + ' File upload failed (' + ajax.status + ')');
+                } else if (ajax.status === 200 && parent.options.enableBackend){
+                   const json = JSON.parse(ajax.response);
+                    parent.files.update({
+                        'id': file.id,
+                        'failed': json.file_name
+                    } as typeFile, parent);
                 }
             });
             ajax.open("POST", parent.options.requestUrl);
