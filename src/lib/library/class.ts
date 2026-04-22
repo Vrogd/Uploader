@@ -5,6 +5,7 @@ import type {typeFile} from "$lib";
 import type {fileBlob} from "$lib";
 import type {adjustOptions} from "../types/adjustOptions";
 import {library} from "$lib";
+import {eventBus} from "$lib/library/Bus";
 
 /**
  * @description upload class
@@ -155,9 +156,10 @@ export class Upload {
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
-                if (this.component) this.component.dispatchEvent(library.functions.customEvent(library.constants.downloadEvent, file));
+                eventBus.emit(library.constants.downloadEvent, file);
             }
         } catch (e){
+            eventBus.emit('error', "failed to download file image");
             console.error(library.constants.prefixError + ' failed to download file image');
         }
     }
@@ -168,7 +170,7 @@ export class Upload {
      */
     public delete : (file : typeFile) => void = (file : typeFile) : void => {
         if (typeof this.files.delete === 'function') this.files.delete(file);
-        if(this.component) this.component.dispatchEvent(library.functions.customEvent(library.constants.deleteEvent, file));
+        eventBus.emit(library.constants.deleteEvent, file);
     }
     /**
      * @description check if crop can be shown
@@ -192,10 +194,10 @@ export class Upload {
      * @return void
      */
     public crop : (file : typeFile) => void = (file: typeFile) : void => {
-        if (this.component) this.component.dispatchEvent(library.functions.customEvent(library.constants.cropEvent, file));
+        eventBus.emit(library.constants.cropEvent, file);
     }
     /**
-     * @description save / get blob to window list / based on change date
+     * @description save / get blob to a window list / based on change date
      * @param {string} url current file url / name
      * @param {string|Number} id id
      * @param {Blob} blob blob element
@@ -222,7 +224,7 @@ export class Upload {
         return null;
     }
     /**
-     * @description if other tab show different dat / no preview / compact
+     * @description if another tab shows different dat / no preview / compact
      * @return {boolean}
      */
     public isCompact = () : boolean => {

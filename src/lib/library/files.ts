@@ -80,7 +80,7 @@ export const filesList: typeFileList = {
 }
 
 /**
- * overwrite first with second object
+ * overwrite the first with the second object
  * @param {typeFile} obj1
  * @param {typeFile} obj2
  */

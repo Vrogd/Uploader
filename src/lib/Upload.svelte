@@ -1,9 +1,12 @@
 <script lang="ts">
     import {onDestroy, onMount, tick, untrack} from 'svelte';
-    import type {typeFile} from "./types/file";
+    import type {ErrorEventHandler, FileEventHandler, typeFile} from "./types/file";
     import {library} from "./index";
     import constants from "./library/constants";
     import File from "./File.svelte";
+    import {eventBus} from "$lib/library/Bus";
+    import {browser} from "$app/environment";
+    import {error} from "@sveltejs/kit";
 
     let { options = {}, files = [], ...other} = $props();
 
@@ -22,10 +25,17 @@
 
     // init
     let fileList = <typeFile[]> $state();
+    let handleUpload: (file: typeFile) => void;
+    let handleDelete: (file: typeFile) => void;
+    let handleCrop: (file: typeFile) => void;
+    let handleDomLoad: (e: CustomEvent) => void;
+    let handleError: (error : string) => void;
+
     onMount(async () => {
-        const uploadHandler = other[constants.uploadEvent] ? other[constants.uploadEvent] as EventListener : null;
-        const deleteHandler = other[constants.deleteEvent] ? other[constants.deleteEvent] as EventListener : null;
-        const cropHandler = other[constants.cropEvent] ? other[constants.cropEvent] as EventListener : null;
+        const uploadHandler = other[constants.uploadEvent] ? other[constants.uploadEvent] as FileEventHandler : null;
+        const deleteHandler = other[constants.deleteEvent] ? other[constants.deleteEvent] as FileEventHandler : null;
+        const cropHandler = other[constants.cropEvent] ? other[constants.cropEvent] as FileEventHandler : null;
+        const errorHandler = other['error'] ? other['error'] as ErrorEventHandler : null;
 
         if (other[constants.previewText]){
             uploadText = other[constants.previewText] as string;
@@ -35,30 +45,44 @@
             upload.dom(component);
             fileList = files;
             upload.setFiles(files);
-            let timeout : any[] = [];
-            component.addEventListener(constants.uploadEvent, function (e : CustomEvent){
-                clearTimeout(timeout[e.detail.id]);
-                timeout[e.detail.id] = setTimeout(() => {
-                    if (typeof uploadHandler === "function") uploadHandler(e.detail);
-                }, constants.timeoutEvents)
-            } as EventListener);
-            // delete event
-            component.addEventListener(constants.deleteEvent, function (e: CustomEvent){
-                if (typeof deleteHandler === "function") deleteHandler(e.detail);
-            } as EventListener)
-            // crop event
-            component.addEventListener(constants.cropEvent, function (e: CustomEvent){
-                if (typeof cropHandler === "function") cropHandler(e.detail);
-            } as EventListener)
-            // loaded dom event // load preview if clicked on tab
-            component.addEventListener(constants.domLoadEvent, function (e : CustomEvent){
+            const timeout: { [key: string]: ReturnType<typeof setTimeout> } = {};
+            handleUpload = (file: typeFile) => {
+                clearTimeout(timeout[file.id]);
+                timeout[file.id] = setTimeout(() => {
+                    uploadHandler?.(file);
+                }, constants.timeoutEvents);
+            };
+            handleDelete = (file: typeFile) => {
+                deleteHandler?.(file);
+            };
+            handleCrop = (file: typeFile) => {
+                cropHandler?.(file);
+            };
+            handleDomLoad = (e: CustomEvent) => {
                 upload.files.update(e.detail, upload);
-            } as EventListener)
+            };
+            handleError = (message : string) => {
+                errorHandler?.(message);
+            };
+
+            eventBus.on(constants.uploadEvent, handleUpload);
+            eventBus.on(constants.deleteEvent, handleDelete);
+            eventBus.on(constants.cropEvent, handleCrop);
+
+            // loaded dom event // load preview if clicked on tab
+            component.addEventListener(constants.domLoadEvent, handleDomLoad as EventListener);
         }
     });
 
     onDestroy(() => {
         fileList = [];
+        eventBus.off(constants.uploadEvent, handleUpload);
+        eventBus.off(constants.deleteEvent, handleDelete);
+        eventBus.off(constants.cropEvent, handleCrop);
+        eventBus.off('error', handleError);
+        if (typeof window !== "undefined" && component instanceof HTMLElement) {
+            component.removeEventListener(constants.domLoadEvent, handleDomLoad as EventListener);
+        }
     })
 </script>
 <div class="uploader" bind:this={component}>

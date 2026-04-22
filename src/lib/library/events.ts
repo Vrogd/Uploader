@@ -2,6 +2,7 @@ import type {Upload} from "./class";
 import {formatFileSize, Functions} from "./functions";
 import type {typeFile} from "$lib";
 import {library} from "$lib";
+import {eventBus} from "$lib/library/Bus";
 
 export class Events {
     /**
@@ -73,10 +74,11 @@ export class Events {
                     } as typeFile, parent);
                     console.error(library.constants.prefixError + ' File upload failed (' + ajax.status + ')');
                 } else if (ajax.status === 200 && parent.options.enableBackend){
-                   const json = JSON.parse(ajax.response);
+                    const json = JSON.parse(ajax.response);
                     parent.files.update({
                         'id': file.id,
-                        'failed': json.file_name
+                        'name': json.file_name,
+                        'url': json.path,
                     } as typeFile, parent);
                 }
             });
@@ -188,5 +190,5 @@ function uploadAbortHandler(e : Event): void {
  */
 function uploadLoadEndHandler(file : typeFile, parent : Upload): void {
     file.completed = true;
-    if (parent.component) parent.component.dispatchEvent(library.functions.customEvent(library.constants.uploadEvent, file));
+    eventBus.emit(library.constants.uploadEvent, file);
 }

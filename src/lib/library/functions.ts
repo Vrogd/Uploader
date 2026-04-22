@@ -198,7 +198,7 @@ export class Functions {
         return new CustomEvent(key, {detail: detail});
     }
     /**
-     * @description validate if correct type of file is upload / external otherwise throw error
+     * @description validate if a correct type of file is upload / external otherwise throw error
      * @param {typeFile} file
      * @param {Tabs} activeTab
      * @param {Upload} parent main class

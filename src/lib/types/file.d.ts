@@ -15,3 +15,7 @@ export type typeFile = {
     type?: Tabs | string
     external?: boolean | null
 }
+
+export type FileEventHandler = (file: typeFile) => void;
+
+export type ErrorEventHandler = (error: string) => void;
