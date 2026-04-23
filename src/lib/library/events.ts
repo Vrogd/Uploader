@@ -80,6 +80,7 @@ export class Events {
                         'name': json.file_name,
                         'url': json.path,
                     } as typeFile, parent);
+                    eventBus.emit(library.constants.uploadEvent, file);
                 }
             });
             ajax.open("POST", parent.options.requestUrl);
@@ -171,6 +172,7 @@ function uploadProgressHandler(file : typeFile, e : ProgressEvent, parent: Uploa
  */
 function uploadErrorhandler(e : Event) : void {
     console.error(library.constants.prefixError + ' failed to upload file ', e);
+    eventBus.emit('error', "failed to upload file");
 }
 
 /**
@@ -189,6 +191,10 @@ function uploadAbortHandler(e : Event): void {
  * @return void
  */
 function uploadLoadEndHandler(file : typeFile, parent : Upload): void {
+    parent.files.update({
+        'id' : file.id,
+        'completed' : true
+    } as typeFile, parent);
     file.completed = true;
     eventBus.emit(library.constants.uploadEvent, file);
 }

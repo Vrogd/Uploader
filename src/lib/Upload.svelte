@@ -5,8 +5,6 @@
     import constants from "./library/constants";
     import File from "./File.svelte";
     import {eventBus} from "$lib/library/Bus";
-    import {browser} from "$app/environment";
-    import {error} from "@sveltejs/kit";
 
     let { options = {}, files = [], ...other} = $props();
 
@@ -68,6 +66,7 @@
             eventBus.on(constants.uploadEvent, handleUpload);
             eventBus.on(constants.deleteEvent, handleDelete);
             eventBus.on(constants.cropEvent, handleCrop);
+            eventBus.on('error', handleError);
 
             // loaded dom event // load preview if clicked on tab
             component.addEventListener(constants.domLoadEvent, handleDomLoad as EventListener);
