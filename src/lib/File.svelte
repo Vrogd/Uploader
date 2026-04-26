@@ -43,18 +43,25 @@
         </span>
         <span class="actions">
             {#if upload.hasCrop(file) && file.completed && !file.failed  && !upload.isCompact()}
-                 <button class="spin" aria-label="crop" data-upload-crop onclick={() => upload.crop(file)}>
-                       <i class="fa-solid fa-crop"></i>
-                 </button>
+                <button class="spin" aria-label="crop" data-upload-crop onclick={() => upload.crop(file)}>
+                    <i class="fa-solid fa-crop"></i>
+                </button>
             {/if}
             {#if file.completed && !file.failed && file.url }
-                 <button class="spin" aria-label="download" data-upload-download onclick={() => upload.download(file)}>
-                       <i class="fa-solid fa-cloud-arrow-down"></i>
-                 </button>
+                <button class="spin" aria-label="download" data-upload-download onclick={() => upload.download(file)}>
+                     <i class="fa-solid fa-cloud-arrow-down"></i>
+                </button>
             {/if}
-            <button class="spin" aria-label="delete" data-upload-delete onclick={() => upload.delete(file)}>
-                 <i class="fa-solid fa-trash"></i>
-            </button>
+            {#if file.timeout && file.url }
+                <button class="spin" aria-label="refresh" data-upload-retry onclick={() => upload.retry(file)}>
+                     <i class="fa fa-undo" aria-hidden="true"></i>
+                </button>
+            {/if}
+            {#if !file.timeout && !file.failed && file.url }
+                <button class="spin" aria-label="delete" data-upload-delete onclick={() => upload.delete(file)}>
+                     <i class="fa-solid fa-trash"></i>
+                </button>
+            {/if}
         </span>
         {#if !upload.isCompact() && !file.failed}
             <span data-upload-percentage class="percentage">{file.progress} %</span>

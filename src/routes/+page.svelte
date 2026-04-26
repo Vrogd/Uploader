@@ -11,4 +11,4 @@
     }
 </script>
 
-<Upload options={options} customUpload={(uploadHandler)} />
+<Upload options={options} customUpload={uploadHandler} />

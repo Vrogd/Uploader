@@ -13,7 +13,7 @@ export class Events {
      * @return void
      */
     static upload(parent : Upload, file : typeFile|void) : void {
-        if (file){
+        if (file && (file.attempts ?? 1) < 4){
             library.functions.validateCorrectUploadType(file, parent.tabActive, parent).then((file : typeFile) => {
                 if (parent.files.list.length <= parent.maxAmountOfFiles) {
                     if (file && file.file instanceof File) this.uploadFile(parent, file);
@@ -39,6 +39,8 @@ export class Events {
         }
         const ajax = new XMLHttpRequest();
         if (ajax.upload) {
+            file.progress = 0;
+            file.completed = false;
             parent.files.update(file, parent);
             Functions.updateFileData(file, parent);
             ajax.upload.addEventListener("progress", (e: ProgressEvent<XMLHttpRequestEventTarget>) => {
@@ -55,35 +57,40 @@ export class Events {
                     'failed': true
                 } as typeFile, parent);
             }, false);
-            ajax.upload.addEventListener("timeout", (e: ProgressEvent<XMLHttpRequestEventTarget>) => {
+            ajax.upload.addEventListener("timeout", () => {
                 parent.files.update({
                     'id': file.id,
-                    'failed': true
+                    'timeout': true,
+                    'failed': true,
+                    "progress": 100,
+                    'completed': false,
                 } as typeFile, parent);
+                eventBus.emit('error', "File upload timed out (" + ajax.status + ")");
                 console.error(library.constants.prefixError + ' File upload timed out (' + ajax.status + ')');
             }, false);
             ajax.upload.addEventListener("loadend", () => {
                 uploadLoadEndHandler(file, parent)
             });
             ajax.addEventListener("load", () => {
-                console.log('ajax', ajax)
                 if (ajax.status >= 400 && ajax.status < 600 && parent.options.enableBackend) {
                     parent.files.update({
                         'id': file.id,
                         'failed': true
                     } as typeFile, parent);
+                    eventBus.emit('error', "File upload failed (" + ajax.status + ")");
                     console.error(library.constants.prefixError + ' File upload failed (' + ajax.status + ')');
                 } else if (ajax.status === 200 && parent.options.enableBackend){
                     const json = JSON.parse(ajax.response);
-                    parent.files.update({
+                    let newFile : typeFile = parent.files.update({
                         'id': file.id,
                         'name': json.file_name,
                         'url': json.path,
-                    } as typeFile, parent);
-                    eventBus.emit(library.constants.uploadEvent, file);
+                    } as typeFile, parent) as typeFile;
+                    eventBus.emit(library.constants.uploadEvent, newFile);
                 }
             });
             ajax.open("POST", parent.options.requestUrl);
+            ajax.timeout =  parent.options.timeout ?? 10;
             ajax.withCredentials = true;
             ajax.send(formData as XMLHttpRequestBodyInit);
         }
@@ -191,10 +198,11 @@ function uploadAbortHandler(e : Event): void {
  * @return void
  */
 function uploadLoadEndHandler(file : typeFile, parent : Upload): void {
-    parent.files.update({
+    const newFile = parent.files.update({
         'id' : file.id,
         'completed' : true
-    } as typeFile, parent);
-    file.completed = true;
-    eventBus.emit(library.constants.uploadEvent, file);
+    } as typeFile, parent) as typeFile;
+    if (!parent.options.enableBackend){
+        eventBus.emit(library.constants.uploadEvent, newFile);
+    }
 }

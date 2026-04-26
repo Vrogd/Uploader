@@ -23,6 +23,7 @@ export class Upload {
     public windowBlobList : string = 'UploadBlobs';
     public options : adjustOptions  = {
         requestUrl: '/file',
+        timeout: 30000,
         enableExternal : true,
         enableImage: true,
         enableVideo : true,
@@ -64,6 +65,7 @@ export class Upload {
         this.options.videoExtensions = Array.isArray(options.videoExtensions) ? options.videoExtensions : library.constants.videoDefaultExtensions;
         if (Array.isArray(options.otherExtensions)) this.options.otherExtensions = options.otherExtensions;
         if (typeof options.maxFiles === 'number') this.maxAmountOfFiles = options.maxFiles;
+        if (typeof options.timeout === 'number') this.options.timeout = options.timeout;
     }
     /**
      * @description on change event file list
@@ -163,6 +165,31 @@ export class Upload {
             console.error(library.constants.prefixError + ' failed to download file image');
         }
     }
+
+    /**
+     * @description retry file
+     * @param {typeFile} file file object
+     * @return void
+     */
+    public retry (file : typeFile) : void {
+        if (file && (file.attempts ?? 1) >= 3){
+            eventBus.emit('error', "Already attempted 3 times to upload file, please try again later");
+            return;
+        } else {
+             const newFile = this.files.update({
+                 'id' : file.id,
+                 'attempts' : (file.attempts ?? 1) + 1,
+                 'failed' : false,
+                 'timeout' : false,
+                 'completed' : false,
+                 'progress' : 0,
+             },this) as typeFile;
+             setTimeout(() => {
+                 Events.upload(this, newFile);
+             }, 500)
+         }
+    }
+
     /**
      * @description delete file
      * @param {typeFile} file file object

@@ -18,6 +18,7 @@ export class Functions {
             'preview': null,
             'name': null,
             'size': null,
+            'attempts': 0,
             'type': tab,
             'id': generateId(30),
         }

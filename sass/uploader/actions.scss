@@ -3,8 +3,8 @@
 
 #{'.' +  #{properties.$componentWrapperClass}}{
   --main-color: #{properties.$componentMainColor};
-  --main-color-high: #{color.adjust(properties.$componentMainColor, $lightness: -7%)};
-  --main-color-low: #{color.adjust(properties.$componentMainColor, $lightness: 7%)};
+  --main-color-high: #{color.adjust(properties.$componentMainColor, $lightness: -10%)};
+  --main-color-low: #{color.adjust(properties.$componentMainColor, $lightness: 10%)};
   --second-color: #{properties.$componentSecondaryColor};
   --high-color: #{properties.$componentHighlightColor};
   --text-color: white;
@@ -63,6 +63,7 @@
   #{'.' +  #{properties.$componentSubmitClass}}{
     width: 100%;
     font-size: inherit;
+    background-color: var(--main-color-high);
     border-radius: .3rem;
   }
   // external
@@ -97,7 +98,7 @@
     margin-right: .8rem;
   }
   &:active, &:focus-within, &:hover{
-    background-color: var(--main-color-high);
+    background-color: var(--main-color);
   }
 }
 
