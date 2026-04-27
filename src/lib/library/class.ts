@@ -5,7 +5,7 @@ import type {typeFile} from "$lib";
 import type {fileBlob} from "$lib";
 import type {adjustOptions} from "../types/adjustOptions";
 import {library} from "$lib";
-import {eventBus} from "$lib/library/Bus";
+import {eventBus} from "./Bus";
 
 /**
  * @description upload class

@@ -2,7 +2,7 @@ import type {Upload} from "./class";
 import {formatFileSize, Functions} from "./functions";
 import type {typeFile} from "$lib";
 import {library} from "$lib";
-import {eventBus} from "$lib/library/Bus";
+import {eventBus} from "./Bus";
 
 export class Events {
     /**
@@ -80,6 +80,7 @@ export class Events {
                     eventBus.emit('error', "File upload failed (" + ajax.status + ")");
                     console.error(library.constants.prefixError + ' File upload failed (' + ajax.status + ')');
                 } else if (ajax.status === 200 && parent.options.enableBackend){
+                    console.dir('sdfjksnf')
                     const json = JSON.parse(ajax.response);
                     let newFile : typeFile = parent.files.update({
                         'id': file.id,
@@ -90,7 +91,7 @@ export class Events {
                 }
             });
             ajax.open("POST", parent.options.requestUrl);
-            ajax.timeout =  parent.options.timeout ?? 10;
+            ajax.timeout =  parent.options.timeout ?? 10000;
             ajax.withCredentials = true;
             ajax.send(formData as XMLHttpRequestBodyInit);
         }

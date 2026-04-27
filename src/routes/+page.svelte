@@ -9,6 +9,7 @@
     const uploadHandler = (file) => {
         console.log(file)
     }
+    console.log(options)
 </script>
 
 <Upload options={options} customUpload={uploadHandler} />

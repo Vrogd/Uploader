@@ -4,7 +4,7 @@
     import {library} from "./index";
     import constants from "./library/constants";
     import File from "./File.svelte";
-    import {eventBus} from "$lib/library/Bus";
+    import {eventBus} from "./library/Bus";
 
     let { options = {}, files = [], ...other} = $props();
 

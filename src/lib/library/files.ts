@@ -1,6 +1,6 @@
 import {type typeFile} from "$lib";
 import type {typeFileList} from "$lib/types/fileList";
-import {generateId} from "$lib/library/functions";
+import {generateId} from "./functions";
 import type Upload from "./class";
 
 /**
