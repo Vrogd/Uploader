@@ -42,12 +42,12 @@
              <span data-upload-size>{file.size}</span>
         </span>
         <span class="actions">
-            {#if upload.hasCrop(file) && file.completed && !file.failed  && !upload.isCompact()}
+            {#if upload.hasCrop(file) && (file.completed && upload.isNew(file) || !upload.isNew(file)) && !file.failed  && !upload.isCompact()}
                 <button class="spin" aria-label="crop" data-upload-crop onclick={() => upload.crop(file)}>
                     <i class="fa-solid fa-crop"></i>
                 </button>
             {/if}
-            {#if file.completed && !file.failed && file.url }
+            {#if (upload.isNew(file) && file.completed || !upload.isNew(file)) && !file.failed && file.url }
                 <button class="spin" aria-label="download" data-upload-download onclick={() => upload.download(file)}>
                      <i class="fa-solid fa-cloud-arrow-down"></i>
                 </button>
@@ -63,11 +63,11 @@
                 </button>
             {/if}
         </span>
-        {#if !upload.isCompact() && !file.failed}
+        {#if !upload.isCompact() && !file.failed && upload.isNew(file)}
             <span data-upload-percentage class="percentage">{file.progress} %</span>
         {/if}
     </div>
-    {#if !(file.external)}
+    {#if !(file.external) && upload.isNew(file)}
         <div class="progress">
             <span class="bar" style="width: {file.progress}%"></span>
         </div>

@@ -6,6 +6,7 @@ import type {fileBlob} from "$lib";
 import type {adjustOptions} from "../types/adjustOptions";
 import {library} from "$lib";
 import {eventBus} from "./Bus";
+import {Functions} from "$lib/library/functions";
 
 /**
  * @description upload class
@@ -45,6 +46,9 @@ export class Upload {
      */
     public setFiles(files : typeFile[]) : void {
         this.files.list = files;
+        for (const file of files) {
+            Functions.updateFileData(file, this);
+        }
     }
     /**
      * @description set settings
@@ -256,6 +260,13 @@ export class Upload {
      */
     public isCompact = () : boolean => {
         return this.tabActive === 'other' && this.options.enableExternal;
+    }
+    /**
+     * @description only hsow certain parts if its new
+     * @return {boolean}
+     */
+    public isNew = (file: typeFile) : boolean => {
+        return file.file instanceof File && !file.external;
     }
 }
 

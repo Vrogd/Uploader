@@ -44,6 +44,13 @@ export class Functions {
                 'name' : file.file.name,
                 'isPreviewAble' : condImg || condVideo,
             } as typeFile, parent);
+        } else if (file.type && file.id){
+            const condImg = this.isPreviewAbleImage(file);
+            const condVideo = this.isPreviewAbleVideo(file);
+            parent.files.update({
+                'id' : file.id,
+                'isPreviewAble' : condImg || condVideo,
+            } as typeFile, parent);
         }
     }
     /**
@@ -52,7 +59,7 @@ export class Functions {
      * @return {boolean}
      */
     static isPreviewAbleImage(file: typeFile) : boolean {
-        return file.file instanceof File && file.file.type.includes('image');
+        return !!(file.type) && file.type.includes('image');
     }
     /**
      * @description video is previewAble
@@ -60,7 +67,7 @@ export class Functions {
      * @return {boolean}
      */
     static isPreviewAbleVideo(file: typeFile) : boolean {
-        return file.file instanceof File && (file.file.type.includes('video/mp4') || file.file.type.includes('video/webm') || file.file.type.includes('video/ogg'));
+        return !!(file.type) && (file.type.includes('video/mp4') || file.type.includes('video/webm') || file.type.includes('video/ogg'));
     }
     /**
      * @description render dom element if available
@@ -92,7 +99,7 @@ export class Functions {
                     });
                 } else {
                     this.loadPreview(file, parent, canvas).then(() => resolve()).catch((err : Error) => {
-                        console.error(library.constants.prefixError + ' failed to load preview.', err);
+                        console.error(library.constants.prefixError + ' failed to load preview.', err ?? '');
                         resolve();
                     });
                 }
@@ -116,9 +123,10 @@ export class Functions {
                     reject();
                 });
             } else if(library.functions.isPreviewAbleImage(file)) {
+                console.dir('sdfsdfsf')
                 imagePreviewHandler(file, parent, canvas).then((updatedFile : typeFile) : void => {
                     resolve(parent.files.load(updatedFile));
-                }).catch(() => {
+                }).catch((e) => {
                     console.error(library.constants.prefixError + ' failed to load preview');
                     reject();
                 });

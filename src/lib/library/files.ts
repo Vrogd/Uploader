@@ -22,6 +22,7 @@ export const filesList: typeFileList = {
         });
         if (find && find as typeFile){
             const index : number = this.list.indexOf(find);
+            console.dir(this.list, index);
             if (index > -1){
                 if (typeof item.failed === 'boolean' && !item.failed) item.completed = false
                 if (item.completed) item.failed = false;
@@ -37,6 +38,7 @@ export const filesList: typeFileList = {
             this.queue(this.list.filter((file: typeFile) => file.type === parent.tabActive));
             return item;
         }
+        console.dir(this.list);
         return null;
     },
     load: function (item : typeFile) : void {

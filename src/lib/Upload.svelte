@@ -17,6 +17,7 @@
 
     // callback
     upload.files.callback = function (list: typeFile[]) {
+        console.log(list);
         fileList = list;
         updater++;
     }

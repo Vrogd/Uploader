@@ -80,7 +80,6 @@ export class Events {
                     eventBus.emit('error', "File upload failed (" + ajax.status + ")");
                     console.error(library.constants.prefixError + ' File upload failed (' + ajax.status + ')');
                 } else if (ajax.status === 200 && parent.options.enableBackend){
-                    console.dir('sdfjksnf')
                     const json = JSON.parse(ajax.response);
                     let newFile : typeFile = parent.files.update({
                         'id': file.id,
