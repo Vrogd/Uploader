@@ -65,11 +65,9 @@
     display: flex;
 
     .text {
-      display: flex;
-      flex: 1;
+      display: grid;
       align-items: center;
       padding: .4em 0 .4em .4em;
-      flex-direction: column;
       margin-right: .4rem;
       width: auto;
       max-width: 100%;
@@ -93,7 +91,7 @@
 
     .percentage {
       width: 30%;
-      display: flex;
+      display: grid;
       border-left: 2px solid var(--text-color);
       justify-content: center;
       align-items: center;
