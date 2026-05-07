@@ -123,10 +123,9 @@ export class Functions {
                     reject();
                 });
             } else if(library.functions.isPreviewAbleImage(file)) {
-                console.dir('sdfsdfsf')
                 imagePreviewHandler(file, parent, canvas).then((updatedFile : typeFile) : void => {
                     resolve(parent.files.load(updatedFile));
-                }).catch((e) => {
+                }).catch(() => {
                     console.error(library.constants.prefixError + ' failed to load preview');
                     reject();
                 });
