@@ -22,7 +22,6 @@ export const filesList: typeFileList = {
         });
         if (find && find as typeFile){
             const index : number = this.list.indexOf(find);
-            console.dir(this.list, index);
             if (index > -1){
                 if (typeof item.failed === 'boolean' && !item.failed) item.completed = false
                 if (item.completed) item.failed = false;

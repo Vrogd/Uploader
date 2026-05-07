@@ -19,9 +19,11 @@ export class Events {
                     if (file && file.file instanceof File) this.uploadFile(parent, file);
                     else console.error(library.constants.prefixError + ' data is missing to handle upload');
                 } else {
+                    eventBus.emit('error', "Reached max limit of files");
                     console.error(library.constants.prefixError + ' reached max limit of files');
                 }
             }).catch((err : any) => {
+                eventBus.emit('error', "Failed to validate upload");
                 console.error(library.constants.prefixError + ' failed to validate upload', err);
             });
         }
