@@ -20,3 +20,4 @@ export type { typeOptions } from './types/options';
 export type { fileBlob } from './types/fileBlob';
 // component
 export { default as Upload } from './Upload.svelte';
+export { default } from './Upload.svelte';
