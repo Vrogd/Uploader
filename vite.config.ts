@@ -3,6 +3,7 @@ import { sveltekit } from '@sveltejs/kit/vite';
 import { resolve } from 'path';
 import { writeFileSync, mkdirSync } from 'fs';
 import { exec } from 'child_process';
+
 import * as sass from 'sass'
 
 const svelteConfig = defineConfig({
@@ -11,16 +12,14 @@ const svelteConfig = defineConfig({
 		{
 			name: 'compile-sass',
 			buildStart() {
-				const result = sass.renderSync({
-					file: resolve(__dirname, 'sass/app.scss'),
-					outputStyle: 'compressed'
+				const result = sass.compile(resolve(import.meta.dirname, 'sass/app.scss'), {
+					style: 'compressed'
 				});
-
 				// Create static directory if it doesn't exist
-				mkdirSync(resolve(__dirname, 'static'), { recursive: true });
+				mkdirSync(resolve(import.meta.dirname, 'static'), { recursive: true });
 
 				// Write the compiled CSS to the output file
-				writeFileSync(resolve(__dirname, 'static/output.css'), result.css);
+				writeFileSync(resolve(import.meta.dirname, 'static/output.css'), result.css);
 			}
 		},
 		{

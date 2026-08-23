@@ -11,7 +11,7 @@
   --text-color-high: white;
   --text-error: #{properties.$componentErrorColor};
 
-  box-shadow: 0 0 1px 1px var(--main-color-high);
+  box-shadow: 0 0 2px 1px var(--main-color-high);
   font-family: "Calibri Light", sans-serif;
   text-align: center;
   background-color: var(--main-color);
@@ -27,7 +27,7 @@
 }
 // uploader -tabs
 #{'.' +  #{properties.$componentTabsClass}}{
-  border-bottom: .12rem solid var(--main-color-high);
+  border-bottom: .12em solid var(--main-color-high);
   overflow: hidden;
   display: inline-flex;
   justify-content: center;
@@ -53,9 +53,9 @@
 
 // main class
 #{'.' +  #{properties.$componentSubmitActions}}{
-  border-top: .15rem solid var(--main-color-high);
+  border-top: .15em solid var(--main-color-high);
   display: flex;
-  padding: 0 0.2rem;
+  padding: 0 0.2em;
   & :not(.#{properties.$componentSubmitClassExternal}){
     width: auto;
   }
@@ -64,14 +64,14 @@
     width: 100%;
     font-size: inherit;
     background-color: var(--main-color-high);
-    border-radius: .3rem;
+    border-radius: .3em;
   }
   // external
   #{'.' +  #{properties.$componentSubmitClassExternal}}{
     width: 15%;
     svg {
-      line-height: 1.6rem;
-      max-height: 1.6rem;
+      line-height: 1.6em;
+      max-height: 1.6em;
       margin: auto !important;
     }
   }
@@ -80,8 +80,8 @@
 // submit class
 #{'.' +  #{properties.$componentSubmitClass}}, #{'.' +  #{properties.$componentSubmitClassExternal}}{
   background-color: var(--main-color);
-  padding: 0.5rem 1rem;
-  margin: .2rem 0;
+  padding: 0.5em 1em;
+  margin: .2em 0;
   display: flex;
   justify-content: center;
   place-items: center;
@@ -90,12 +90,12 @@
   text-decoration: none;
   user-select: none;
   svg{
-    line-height: 2rem;
-    max-height: 2rem;
+    line-height: 2em;
+    max-height: 2em;
     vertical-align: middle;
     fill: var(--text-color);
     transition: opacity, 0.3s, ease-in-out;
-    margin-right: .8rem;
+    margin-right: .8em;
   }
   &:active, &:focus-within, &:hover{
     background-color: var(--main-color);
@@ -105,10 +105,10 @@
 #{'.' +  #{properties.$componentSubmitActions}}:has(#{'.' +  #{properties.$componentSubmitClass}}):has(#{'.' +  #{properties.$componentSubmitClassExternal}}) {
   #{'.' +  #{properties.$componentSubmitClass}}, #{'.' +  #{properties.$componentSubmitClassExternal}} {
     &:first-of-type{
-      border-radius: .3rem 0 0 .3rem !important;
+      border-radius: .3em 0 0 .3em !important;
     }
     &:last-of-type{
-      border-radius: 0 .3rem .3rem 0 !important;
+      border-radius: 0 .3em .3em 0 !important;
     }
   }
 }
@@ -120,7 +120,7 @@
   flex-wrap: wrap;
   position: relative;
   list-style: none;
-  padding: .6rem 1rem;
+  padding: .6em 1em;
   color: var(--text-color);
   user-select: none;
   &:hover, &.show {
@@ -130,13 +130,13 @@
 
 .actions{
   display: none;
-  font-size: .95rem;
+  font-size: .95em;
   button{
     border:none;
     height: 100%;
     background: none;
     color: var(--text-color);
-    padding: 0.3rem 0.7rem;
+    padding: 0.3em 0.7em;
     font-family: inherit;
     &:active, &:hover{
       cursor: pointer;
