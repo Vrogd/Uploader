@@ -321,22 +321,22 @@ function imagePreviewHandler(file: typeFile, parent: Upload, canvas : HTMLCanvas
 function renderPreview(file: typeFile,  parent: Upload, image: HTMLImageElement, canvas: HTMLCanvasElement) : Promise<unknown> {
     return new Promise(((resolve: any) => {
         image.addEventListener("load", function() {
-            setTimeout(() => {
-                const clientWidth = file.previewElement?.clientWidth;
-                const clientHeight = library.constants.previewHeight * parseFloat(getComputedStyle(document.documentElement).fontSize);
+            requestAnimationFrame(() => {
+                const clientWidth: number | undefined = file.previewElement?.clientWidth;
+                const clientHeight : number = library.constants.previewHeight * parseFloat((getComputedStyle(document.documentElement).fontSize ?? 16));
                 if (clientHeight && clientWidth) {
                     const size : canvasSize = calculateCanvasSize(clientWidth, clientHeight, image.width, image.height);
                     canvas.width = size.width;
                     canvas.height = size.height;
                     canvas.setAttribute('data-width', String(size.width));
-                    canvas.setAttribute('data-height', String(size.height))
-                    const ctx : CanvasRenderingContext2D | null = canvas.getContext('2d');
+                    canvas.setAttribute('data-height', String(size.height));
+                    const ctx = canvas.getContext('2d');
                     if (ctx) ctx.drawImage(image, size.left, size.top, size.width, size.height);
                 } else {
                     console.error(library.constants.prefixError + ' dom missing width / height');
                 }
                 resolve();
-            }, 0)
+            });
         }, false);
         image.addEventListener("error", function() {
             parent.files.update({
