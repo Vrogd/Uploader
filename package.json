@@ -1,6 +1,6 @@
 {
 	"name": "@vrogd/uploader",
-	"version": "0.0.120",
+	"version": "0.0.121",
 	"scripts": {
 		"dev": "vite dev && npm link",
 		"build": "vite build && npm run package",
