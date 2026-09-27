@@ -3,6 +3,7 @@ import type {canvasSize} from "../types/size";
 import type {Tabs} from "$lib";
 import {Upload} from "./class";
 import {library} from "$lib";
+import {draw} from "svelte/transition";
 
 export class Functions {
     /**
@@ -319,24 +320,32 @@ function imagePreviewHandler(file: typeFile, parent: Upload, canvas : HTMLCanvas
  * @return {Promise<unknown>}
  */
 function renderPreview(file: typeFile,  parent: Upload, image: HTMLImageElement, canvas: HTMLCanvasElement) : Promise<unknown> {
-    return new Promise(((resolve: any) => {
-        image.addEventListener("load", function() {
-            requestAnimationFrame(() => {
-                const clientWidth: number | undefined = file.previewElement?.clientWidth;
-                const clientHeight : number = library.constants.previewHeight * parseFloat((getComputedStyle(document.documentElement).fontSize ?? 16));
-                if (clientHeight && clientWidth) {
-                    const size : canvasSize = calculateCanvasSize(clientWidth, clientHeight, image.width, image.height);
-                    canvas.width = size.width;
-                    canvas.height = size.height;
-                    canvas.setAttribute('data-width', String(size.width));
-                    canvas.setAttribute('data-height', String(size.height));
-                    const ctx = canvas.getContext('2d');
-                    if (ctx) ctx.drawImage(image, size.left, size.top, size.width, size.height);
-                } else {
-                    console.error(library.constants.prefixError + ' dom missing width / height');
-                }
+    return new Promise(((resolve: any) : void => {
+        const drawCallback : (attemptsLeft: number) => void = (attemptsLeft : number) : void => {
+            const clientWidth : number | undefined = file.previewElement?.clientWidth;
+            const clientHeight : number = library.constants.previewHeight * parseFloat(getComputedStyle(document.documentElement).fontSize ?? 16);
+
+            if (clientHeight && clientWidth) {
+                const size = calculateCanvasSize(clientWidth, clientHeight, image.width, image.height);
+                canvas.width = size.width;
+                canvas.height = size.height;
+                canvas.setAttribute('data-width', String(size.width));
+                canvas.setAttribute('data-height', String(size.height));
+                const ctx : CanvasRenderingContext2D | null = canvas.getContext('2d');
+                if (ctx) ctx.drawImage(image, size.left, size.top, size.width, size.height);
                 resolve();
-            });
+                return;
+            }
+
+            if (attemptsLeft > 0) {
+                setTimeout(() : void => drawCallback(attemptsLeft - 1), 50);
+            } else {
+                console.error(library.constants.prefixError + ' dom missing width / height');
+                resolve();
+            }
+        };
+        image.addEventListener("load", function () {
+            requestAnimationFrame(() => drawCallback(10))
         }, false);
         image.addEventListener("error", function() {
             parent.files.update({

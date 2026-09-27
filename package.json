@@ -1,6 +1,6 @@
 {
 	"name": "@vrogd/uploader",
-	"version": "0.0.119",
+	"version": "0.0.120",
 	"scripts": {
 		"dev": "vite dev && npm link",
 		"build": "vite build && npm run package",
@@ -34,7 +34,7 @@
 		"!dist/**/*.spec.*"
 	],
 	"peerDependencies": {
-		"svelte": "^5.55.5"
+		"svelte": "^5.57.1"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^7.0.1",
